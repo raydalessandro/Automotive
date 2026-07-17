@@ -25,6 +25,15 @@ export default async function CampagnaPage({ params }: { params: { id: string } 
   if (!campagna) notFound();
   const c = campagna as Campagna;
 
+  // Altre campagne dello stesso segmento (per l'opzione follow-up "già raggiunte da X").
+  const { data: altreData } = await supabase
+    .from("campagne")
+    .select("id, nome")
+    .eq("segmento", c.segmento)
+    .neq("id", c.id)
+    .order("creato_il", { ascending: false });
+  const altreCampagne = (altreData ?? []) as { id: string; nome: string }[];
+
   // Azienda campione del segmento per l'anteprima.
   const { data: sampleData } = await supabase
     .from("aziende")
@@ -78,7 +87,7 @@ export default async function CampagnaPage({ params }: { params: { id: string } 
         / <span className="text-testo-chiaro/70">{c.nome}</span>
       </nav>
 
-      <CampagnaEditor campagna={c} sample={sample} />
+      <CampagnaEditor campagna={c} sample={sample} altreCampagne={altreCampagne} />
 
       <section className="mt-10">
         <h2 className="font-display text-lg font-semibold">Andamento invii</h2>

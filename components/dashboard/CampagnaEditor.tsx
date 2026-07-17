@@ -15,11 +15,21 @@ import { aggiornaCampagna, cambiaStatoCampagna, accoda } from "@/app/app/(dash)/
 
 type Sample = Record<string, string | null>;
 
-export function CampagnaEditor({ campagna, sample }: { campagna: Campagna; sample: Sample }) {
+export function CampagnaEditor({
+  campagna,
+  sample,
+  altreCampagne = [],
+}: {
+  campagna: Campagna;
+  sample: Sample;
+  altreCampagne?: { id: string; nome: string }[];
+}) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [c, setC] = useState(campagna);
   const [msg, setMsg] = useState<string | null>(null);
+  const [followUp, setFollowUp] = useState(false);
+  const [origine, setOrigine] = useState("");
 
   const set = <K extends keyof Campagna>(k: K, v: Campagna[K]) => setC((p) => ({ ...p, [k]: v }));
 
@@ -51,7 +61,10 @@ export function CampagnaEditor({ campagna, sample }: { campagna: Campagna; sampl
   const faiAccoda = () =>
     start(async () => {
       setMsg(null);
-      const r = await accoda(c.id);
+      const r = await accoda(c.id, {
+        followUp,
+        origineCampagnaId: followUp && origine ? origine : undefined,
+      });
       if (r.error) setMsg(`Errore: ${r.error}`);
       else {
         setMsg(`Accodati ${r.accodati} invii.`);
@@ -100,6 +113,32 @@ export function CampagnaEditor({ campagna, sample }: { campagna: Campagna; sampl
         <p className="text-xs text-testo-chiaro/55">
           Segnaposto: {SEGNAPOSTO_DISPONIBILI.map((s) => `{${s}}`).join(" ")}
         </p>
+
+        {/* Selezione destinatari (PR14) */}
+        <div className="rounded-xl border border-nero/10 bg-avorio/50 p-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={followUp} onChange={(e) => setFollowUp(e.target.checked)} className="accent-oro" />
+            Follow-up: aziende già in campagna (esclude chi ha risposto/opt-out)
+          </label>
+          {followUp && altreCampagne.length > 0 && (
+            <label className="mt-2 block text-sm">
+              <span className="text-testo-chiaro/60">Solo quelle già raggiunte dalla campagna:</span>
+              <select value={origine} onChange={(e) => setOrigine(e.target.value)} className="mt-1 w-full rounded-lg border border-nero/15 bg-carta px-3 py-2 text-sm">
+                <option value="">Tutte le già-in-campagna del segmento</option>
+                {altreCampagne.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.nome}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <p className="mt-2 text-xs text-testo-chiaro/50">
+            {followUp
+              ? "Accoderà le aziende in_campagna del segmento (T2/T3)."
+              : "Accoderà le aziende da_contattare del segmento (primo tocco)."}
+          </p>
+        </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <button onClick={salva} disabled={pending} className="btn-oro px-4 py-2 text-sm disabled:opacity-50">

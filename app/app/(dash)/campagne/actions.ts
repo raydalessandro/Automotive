@@ -51,26 +51,46 @@ export async function cambiaStatoCampagna(id: string, stato: StatoCampagna): Pro
   return { ok: true };
 }
 
-// Accodamento (§3): destinatari = aziende 'da_contattare' del segmento, non opt_out,
-// non già in un invio di questa campagna. Righe invii distribuite sui giorni col tetto.
-export async function accoda(id: string): Promise<{ ok?: boolean; error?: string; accodati?: number }> {
+// Accodamento (§3 + PR14). Primo tocco: aziende 'da_contattare' del segmento.
+// Follow-up: aziende 'in_campagna' (già toccate, non ancora risposte/opt_out),
+// opzionalmente solo quelle già raggiunte da una campagna d'origine.
+export type OpzioniAccoda = { followUp?: boolean; origineCampagnaId?: string };
+
+export async function accoda(
+  id: string,
+  opts: OpzioniAccoda = {},
+): Promise<{ ok?: boolean; error?: string; accodati?: number }> {
   if (!supabaseConfigurato()) return { error: "Supabase non configurato" };
   const supabase = sb();
 
   const { data: campagna, error: eCamp } = await supabase.from("campagne").select("*").eq("id", id).single();
   if (eCamp || !campagna) return { error: "Campagna non trovata" };
 
-  // Aziende candidate del segmento.
+  // Stato candidato: follow-up = in_campagna (esclude di fatto risposto/lead/non_interessata/opt_out);
+  // primo tocco = da_contattare.
+  const statoTarget = opts.followUp ? "in_campagna" : "da_contattare";
+
   const { data: aziende } = await supabase
     .from("aziende")
     .select("id, email, stato")
     .eq("segmento", campagna.segmento)
-    .eq("stato", "da_contattare")
+    .eq("stato", statoTarget)
     .not("email", "is", null)
     .limit(5000);
 
-  const candidate = (aziende ?? []) as { id: string; email: string | null }[];
+  let candidate = (aziende ?? []) as { id: string; email: string | null }[];
   if (candidate.length === 0) return { ok: true, accodati: 0 };
+
+  // Opzione "già raggiunte dalla campagna X": intersezione con chi ha un invio in quella campagna.
+  if (opts.origineCampagnaId) {
+    const { data: origine } = await supabase
+      .from("invii")
+      .select("azienda_id")
+      .eq("campagna_id", opts.origineCampagnaId);
+    const raggiunte = new Set((origine ?? []).map((r: { azienda_id: string }) => r.azienda_id));
+    candidate = candidate.filter((a) => raggiunte.has(a.id));
+    if (candidate.length === 0) return { ok: true, accodati: 0 };
+  }
 
   // Escludi quelle già accodate per questa campagna (vincolo unique le bloccherebbe comunque).
   const { data: giaInvii } = await supabase.from("invii").select("azienda_id").eq("campagna_id", id);
@@ -92,11 +112,13 @@ export async function accoda(id: string): Promise<{ ok?: boolean; error?: string
   const { error: eIns } = await supabase.from("invii").insert(righe);
   if (eIns) return { error: eIns.message };
 
-  // Segna le aziende come in_campagna.
-  await supabase.from("aziende").update({ stato: "in_campagna" }).in(
-    "id",
-    target.map((a) => a.id),
-  );
+  // Primo tocco: le aziende passano a in_campagna. Follow-up: già in_campagna, non tocchiamo lo stato.
+  if (!opts.followUp) {
+    await supabase.from("aziende").update({ stato: "in_campagna" }).in(
+      "id",
+      target.map((a) => a.id),
+    );
+  }
 
   revalidatePath(`/app/campagne/${id}`);
   return { ok: true, accodati: righe.length };
