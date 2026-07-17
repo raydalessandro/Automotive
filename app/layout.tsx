@@ -5,6 +5,7 @@ import "./globals.css";
 import { SITE, siteUrl } from "@/lib/site";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { UtmCapture } from "@/components/UtmCapture";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <UtmCapture />
         <Analytics />
       </body>
     </html>
