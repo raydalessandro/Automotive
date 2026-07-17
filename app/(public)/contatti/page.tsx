@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CONTATTI, whatsappLink } from "@/lib/contatti";
+import { LinkTracciato } from "@/components/traccia/LinkTracciato";
 
 export const metadata: Metadata = {
   title: "Contatti",
@@ -16,14 +17,16 @@ export default function ContattiPage() {
 
       {/* [APERTO §11: numeri e orari definitivi] */}
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <a
+        <LinkTracciato
+          tipo="telefono_click"
           href={`tel:${CONTATTI.telefonoHref}`}
           className="rounded-2xl border border-nero/10 bg-carta p-6 transition-shadow hover:shadow-md"
         >
           <p className="text-xs font-semibold uppercase tracking-widest text-oro">Telefono</p>
           <p className="mt-2 font-display text-xl font-semibold">{CONTATTI.telefono}</p>
-        </a>
-        <a
+        </LinkTracciato>
+        <LinkTracciato
+          tipo="whatsapp_click"
           href={whatsappLink("Ciao, vorrei informazioni sul noleggio a lungo termine.")}
           target="_blank"
           rel="noopener noreferrer"
@@ -31,7 +34,7 @@ export default function ContattiPage() {
         >
           <p className="text-xs font-semibold uppercase tracking-widest text-oro">WhatsApp</p>
           <p className="mt-2 font-display text-xl font-semibold">Scrivici su WhatsApp</p>
-        </a>
+        </LinkTracciato>
         <a
           href={`mailto:${CONTATTI.email}`}
           className="rounded-2xl border border-nero/10 bg-carta p-6 transition-shadow hover:shadow-md"

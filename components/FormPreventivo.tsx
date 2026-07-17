@@ -8,6 +8,7 @@ import {
   N_VEICOLI,
   KM_ANNO,
 } from "@/lib/lead/schema";
+import { traccia } from "@/lib/traccia";
 
 type Fonte = {
   utm_source?: string;
@@ -73,6 +74,7 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
+        traccia("preventivo_inviato", { veicolo_id: veicoloId });
         setStato("ok");
       } else {
         setErroriCampo(data.dettagli ?? {});

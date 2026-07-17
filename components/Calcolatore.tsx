@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   PROFILI,
   PROFILO_DEFAULT,
@@ -9,6 +9,7 @@ import {
 } from "@/lib/fiscale.config";
 import { calcolaDeduzione, prezzoIvaInclusa } from "@/lib/fiscale";
 import { euro } from "@/lib/format";
+import { traccia } from "@/lib/traccia";
 
 const ORDINE_PROFILI: ProfiloId[] = [
   "srl_ordinaria",
@@ -42,6 +43,17 @@ export function Calcolatore({
   const [spesaAttuale, setSpesaAttuale] = useState<number | "">("");
 
   const profilo = PROFILI[profiloId];
+
+  // Traccia l'uso del calcolatore al cambio profilo, debounced, saltando il mount (§5).
+  const mount = useRef(true);
+  useEffect(() => {
+    if (mount.current) {
+      mount.current = false;
+      return;
+    }
+    const t = setTimeout(() => traccia("calcolatore_usato", { profilo_fiscale: profiloId }), 600);
+    return () => clearTimeout(t);
+  }, [profiloId]);
 
   return (
     <div className="rounded-2xl border border-nero/10 bg-carta p-6 shadow-sm sm:p-8">

@@ -11,6 +11,8 @@ import {
 } from "@/lib/catalogo";
 import { VeicoloImg } from "@/components/VeicoloImg";
 import { Calcolatore } from "@/components/Calcolatore";
+import { TracciaVeicolo } from "@/components/traccia/TracciaVeicolo";
+import { LinkTracciato } from "@/components/traccia/LinkTracciato";
 import { euro, numero } from "@/lib/format";
 import { siteUrl } from "@/lib/site";
 import { whatsappLink } from "@/lib/contatti";
@@ -80,6 +82,7 @@ export default function VeicoloPage({ params }: { params: { id: string } }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(v)) }}
       />
+      <TracciaVeicolo id={v.id} />
 
       <nav className="mb-6 text-sm text-testo-chiaro/50">
         <Link href="/veicoli" className="hover:text-oro">
@@ -155,14 +158,16 @@ export default function VeicoloPage({ params }: { params: { id: string } }) {
               <Link href={`/preventivo?veicolo=${v.id}`} className="btn-oro w-full">
                 Richiedi il preventivo
               </Link>
-              <a
+              <LinkTracciato
+                tipo="condividi_click"
+                veicoloId={v.id}
                 href={whatsappLink(testoWa)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-ghost w-full"
               >
                 Condividi su WhatsApp
-              </a>
+              </LinkTracciato>
             </div>
             <p className="mt-3 text-center text-xs text-testo-chiaro/45">
               Ti richiamiamo entro poche ore lavorative.
