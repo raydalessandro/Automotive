@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseImport } from "./import";
+import { parseImport, chiaveCascata } from "./import";
 import { isPec } from "./pec";
 
 describe("guardrail PEC", () => {
@@ -37,5 +37,27 @@ describe("parseImport", () => {
   it("normalizza il segmento mancante a 'altro'", () => {
     const r = parseImport(JSON.stringify([{ ragione_sociale: "Delta" }]));
     expect(r.valide[0].segmento).toBe("altro");
+  });
+
+  it("accetta righe SENZA email (raccolta grezze)", () => {
+    const r = parseImport(JSON.stringify([{ ragione_sociale: "Grezza SRL", provincia: "MI" }]));
+    expect(r.valide).toHaveLength(1);
+    expect(r.scartate).toHaveLength(0);
+    expect(r.valide[0].email ?? null).toBeNull();
+  });
+
+  it("scarta una piva malformata", () => {
+    const r = parseImport(JSON.stringify([{ ragione_sociale: "X SRL", piva: "123" }]));
+    expect(r.valide).toHaveLength(0);
+    expect(r.scartate[0].motivo).toContain("piva");
+  });
+});
+
+describe("chiaveCascata", () => {
+  it("segue la priorità id → piva → email → nome+provincia", () => {
+    expect(chiaveCascata({ id: "abc", piva: "1", email: "a@b.it", ragione_sociale: "X" })).toBe("id:abc");
+    expect(chiaveCascata({ piva: "12345678903", email: "a@b.it", ragione_sociale: "X" })).toBe("piva:12345678903");
+    expect(chiaveCascata({ email: "A@B.it", ragione_sociale: "X" })).toBe("email:a@b.it");
+    expect(chiaveCascata({ ragione_sociale: "Rossi SRL", provincia: "MI" })).toBe("np:rossi srl|mi");
   });
 });

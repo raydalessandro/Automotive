@@ -11,6 +11,7 @@ export const SEGMENTI = [
 ] as const;
 
 export const STATI_AZIENDA = [
+  { id: "grezza", label: "Grezza" },
   { id: "da_contattare", label: "Da contattare" },
   { id: "in_campagna", label: "In campagna" },
   { id: "risposto", label: "Risposto" },
@@ -39,10 +40,20 @@ export type Azienda = {
   score: number | null;
   stato: string;
   fonte_ricerca: string | null;
+  piva: string | null;
+  arricchita_il: string | null;
 };
 
 // Riga di import (formato = output ricerca AI, vedi docs/import-aziende.md).
 export const importRowSchema = z.object({
+  id: z.string().uuid().optional().nullable(),
+  piva: z
+    .union([z.string(), z.number()])
+    .transform((v) => String(v).replace(/\D/g, ""))
+    .refine((v) => v === "" || /^\d{11}$/.test(v), "piva deve avere 11 cifre")
+    .transform((v) => (v === "" ? null : v))
+    .optional()
+    .nullable(),
   ragione_sociale: z.string().trim().min(1),
   segmento: z.enum(idsSeg).optional().default("altro"),
   settore: z.string().trim().optional().nullable(),

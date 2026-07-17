@@ -55,6 +55,20 @@ function normalizza(r: Record<string, unknown>): Record<string, unknown> {
   return out;
 }
 
+// Chiave di dedup a cascata (id → piva → email → nome+provincia) — Addendum §2.
+export function chiaveCascata(r: {
+  id?: string | null;
+  piva?: string | null;
+  email?: string | null;
+  ragione_sociale: string;
+  provincia?: string | null;
+}): string {
+  if (r.id) return "id:" + r.id;
+  if (r.piva) return "piva:" + r.piva;
+  if (r.email) return "email:" + r.email.toLowerCase();
+  return "np:" + r.ragione_sociale.toLowerCase().trim() + "|" + (r.provincia ?? "").toLowerCase().trim();
+}
+
 export function parseImport(testo: string): RisultatoParsing {
   let rows: Record<string, unknown>[];
   try {
