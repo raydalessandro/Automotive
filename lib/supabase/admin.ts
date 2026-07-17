@@ -1,13 +1,12 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-// Client Supabase server-side con service role (§6.1). Solo lato server.
-// Se le env non sono configurate, ritorna null: l'API gestisce il fallback.
-
+// Client service-role: bypassa RLS. SOLO lato server (API route, cron).
+// Usato per gli insert pubblici (form preventivo, eventi) e per il motore d'invio.
 let cached: SupabaseClient | null | undefined;
 
-export function getSupabase(): SupabaseClient | null {
+export function getAdmin(): SupabaseClient | null {
   if (cached !== undefined) return cached;
-  const url = process.env.SUPABASE_URL;
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
     cached = null;

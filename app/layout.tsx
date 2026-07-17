@@ -3,9 +3,6 @@ import { Fraunces, Instrument_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { SITE, siteUrl } from "@/lib/site";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { UtmCapture } from "@/components/UtmCapture";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -41,10 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="it" className={`${fraunces.variable} ${instrument.variable}`}>
       <body className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <UtmCapture />
+        {children}
         <Analytics />
       </body>
     </html>

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { leadSchema } from "@/lib/lead/schema";
 import { calcolaScore } from "@/lib/scoring.config";
-import { getSupabase } from "@/lib/lead/supabase";
+import { getAdmin } from "@/lib/supabase/admin";
 import { notificaVenditore, emailCortesia } from "@/lib/lead/notifiche";
 import { veicoloById, titoloVeicolo } from "@/lib/catalogo";
 
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
   const veicoloTitolo = veicolo ? titoloVeicolo(veicolo) : null;
 
   // 1) Insert PRIMA (il lead non deve mai andare perso) — §6.
-  const supabase = getSupabase();
+  const supabase = getAdmin();
   if (supabase) {
     const { error } = await supabase.from("leads").insert({
       fonte: d.fonte ?? null,
