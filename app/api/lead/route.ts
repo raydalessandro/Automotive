@@ -40,29 +40,36 @@ export async function POST(req: Request) {
   const veicoloTitolo = veicolo ? titoloVeicolo(veicolo) : null;
 
   // 1) Insert PRIMA (il lead non deve mai andare perso) — §6.
+  let leadId: string | null = null;
   const supabase = getAdmin();
   if (supabase) {
-    const { error } = await supabase.from("leads").insert({
-      fonte: d.fonte ?? null,
-      pagina: d.pagina || null,
-      veicolo_id: d.veicolo_id || null,
-      ragione_sociale: d.ragione_sociale,
-      referente: d.referente,
-      forma_giuridica: d.forma_giuridica,
-      anni_attivita: d.anni_attivita,
-      settore: d.settore || null,
-      n_veicoli: d.n_veicoli,
-      km_anno: d.km_anno,
-      telefono: d.telefono,
-      email: d.email || null,
-      provincia: d.provincia,
-      consenso_privacy: d.consenso_privacy,
-      consenso_marketing: d.consenso_marketing ?? false,
-      score,
-    });
+    const { data, error } = await supabase
+      .from("leads")
+      .insert({
+        fonte: d.fonte ?? null,
+        pagina: d.pagina || null,
+        veicolo_id: d.veicolo_id || null,
+        ragione_sociale: d.ragione_sociale,
+        referente: d.referente,
+        forma_giuridica: d.forma_giuridica,
+        anni_attivita: d.anni_attivita,
+        settore: d.settore || null,
+        n_veicoli: d.n_veicoli,
+        km_anno: d.km_anno,
+        telefono: d.telefono,
+        email: d.email || null,
+        provincia: d.provincia,
+        consenso_privacy: d.consenso_privacy,
+        consenso_marketing: d.consenso_marketing ?? false,
+        score,
+      })
+      .select("id")
+      .single();
     if (error) {
       console.error("[lead] insert Supabase fallito:", error.message);
       // Non blocchiamo: proviamo comunque a notificare così il lead arriva al venditore.
+    } else {
+      leadId = data?.id ?? null;
     }
   } else {
     console.warn("[lead] Supabase non configurato: il lead viene solo notificato.");
@@ -70,7 +77,7 @@ export async function POST(req: Request) {
 
   // 2) Notifiche DOPO (best effort): Telegram + fallback email, poi email di cortesia.
   await Promise.allSettled([
-    notificaVenditore(d, { score, veicoloTitolo }),
+    notificaVenditore(d, { score, veicoloTitolo, leadId }),
     emailCortesia(d),
   ]);
 

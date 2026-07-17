@@ -11,22 +11,26 @@ import {
 } from "./schema";
 import { isHot } from "../scoring.config";
 import { CONTATTI } from "../contatti";
+import { siteUrl } from "../site";
 
-type Contesto = { score: number; veicoloTitolo: string | null };
+type Contesto = { score: number; veicoloTitolo: string | null; leadId?: string | null };
 
 function messaggioTelegram(d: DatiLead, ctx: Contesto): string {
   const hot = isHot(ctx.score) ? " · HOT" : "";
   const fonte = d.fonte?.utm_source
     ? `${d.fonte.utm_source}/${d.fonte.utm_medium ?? "-"}`
     : "diretto";
-  return [
+  const righe = [
     `🔥 NUOVO LEAD (score ${ctx.score}${hot})`,
     `${d.ragione_sociale} — ${labelForma(d.forma_giuridica)}, attività da ${labelAnni(d.anni_attivita)}`,
     `Veicolo: ${ctx.veicoloTitolo ?? "non specificato"} · ${labelNVeicoli(d.n_veicoli)} veicoli · ${labelKm(d.km_anno)} km/anno`,
     `📞 ${d.telefono} · ${d.provincia}`,
     `✉️ ${d.email || "—"}`,
     `Fonte: ${fonte} · Pagina: ${d.pagina || "—"}`,
-  ].join("\n");
+  ];
+  // Deep link al dettaglio nella dashboard (§6): la dashboard è il posto di lavoro.
+  if (ctx.leadId) righe.push(`🔗 ${siteUrl()}/app/lead?apri=${ctx.leadId}`);
+  return righe.join("\n");
 }
 
 async function inviaTelegram(testo: string): Promise<boolean> {
