@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-fraunces: "Fraunces", Georgia, serif;
+  --font-instrument: "Instrument Sans", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    @apply bg-avorio text-testo-chiaro font-sans antialiased;
+  }
+
+  /* Cifre tabellari per canoni e specifiche (§8). */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Focus visibile — accessibilità (§8). */
+  :focus-visible {
+    outline: 2px solid theme("colors.oro");
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .container-content {
+    @apply mx-auto w-full max-w-content px-5 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold
+      transition-colors focus-visible:outline-2;
+  }
+
+  .btn-oro {
+    @apply btn bg-oro text-nero hover:bg-oro-chiaro;
+  }
+
+  .btn-scuro {
+    @apply btn bg-nero text-testo-scuro hover:bg-grafite;
+  }
+
+  .btn-ghost {
+    @apply btn border border-oro/40 text-oro hover:bg-oro/10;
+  }
+}
