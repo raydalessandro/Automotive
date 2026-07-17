@@ -13,7 +13,8 @@ export function GET(_req: Request, { params }: { params: { id: string } }) {
 
   const anticipo = v.anticipo_iva_esclusa === 0 ? "Anticipo zero" : `Anticipo ${euro(v.anticipo_iva_esclusa)}`;
 
-  return new ImageResponse(
+  try {
+    return new ImageResponse(
     (
       <div
         style={{
@@ -45,8 +46,9 @@ export function GET(_req: Request, { params }: { params: { id: string } }) {
           >
             IV
           </div>
-          <div style={{ fontSize: "22px", letterSpacing: "6px", color: "#F2EEE6" }}>
-            IMPERO <span style={{ color: "#B08D4F" }}>AUTOMOTIVE</span>
+          <div style={{ display: "flex", gap: "8px", fontSize: "22px", letterSpacing: "6px", color: "#F2EEE6" }}>
+            <span>IMPERO</span>
+            <span style={{ color: "#B08D4F" }}>AUTOMOTIVE</span>
           </div>
         </div>
 
@@ -86,13 +88,17 @@ export function GET(_req: Request, { params }: { params: { id: string } }) {
               opacity: 0.85,
             }}
           >
-            <div>{v.durata_mesi} mesi</div>
-            <div>{numero(kmAnno(v))} km/anno</div>
+            <div>{`${v.durata_mesi} mesi`}</div>
+            <div>{`${numero(kmAnno(v))} km/anno`}</div>
             <div style={{ color: "#B08D4F" }}>{anticipo}</div>
           </div>
         </div>
       </div>
     ),
-    { width: 1200, height: 630 },
-  );
+      { width: 1200, height: 630 },
+    );
+  } catch (e) {
+    console.error("[og] render fallito:", (e as Error).message);
+    return new Response("Errore generazione immagine", { status: 500 });
+  }
 }
