@@ -15,8 +15,11 @@ Finché manca la config, le campagne restano in `bozza` e il cron è un no-op.
 
 ## Come funziona
 
-- **Cron**: `vercel.json` schedula `/api/cron/invii` ogni 30 minuti. L'endpoint invia solo
-  nella finestra **8:30–18:00 lun–ven (ora italiana)**; fuori finestra è un no-op.
+- **Cron**: `vercel.json` schedula `/api/cron/invii`. **Su Hobby Vercel ammette solo cron
+  giornalieri**, quindi lo schedule è `0 8 * * *` (una volta al giorno, ~09:00 ora italiana,
+  dentro la finestra). Passando a **Pro** si può alzare a `*/30 * * * *` (ogni 30 min) per uno
+  spread migliore. L'endpoint invia solo nella finestra **8:30–18:00 lun–ven (ora italiana)**;
+  fuori finestra è un no-op.
 - Preleva gli `invii` `in_coda` con `pianificato_il <= now`, solo di campagne **attive**,
   verso aziende con email e non in `opt_out`.
 - Rispetta il **tetto giornaliero per campagna** e il **tetto globale**. Batch piccoli per run
@@ -24,8 +27,9 @@ Finché manca la config, le campagne restano in `bozza` e il cron è un no-op.
 - Ogni email ha link con UTM (`utm_source=email`, `utm_campaign={nome}`), firma e footer
   **opt-out** (`/api/opt-out?token=`): un click → azienda `opt_out`, mai più selezionata.
 
-> Nota Vercel: i cron ad alta frequenza richiedono il piano Pro. Sul piano Hobby la cadenza
-> è limitata; in tal caso l'endpoint resta invocabile manualmente/da uno scheduler esterno.
+> Nota Vercel: i cron **sub-giornalieri richiedono il piano Pro**. Su Hobby lo schedule deve
+> essere giornaliero (come qui `0 8 * * *`), altrimenti Vercel **rifiuta il deployment**.
+> In alternativa l'endpoint resta invocabile da uno scheduler esterno.
 
 ## Flusso operativo
 

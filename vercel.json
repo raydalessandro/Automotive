@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/invii",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 8 * * *"
     }
   ]
 }
