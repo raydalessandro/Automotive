@@ -22,6 +22,9 @@ Dettagli operativi in `docs/mailing.md`. Servono tutte per far partire gli invii
 - [ ] Casella **reply-to** del venditore per leggere le risposte.
 - [ ] (opz.) `TETTO_GLOBALE_GIORNO` (default 50).
 - [ ] Nota: cron ad alta frequenza richiede Vercel **Pro** (vedi `docs/mailing.md`).
+- [ ] _(priorità bassissima)_ **Se/quando si passa a Vercel Pro**: in `vercel.json` rialzare il cron
+      da `0 8 * * *` (giornaliero, richiesto da Hobby) a `*/30 * * * *` (ogni 30 min) — spread
+      d'invio migliore. Su Hobby un cron sub-giornaliero fa **rifiutare il deployment**.
 
 ## 👤 Account definitivi
 - [ ] Le **3 email** definitive (venditore, cliente, Ray). Ora esiste solo l'account demo
