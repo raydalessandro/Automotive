@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { RuotaGuilloche } from "@/components/design/RuotaGuilloche";
 
 export default function NotFound() {
   return (
     <div className="container-content flex min-h-[50vh] flex-col items-center justify-center py-24 text-center">
+      <RuotaGuilloche spin className="mb-6 h-24 w-24 text-oro/70" />
       <p className="font-display text-6xl font-semibold text-oro">404</p>
       <h1 className="mt-4 font-display text-2xl font-semibold">Pagina non trovata</h1>
       <p className="mt-2 text-testo-chiaro/60">

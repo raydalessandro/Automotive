@@ -63,3 +63,30 @@
     @apply btn border border-oro/40 text-oro hover:bg-oro/10;
   }
 }
+
+@layer utilities {
+  /* La linea che si disegna da sola (LineaVeicoli). Con prefers-reduced-motion
+     la regola globale porta la durata a 0.01ms: la linea appare già completa. */
+  .linea-disegna {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: disegna-linea 3s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+  }
+  @keyframes disegna-linea {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Rotazione lentissima della ruota guilloché (sigillo/spinner). */
+  .ruota-lenta {
+    animation: ruota-lenta 28s linear infinite;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  @keyframes ruota-lenta {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}

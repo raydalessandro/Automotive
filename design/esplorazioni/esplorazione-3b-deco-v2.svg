@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <linearGradient id="oroA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EFDFAF"/>
+      <stop offset=".5" stop-color="#C9A96B"/>
+      <stop offset="1" stop-color="#8A6B3A"/>
+    </linearGradient>
+    <linearGradient id="oroB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6E9C2"/>
+      <stop offset=".5" stop-color="#D6BC8A"/>
+      <stop offset="1" stop-color="#9C7B45"/>
+    </linearGradient>
+    <!-- arco superiore: da ore 9, sopra le 12, fino a ore 3 -->
+    <path id="arcoAlto" d="M 218 520 A 282 282 0 0 1 782 520" fill="none"/>
+    <line id="raggio" x1="0" y1="-215" x2="0" y2="-455" stroke="#B08D4F" stroke-width="0.8"/>
+  </defs>
+
+  <rect width="1000" height="1000" fill="#12100D"/>
+
+  <rect x="42" y="42" width="916" height="916" fill="none" stroke="#B08D4F" stroke-width="1.2"/>
+  <g fill="none" stroke="#B08D4F" stroke-width="1" opacity="0.85">
+    <path d="M60 108 v-32 h16 v-16 h32 v48 Z"/>
+    <path d="M940 108 v-32 h-16 v-16 h-32 v48 Z"/>
+    <path d="M60 892 v32 h16 v16 h32 v-48 Z"/>
+    <path d="M940 892 v32 h-16 v16 h-32 v-48 Z"/>
+  </g>
+
+  <g transform="translate(500 520)" opacity="0.28">
+    <use href="#raggio" transform="rotate(0)"/><use href="#raggio" transform="rotate(8)"/>
+    <use href="#raggio" transform="rotate(16)"/><use href="#raggio" transform="rotate(24)"/>
+    <use href="#raggio" transform="rotate(32)"/><use href="#raggio" transform="rotate(40)"/>
+    <use href="#raggio" transform="rotate(48)"/><use href="#raggio" transform="rotate(56)"/>
+    <use href="#raggio" transform="rotate(64)"/><use href="#raggio" transform="rotate(72)"/>
+    <use href="#raggio" transform="rotate(80)"/><use href="#raggio" transform="rotate(88)"/>
+    <use href="#raggio" transform="rotate(96)"/><use href="#raggio" transform="rotate(104)"/>
+    <use href="#raggio" transform="rotate(112)"/><use href="#raggio" transform="rotate(120)"/>
+    <use href="#raggio" transform="rotate(128)"/><use href="#raggio" transform="rotate(136)"/>
+    <use href="#raggio" transform="rotate(144)"/><use href="#raggio" transform="rotate(152)"/>
+    <use href="#raggio" transform="rotate(160)"/><use href="#raggio" transform="rotate(168)"/>
+    <use href="#raggio" transform="rotate(176)"/><use href="#raggio" transform="rotate(184)"/>
+    <use href="#raggio" transform="rotate(192)"/><use href="#raggio" transform="rotate(200)"/>
+    <use href="#raggio" transform="rotate(208)"/><use href="#raggio" transform="rotate(216)"/>
+    <use href="#raggio" transform="rotate(224)"/><use href="#raggio" transform="rotate(232)"/>
+    <use href="#raggio" transform="rotate(240)"/><use href="#raggio" transform="rotate(248)"/>
+    <use href="#raggio" transform="rotate(256)"/><use href="#raggio" transform="rotate(264)"/>
+    <use href="#raggio" transform="rotate(272)"/><use href="#raggio" transform="rotate(280)"/>
+    <use href="#raggio" transform="rotate(288)"/><use href="#raggio" transform="rotate(296)"/>
+    <use href="#raggio" transform="rotate(304)"/><use href="#raggio" transform="rotate(312)"/>
+    <use href="#raggio" transform="rotate(320)"/><use href="#raggio" transform="rotate(328)"/>
+    <use href="#raggio" transform="rotate(336)"/><use href="#raggio" transform="rotate(344)"/>
+    <use href="#raggio" transform="rotate(352)"/>
+  </g>
+
+  <circle cx="500" cy="520" r="215" fill="#12100D" stroke="#B08D4F" stroke-width="1.1"/>
+  <circle cx="500" cy="520" r="205" fill="none" stroke="#B08D4F" stroke-width="0.5" opacity="0.7"/>
+
+  <!-- testo ad anello: centrato sulle 12, da ore 9 a ore 3 -->
+  <text font-family="Helvetica, Arial, sans-serif" font-size="20" letter-spacing="6"
+        fill="#C9A96B" opacity="0.9" text-anchor="middle">
+    <textPath href="#arcoAlto" startOffset="50%">IMPERO AUTOMOTIVE · NOLEGGIO A LUNGO TERMINE</textPath>
+  </text>
+
+  <!-- monogramma: SEGNAPOSTO in attesa del logo confermato dal cliente -->
+  <g>
+    <path d="M 372 402 h 66 l 62 210 62 -210 h 66 L 528 664 h -56 Z" fill="url(#oroA)"/>
+    <path d="M 452 388 h 96 v 22 h -20 v 258 h 20 v 22 h -96 v -22 h 20 V 410 h -20 Z"
+          fill="url(#oroB)" stroke="#12100D" stroke-width="7"/>
+  </g>
+
+  <path d="M232 520 l10 9 -10 9 -10 -9 Z" fill="none" stroke="#B08D4F" stroke-width="1"/>
+  <path d="M768 520 l10 9 -10 9 -10 -9 Z" fill="none" stroke="#B08D4F" stroke-width="1"/>
+
+  <g text-anchor="middle">
+    <text x="500" y="836" fill="url(#oroA)" font-size="46" letter-spacing="12">IMPERO AUTOMOTIVE</text>
+    <line x1="330" y1="866" x2="452" y2="866" stroke="#B08D4F" stroke-width="1"/>
+    <line x1="548" y1="866" x2="670" y2="866" stroke="#B08D4F" stroke-width="1"/>
+    <path d="M500 859 l8 7 -8 7 -8 -7 Z" fill="none" stroke="#B08D4F" stroke-width="1"/>
+    <text x="500" y="902" fill="#F2EEE6" opacity="0.6" font-family="Helvetica, Arial, sans-serif"
+          font-size="15" letter-spacing="7">NOLEGGIO · VENDITA · VEICOLI COMMERCIALI</text>
+  </g>
+</svg>

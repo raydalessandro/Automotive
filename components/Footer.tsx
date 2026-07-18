@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "./Wordmark";
+import { RuotaGuilloche } from "./design/RuotaGuilloche";
 import { SITE } from "@/lib/site";
 import { CONTATTI } from "@/lib/contatti";
 
@@ -50,6 +51,7 @@ export function Footer() {
               </a>
             </p>
           </div>
+          <RuotaGuilloche className="mt-6 h-12 w-12 text-oro/50" />
         </div>
         {COLONNE.map((c) => (
           <nav key={c.titolo} aria-label={c.titolo}>

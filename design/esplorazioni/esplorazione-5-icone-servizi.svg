@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 430" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <linearGradient id="oroL" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1400" y2="0">
+      <stop offset="0" stop-color="#E8D5A4"/>
+      <stop offset=".5" stop-color="#C9A96B"/>
+      <stop offset="1" stop-color="#8F6D3C"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1400" height="430" fill="#12100D"/>
+
+  <g text-anchor="middle">
+    <text x="700" y="64" fill="url(#oroL)" font-size="26" letter-spacing="9">TUTTO NEL CANONE</text>
+    <text x="700" y="92" fill="#F2EEE6" opacity="0.55" font-family="Helvetica, Arial, sans-serif"
+          font-size="15" letter-spacing="3">sei cose in meno a cui pensare</text>
+  </g>
+
+  <g fill="none" stroke="url(#oroL)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- assicurazione: scudo -->
+    <g transform="translate(160 218)">
+      <path d="M0 -52 C22 -46 40 -42 48 -36 L48 2 C48 34 26 54 0 64 C-26 54 -48 34 -48 2 L-48 -36 C-40 -42 -22 -46 0 -52 Z"/>
+      <path d="M-18 4 L-4 18 L22 -14"/>
+    </g>
+    <!-- manutenzione: chiave con ricciolo -->
+    <g transform="translate(380 218)">
+      <path d="M-16 -48 A18 18 0 1 0 -8 -26 L30 16 a13 13 0 1 1 0.5 0.5"/>
+    </g>
+    <!-- pneumatici: ruota -->
+    <g transform="translate(600 218)">
+      <circle r="34"/>
+      <circle r="6" fill="url(#oroL)" stroke="none"/>
+      <line x1="0" y1="-13" x2="0" y2="-26"/>
+      <line x1="13" y1="0" x2="26" y2="0"/>
+      <line x1="0" y1="13" x2="0" y2="26"/>
+      <line x1="-13" y1="0" x2="-26" y2="0"/>
+    </g>
+    <!-- bollo e tasse: sigillo con nastri -->
+    <g transform="translate(820 214)">
+      <g stroke-width="1.6">
+        <ellipse rx="30" ry="11"/>
+        <ellipse rx="30" ry="11" transform="rotate(60)"/>
+        <ellipse rx="30" ry="11" transform="rotate(120)"/>
+      </g>
+      <circle r="3.5" fill="url(#oroL)" stroke="none"/>
+      <path d="M-7 26 L-15 56 L-3 47" stroke-width="2.4"/>
+      <path d="M7 26 L15 56 L3 47" stroke-width="2.4"/>
+    </g>
+    <!-- assistenza: cornetta -->
+    <g transform="translate(1040 222)">
+      <circle cx="-30" cy="14" r="10"/>
+      <circle cx="30" cy="14" r="10"/>
+      <path d="M-24 6 C-12 -26 12 -26 24 6"/>
+    </g>
+    <!-- km inclusi: strada -->
+    <g transform="translate(1260 218)">
+      <path d="M-27 52 L-7 -46"/>
+      <path d="M27 52 L7 -46"/>
+      <path d="M0 44 V30 M0 14 V0 M0 -16 V-30" stroke-width="3.2"/>
+    </g>
+  </g>
+
+  <g fill="#B08D4F" font-family="Helvetica, Arial, sans-serif" font-size="15" letter-spacing="4"
+     text-anchor="middle" opacity="0.9">
+    <text x="160" y="352">ASSICURAZIONE</text>
+    <text x="380" y="352">MANUTENZIONE</text>
+    <text x="600" y="352">PNEUMATICI</text>
+    <text x="820" y="352">BOLLO E TASSE</text>
+    <text x="1040" y="352">ASSISTENZA</text>
+    <text x="1260" y="352">KM INCLUSI</text>
+  </g>
+</svg>

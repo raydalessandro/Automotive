@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <linearGradient id="oroV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EBD9A9"/>
+      <stop offset=".55" stop-color="#C9A96B"/>
+      <stop offset="1" stop-color="#8F6D3C"/>
+    </linearGradient>
+    <linearGradient id="fade1" gradientUnits="userSpaceOnUse" x1="430" y1="470" x2="720" y2="550">
+      <stop offset="0" stop-color="#C9A96B" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#C9A96B" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="fade2" gradientUnits="userSpaceOnUse" x1="430" y1="610" x2="720" y2="690">
+      <stop offset="0" stop-color="#C9A96B" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#C9A96B" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="1100" fill="#12100D"/>
+
+  <!-- titolo -->
+  <g text-anchor="middle">
+    <text x="450" y="72" fill="url(#oroV)" font-size="27" letter-spacing="8">DAL LISTINO AL COSTO REALE</text>
+    <text x="450" y="102" fill="#F2EEE6" opacity="0.55" font-family="Helvetica, Arial, sans-serif" font-size="15" letter-spacing="2">esempio: Fiesta Van N1 · regime ordinario</text>
+  </g>
+
+  <!-- la linea che scende -->
+  <line x1="430" y1="140" x2="430" y2="758" stroke="#C9A96B" stroke-width="6" opacity="0.25" filter="url(#glow)"/>
+  <line x1="430" y1="140" x2="430" y2="758" stroke="url(#oroV)" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- i soldi che escono, escono dalla linea e svaniscono -->
+  <path d="M430 470 C560 476 630 505 706 546" fill="none" stroke="url(#fade1)"
+        stroke-width="3" stroke-linecap="round" stroke-dasharray="1 11"/>
+  <path d="M430 610 C560 616 630 645 706 686" fill="none" stroke="url(#fade2)"
+        stroke-width="3" stroke-linecap="round" stroke-dasharray="1 11"/>
+
+  <!-- stazioni -->
+  <g fill="#12100D" stroke="#C9A96B" stroke-width="1.5">
+    <path d="M430 202 l9 9 -9 9 -9 -9 Z"/>
+    <path d="M430 322 l9 9 -9 9 -9 -9 Z"/>
+    <path d="M430 461 l9 9 -9 9 -9 -9 Z"/>
+    <path d="M430 601 l9 9 -9 9 -9 -9 Z"/>
+    <path d="M430 749 l9 9 -9 9 -9 -9 Z"/>
+  </g>
+
+  <!-- etichette a sinistra -->
+  <g font-family="Helvetica, Arial, sans-serif" font-size="16" letter-spacing="3"
+     fill="#F2EEE6" opacity="0.75" text-anchor="end">
+    <text x="380" y="217">CANONE LISTINO</text>
+    <text x="380" y="337">PREZZO PIENO</text>
+    <text x="380" y="476">IVA CHE RECUPERI</text>
+    <text x="380" y="616">IMPOSTE CHE RISPARMI</text>
+  </g>
+
+  <!-- valori -->
+  <g font-size="27" fill="url(#oroV)">
+    <text x="482" y="220">€ 245 <tspan font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#F2EEE6" opacity="0.6">+ IVA</tspan></text>
+    <text x="482" y="340">€ 299</text>
+  </g>
+  <g font-size="24" fill="#C9A96B" opacity="0.85">
+    <text x="722" y="556">− € 54</text>
+    <text x="722" y="696">− € 68</text>
+  </g>
+
+  <!-- arrivo -->
+  <g text-anchor="middle">
+    <text x="450" y="822" fill="#B08D4F" font-family="Helvetica, Arial, sans-serif"
+          font-size="17" letter-spacing="7">COSTO REALE AL MESE</text>
+    <text x="450" y="936" fill="url(#oroV)" font-size="122" font-weight="bold">€ 177</text>
+    <line x1="318" y1="972" x2="424" y2="972" stroke="#B08D4F" stroke-width="1"/>
+    <line x1="476" y1="972" x2="582" y2="972" stroke="#B08D4F" stroke-width="1"/>
+    <path d="M450 964 l8 8 -8 8 -8 -8 Z" fill="none" stroke="#B08D4F" stroke-width="1"/>
+    <text x="450" y="1022" fill="#F2EEE6" opacity="0.45" font-family="Helvetica, Arial, sans-serif"
+          font-size="13" letter-spacing="2">stima indicativa · verifica con il tuo commercialista</text>
+  </g>
+</svg>

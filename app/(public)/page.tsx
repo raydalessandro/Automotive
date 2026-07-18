@@ -2,6 +2,9 @@ import Link from "next/link";
 import { veicoliInEvidenza } from "@/lib/catalogo";
 import { VeicoloCard } from "@/components/VeicoloCard";
 import { SITE } from "@/lib/site";
+import { LineaVeicoli } from "@/components/design/LineaVeicoli";
+import { FasciaServizi } from "@/components/design/FasciaServizi";
+import { Filetto } from "@/components/design/RuotaGuilloche";
 
 const SEGMENTI = [
   {
@@ -33,8 +36,8 @@ export default function Home() {
   return (
     <>
       {/* Hero scuro */}
-      <section className="bg-nero text-testo-scuro">
-        <div className="container-content grid gap-10 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-28">
+      <section className="overflow-hidden bg-nero text-testo-scuro">
+        <div className="container-content grid gap-10 pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:pt-28">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-oro">
               Noleggio a lungo termine · Partite IVA e aziende
@@ -63,11 +66,26 @@ export default function Home() {
                 key={x}
                 className="flex items-start gap-3 rounded-xl border border-testo-scuro/10 bg-grafite/40 p-4"
               >
-                <span className="mt-0.5 text-oro">✓</span>
+                <svg
+                  viewBox="0 0 12 12"
+                  className="mt-1 h-3 w-3 shrink-0 text-oro"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 1 l5 5 -5 5 -5 -5 Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                  />
+                </svg>
                 <span className="text-testo-scuro/85">{x}</span>
               </li>
             ))}
           </ul>
+        </div>
+        {/* Una sola linea: la firma del brand attraversa l'hero */}
+        <div className="container-content pb-10 pt-4 lg:pt-6">
+          <LineaVeicoli className="w-full" />
         </div>
       </section>
 
@@ -94,10 +112,14 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Tutto nel canone */}
+      <FasciaServizi />
+
       {/* Come funziona */}
       <section className="bg-avorio">
         <div className="container-content py-16 sm:py-20">
           <h2 className="text-center font-display text-3xl font-semibold">Come funziona</h2>
+          <Filetto className="mx-auto mt-4 h-4 w-52 text-oro" />
           <div className="mx-auto mt-10 grid max-w-4xl gap-8 sm:grid-cols-3">
             {PASSI.map((p) => (
               <div key={p.n} className="text-center">
