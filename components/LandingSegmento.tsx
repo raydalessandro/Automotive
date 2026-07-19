@@ -3,6 +3,8 @@ import Image from "next/image";
 import { Calcolatore } from "./Calcolatore";
 import { VeicoloCard } from "./VeicoloCard";
 import { Faq, type FaqItem } from "./Faq";
+import { MicroGaranzie } from "./design/MicroGaranzie";
+import { BannerFiscale } from "./design/BannerFiscale";
 import type { ProfiloId } from "@/lib/fiscale.config";
 import type { Segmento } from "@/lib/servizi.config";
 import type { Veicolo } from "@/lib/catalogo";
@@ -69,6 +71,7 @@ export function LandingSegmento({
                 Configura la tua rata
               </Link>
             </div>
+            <MicroGaranzie scuro className="mt-6" />
           </div>
           <div className="text-testo-chiaro">
             <Calcolatore
@@ -119,6 +122,10 @@ export function LandingSegmento({
             <Faq items={faq} />
           </div>
         </div>
+      </section>
+
+      <section className="container-content py-8">
+        <BannerFiscale />
       </section>
 
       <section className="bg-nero text-testo-scuro">

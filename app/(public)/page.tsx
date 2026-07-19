@@ -6,6 +6,7 @@ import { SITE } from "@/lib/site";
 import { LineaVeicoli } from "@/components/design/LineaVeicoli";
 import { FasciaServizi } from "@/components/design/FasciaServizi";
 import { TabellaConfronto } from "@/components/design/TabellaConfronto";
+import { MicroGaranzie } from "@/components/design/MicroGaranzie";
 import { Filetto } from "@/components/design/RuotaGuilloche";
 
 const SEGMENTI = [
@@ -81,20 +82,7 @@ export default function Home() {
               </Link>
             </div>
             {/* Micro-garanzie vicino alla CTA (trust nel punto di decisione). */}
-            <p className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-testo-scuro/55">
-              <span className="inline-flex items-center gap-1.5">
-                <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-oro" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 8l3 3 5-6" /></svg>
-                Preventivo gratuito
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-oro" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" /><path d="M5.5 7V5a2.5 2.5 0 015 0v2" /></svg>
-                Dati protetti
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-oro" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="8" cy="8" r="5.5" /><path d="M8 5v3l2 2" /></svg>
-                Risposta in 48h
-              </span>
-            </p>
+            <MicroGaranzie scuro className="mt-6" />
           </div>
           {/* Visual: l'imprenditore e il suo mezzo. La CTA resta l'unico oro pieno. */}
           <div className="relative">

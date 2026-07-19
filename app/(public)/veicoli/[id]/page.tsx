@@ -10,6 +10,7 @@ import {
   type Veicolo,
 } from "@/lib/catalogo";
 import { VeicoloImg } from "@/components/VeicoloImg";
+import { MicroGaranzie } from "@/components/design/MicroGaranzie";
 import { Calcolatore } from "@/components/Calcolatore";
 import { TracciaVeicolo } from "@/components/traccia/TracciaVeicolo";
 import { LinkTracciato } from "@/components/traccia/LinkTracciato";
@@ -172,9 +173,7 @@ export default function VeicoloPage({ params }: { params: { id: string } }) {
                 Condividi su WhatsApp
               </LinkTracciato>
             </div>
-            <p className="mt-3 text-center text-xs text-testo-chiaro/45">
-              Ti richiamiamo entro poche ore lavorative.
-            </p>
+            <MicroGaranzie className="mt-4 justify-center" />
           </div>
 
           {/* Calcolatore inline preimpostato sul canone */}

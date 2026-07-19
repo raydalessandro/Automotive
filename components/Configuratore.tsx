@@ -17,6 +17,7 @@ import {
 } from "@/lib/servizi.config";
 import { IconaServizio } from "@/components/design/FasciaServizi";
 import { Filetto } from "@/components/design/RuotaGuilloche";
+import { MicroGaranzie } from "@/components/design/MicroGaranzie";
 import { Calcolatore } from "@/components/Calcolatore";
 import { euro, numero } from "@/lib/format";
 
@@ -253,6 +254,7 @@ export function Configuratore({
             Richiedi il preventivo con questa configurazione
           </Link>
         </div>
+        <MicroGaranzie className="mt-3 justify-center" />
         <p className="mt-3 text-center text-xs text-testo-chiaro/45">
           Prezzi dei servizi indicativi, confermati nel preventivo.
         </p>
