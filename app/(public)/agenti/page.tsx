@@ -51,6 +51,7 @@ export default function AgentiPage() {
         "Tutti i servizi inclusi, rata fissa",
       ]}
       profilo="agente_rappresentante"
+      segmento="agenti"
       canoneEsempio={460}
       durataEsempio={48}
       veicoli={veicoli}

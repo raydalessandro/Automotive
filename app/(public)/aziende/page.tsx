@@ -55,6 +55,7 @@ export default function AziendePage() {
         "Una regia unica per tutti i veicoli",
       ]}
       profilo="srl_ordinaria"
+      segmento="pmi"
       canoneEsempio={344}
       durataEsempio={36}
       veicoli={veicoli}

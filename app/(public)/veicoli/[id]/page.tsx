@@ -155,7 +155,10 @@ export default function VeicoloPage({ params }: { params: { id: string } }) {
             </dl>
 
             <div className="mt-6 flex flex-col gap-2">
-              <Link href={`/preventivo?veicolo=${v.id}`} className="btn-oro w-full">
+              <Link href={`/configuratore?veicolo=${v.id}`} className="btn-oro w-full">
+                Configura la tua rata
+              </Link>
+              <Link href={`/preventivo?veicolo=${v.id}`} className="btn-ghost w-full">
                 Richiedi il preventivo
               </Link>
               <LinkTracciato

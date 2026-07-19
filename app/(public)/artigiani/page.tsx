@@ -49,6 +49,7 @@ export default function ArtigianiPage() {
         "Anticipo zero disponibile",
       ]}
       profilo="n1_strumentale"
+      segmento="artigiani"
       canoneEsempio={245}
       durataEsempio={48}
       veicoli={veicoli}

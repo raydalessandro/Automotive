@@ -3,6 +3,7 @@ import { Calcolatore } from "./Calcolatore";
 import { VeicoloCard } from "./VeicoloCard";
 import { Faq, type FaqItem } from "./Faq";
 import type { ProfiloId } from "@/lib/fiscale.config";
+import type { Segmento } from "@/lib/servizi.config";
 import type { Veicolo } from "@/lib/catalogo";
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
   sottotitolo: string;
   puntiChiave: string[];
   profilo: ProfiloId;
+  segmento: Segmento;
   canoneEsempio?: number;
   anticipoEsempio?: number;
   durataEsempio?: number;
@@ -27,6 +29,7 @@ export function LandingSegmento({
   sottotitolo,
   puntiChiave,
   profilo,
+  segmento,
   canoneEsempio = 300,
   anticipoEsempio = 0,
   durataEsempio = 48,
@@ -54,9 +57,12 @@ export function LandingSegmento({
                 </li>
               ))}
             </ul>
-            <div className="mt-8">
+            <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/preventivo" className="btn-oro">
                 {ctaTesto}
+              </Link>
+              <Link href={`/configuratore?segmento=${segmento}`} className="btn-ghost">
+                Configura la tua rata
               </Link>
             </div>
           </div>

@@ -1,6 +1,7 @@
 // Le sei icone del "tutto incluso" nello stesso alfabeto a linea singola dei veicoli.
 // La chiave chiude con lo stesso ricciolo delle ruote; il sigillo richiama la direzione incisione.
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 const SERVIZI: { id: string; label: string; disegno: ReactNode }[] = [
@@ -71,13 +72,37 @@ const SERVIZI: { id: string; label: string; disegno: ReactNode }[] = [
       </>
     ),
   },
+  // Icone aggiuntive per il configuratore (§2): stesso alfabeto a linea singola.
+  {
+    id: "cristallo",
+    label: "Cristalli",
+    disegno: (
+      <>
+        <path d="M -40 34 L -30 -26 Q -28 -36 -14 -36 L 14 -36 Q 28 -36 30 -26 L 40 34 Z" />
+        <path d="M 4 -36 L -6 -8 L 10 2 L 2 34" strokeWidth="2" />
+      </>
+    ),
+  },
+  {
+    id: "sostitutiva",
+    label: "Auto sostitutiva",
+    disegno: (
+      <>
+        <path d="M 40 2 A 40 40 0 1 1 6 -39" />
+        <path d="M 6 -39 l 18 3 M 6 -39 l -3 18" strokeWidth="2.4" />
+      </>
+    ),
+  },
 ];
+
+// Le sei icone mostrate nella fascia "Tutto nel canone" (le altre sono per il configuratore).
+const FASCIA_IDS = ["assicurazione", "manutenzione", "pneumatici", "bollo", "assistenza", "km"] as const;
 
 export function IconaServizio({
   servizio,
   className = "",
 }: {
-  servizio: (typeof SERVIZI)[number]["id"];
+  servizio: string;
   className?: string;
 }) {
   const s = SERVIZI.find((x) => x.id === servizio);
@@ -99,24 +124,29 @@ export function IconaServizio({
 }
 
 export function FasciaServizi() {
+  const items = FASCIA_IDS.map((id) => SERVIZI.find((s) => s.id === id)!);
   return (
     <section className="bg-nero text-testo-scuro">
-      <div className="container-content py-14 sm:py-16">
-        <h2 className="text-center font-display text-3xl font-semibold">Tutto nel canone</h2>
-        <p className="mt-1 text-center text-sm text-testo-scuro/60">
-          Sei cose in meno a cui pensare.
-        </p>
-        <ul className="mx-auto mt-10 grid max-w-4xl grid-cols-3 gap-x-4 gap-y-10 sm:grid-cols-6">
-          {SERVIZI.map((s) => (
-            <li key={s.id} className="flex flex-col items-center gap-3 text-center">
-              <IconaServizio servizio={s.id} className="h-14 w-14 text-oro" />
-              <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-testo-scuro/70">
-                {s.label}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Cliccabile → configuratore (§2). */}
+      <Link href="/configuratore" className="block transition-colors hover:bg-grafite/30">
+        <div className="container-content py-14 sm:py-16">
+          <h2 className="text-center font-display text-3xl font-semibold">Tutto nel canone</h2>
+          <p className="mt-1 text-center text-sm text-testo-scuro/60">
+            Sei cose in meno a cui pensare. E tu decidi cos'altro coprire.
+          </p>
+          <ul className="mx-auto mt-10 grid max-w-4xl grid-cols-3 gap-x-4 gap-y-10 sm:grid-cols-6">
+            {items.map((s) => (
+              <li key={s.id} className="flex flex-col items-center gap-3 text-center">
+                <IconaServizio servizio={s.id} className="h-14 w-14 text-oro" />
+                <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-testo-scuro/70">
+                  {s.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-8 text-center text-sm font-medium text-oro">Configura la tua rata →</p>
+        </div>
+      </Link>
     </section>
   );
 }
