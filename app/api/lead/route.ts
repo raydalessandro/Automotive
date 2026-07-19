@@ -61,6 +61,7 @@ export async function POST(req: Request) {
         provincia: d.provincia,
         consenso_privacy: d.consenso_privacy,
         consenso_marketing: d.consenso_marketing ?? false,
+        note: d.note || null,
         score,
         configurazione: d.configurazione ?? null,
       })

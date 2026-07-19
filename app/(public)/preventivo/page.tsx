@@ -51,9 +51,9 @@ export default function PreventivoPage({
         <Filetto className="mx-auto mt-5 h-4 w-52 text-oro" />
       </header>
 
-      {/* Tre canali */}
+      {/* Canali di invio */}
       <div className="mx-auto mt-10 max-w-4xl">
-        <CanaliPreventivo veicoloTitolo={veicoloTitolo} />
+        <CanaliPreventivo veicoloTitolo={veicoloTitolo} veicoloId={veicolo?.id} />
       </div>
 
       {/* Form + sidebar */}

@@ -62,6 +62,8 @@ export const leadSchema = z.object({
     errorMap: () => ({ message: "Il consenso privacy è obbligatorio" }),
   }),
   consenso_marketing: z.boolean().optional().default(false),
+  // Nota interna opzionale (es. "Richiamo rapido" dal modal minimale). Non mostrata all'utente.
+  note: z.string().max(2000).optional().or(z.literal("")),
   // Antispam (§5): honeypot vuoto + tempo minimo di compilazione.
   hp: z.string().max(0).optional().or(z.literal("")),
   ts_apertura: z.number().optional(),
