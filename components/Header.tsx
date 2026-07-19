@@ -7,6 +7,7 @@ const NAV = [
   { href: "/agenti", label: "Agenti" },
   { href: "/artigiani", label: "Artigiani" },
   { href: "/aziende", label: "Aziende" },
+  { href: "/blog", label: "Blog" },
 ];
 
 export function Header() {
