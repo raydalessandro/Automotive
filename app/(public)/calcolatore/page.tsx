@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Calcolatore } from "@/components/Calcolatore";
+import { BannerFiscale } from "@/components/design/BannerFiscale";
 
 export const metadata: Metadata = {
   title: "Calcolatore costo reale noleggio",
@@ -18,6 +19,9 @@ export default function CalcolatorePage() {
         </p>
       </header>
       <div className="mx-auto max-w-2xl">
+        <BannerFiscale />
+      </div>
+      <div className="mx-auto mt-8 max-w-2xl">
         <Calcolatore canoneModificabile />
       </div>
     </div>
