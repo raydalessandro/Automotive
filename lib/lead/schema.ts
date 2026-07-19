@@ -75,6 +75,19 @@ export const leadSchema = z.object({
     })
     .optional(),
   pagina: z.string().max(300).optional().or(z.literal("")),
+  // Configurazione dal configuratore (§3), allegata al lead.
+  configurazione: z
+    .object({
+      veicolo_id: z.string().max(120).nullable().optional(),
+      durata: z.number().int().optional(),
+      km_anno: z.number().int().optional(),
+      servizi_scelti: z.array(z.string().max(60)).max(50).optional(),
+      servizi_interesse: z.array(z.string().max(60)).max(50).optional(),
+      rischi_accettati: z.array(z.string().max(60)).max(50).optional(),
+      rata_configurata: z.number().optional(),
+    })
+    .nullable()
+    .optional(),
 });
 
 export type DatiLead = z.infer<typeof leadSchema>;

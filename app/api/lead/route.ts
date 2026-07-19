@@ -62,6 +62,7 @@ export async function POST(req: Request) {
         consenso_privacy: d.consenso_privacy,
         consenso_marketing: d.consenso_marketing ?? false,
         score,
+        configurazione: d.configurazione ?? null,
       })
       .select("id")
       .single();
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
 
   // 2) Notifiche DOPO (best effort): Telegram + fallback email, poi email di cortesia.
   await Promise.allSettled([
-    notificaVenditore(d, { score, veicoloTitolo, leadId }),
+    notificaVenditore(d, { score, veicoloTitolo, leadId, configurazione: d.configurazione ?? null }),
     emailCortesia(d),
   ]);
 

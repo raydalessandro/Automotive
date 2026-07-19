@@ -12,8 +12,24 @@ import {
 import { isHot } from "../scoring.config";
 import { CONTATTI } from "../contatti";
 import { siteUrl } from "../site";
+import { titoliRischi, type Configurazione } from "../servizi.config";
 
-type Contesto = { score: number; veicoloTitolo: string | null; leadId?: string | null };
+type Contesto = {
+  score: number;
+  veicoloTitolo: string | null;
+  leadId?: string | null;
+  configurazione?: Configurazione | null;
+};
+
+// Riga configurazione per Telegram (§3): dove spingere in chiamata.
+function rigaConfig(c: Configurazione): string | null {
+  const parti: string[] = [];
+  if (c.servizi_scelti?.length) parti.push(`Config: ${titoliRischi(c.servizi_scelti).join(", ")}`);
+  if (c.servizi_interesse?.length) parti.push(`Interessi: ${titoliRischi(c.servizi_interesse).join(", ")}`);
+  if (c.rischi_accettati?.length) parti.push(`Rischi accettati: ${titoliRischi(c.rischi_accettati).join(", ")}`);
+  if (c.rata_configurata) parti.push(`Rata ~€${c.rata_configurata}`);
+  return parti.length ? "🧩 " + parti.join(" · ") : null;
+}
 
 function messaggioTelegram(d: DatiLead, ctx: Contesto): string {
   const hot = isHot(ctx.score) ? " · HOT" : "";
@@ -28,6 +44,11 @@ function messaggioTelegram(d: DatiLead, ctx: Contesto): string {
     `✉️ ${d.email || "—"}`,
     `Fonte: ${fonte} · Pagina: ${d.pagina || "—"}`,
   ];
+  // Configurazione dal configuratore: dove spingere.
+  if (ctx.configurazione) {
+    const rc = rigaConfig(ctx.configurazione);
+    if (rc) righe.push(rc);
+  }
   // Deep link al dettaglio nella dashboard (§6): la dashboard è il posto di lavoro.
   if (ctx.leadId) righe.push(`🔗 ${siteUrl()}/app/lead?apri=${ctx.leadId}`);
   return righe.join("\n");

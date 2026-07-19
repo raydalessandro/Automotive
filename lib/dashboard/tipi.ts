@@ -1,5 +1,7 @@
 // Tipi condivisi dashboard.
 
+import type { Configurazione } from "@/lib/servizi.config";
+
 export const STATI_LEAD = [
   "nuovo",
   "contattato",
@@ -41,4 +43,5 @@ export type Lead = {
   richiamare_il: string | null;
   aggiornato_il: string | null;
   aggiornato_da: string | null;
+  configurazione: Configurazione | null;
 };

@@ -215,3 +215,19 @@ export const RISCHI: Rischio[] = [
 export function rischioById(id: string): Rischio | undefined {
   return RISCHI.find((r) => r.id === id);
 }
+
+// Configurazione allegata al lead (§3). Campi opzionali: arriva da zod/jsonb.
+export type Configurazione = {
+  veicolo_id?: string | null;
+  durata?: number;
+  km_anno?: number;
+  servizi_scelti?: string[];
+  servizi_interesse?: string[];
+  rischi_accettati?: string[];
+  rata_configurata?: number;
+};
+
+/** Mappa una lista di id-rischio nei loro titoli leggibili. */
+export function titoliRischi(ids: string[]): string[] {
+  return ids.map((id) => rischioById(id)?.titolo ?? id);
+}

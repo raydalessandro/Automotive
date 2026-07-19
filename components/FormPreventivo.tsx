@@ -9,6 +9,8 @@ import {
   KM_ANNO,
 } from "@/lib/lead/schema";
 import { traccia } from "@/lib/traccia";
+import { titoliRischi, type Configurazione } from "@/lib/servizi.config";
+import { numero } from "@/lib/format";
 
 type Fonte = {
   utm_source?: string;
@@ -18,6 +20,7 @@ type Fonte = {
 };
 
 const UTM_KEY = "impero_utm";
+const CONFIG_KEY = "impero_config";
 
 function leggiFonte(): Fonte {
   if (typeof window === "undefined") return {};
@@ -26,6 +29,16 @@ function leggiFonte(): Fonte {
     return raw ? (JSON.parse(raw) as Fonte) : {};
   } catch {
     return {};
+  }
+}
+
+function leggiConfig(): Configurazione | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(CONFIG_KEY);
+    return raw ? (JSON.parse(raw) as Configurazione) : null;
+  } catch {
+    return null;
   }
 }
 
@@ -39,6 +52,10 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
   }, []);
 
   const fonte = useMemo(leggiFonte, []);
+  const [config, setConfig] = useState<Configurazione | null>(null);
+  useEffect(() => {
+    setConfig(leggiConfig());
+  }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,6 +81,7 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
       ts_apertura: tsApertura.current,
       fonte,
       pagina: typeof window !== "undefined" ? window.location.pathname : "",
+      configurazione: config,
     };
 
     try {
@@ -75,6 +93,11 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
         traccia("preventivo_inviato", { veicolo_id: veicoloId });
+        try {
+          sessionStorage.removeItem(CONFIG_KEY);
+        } catch {
+          /* ignora */
+        }
         setStato("ok");
       } else {
         setErroriCampo(data.dettagli ?? {});
@@ -100,6 +123,33 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
         <p className="mb-6 rounded-lg bg-avorio px-4 py-3 text-sm">
           Richiesta per: <strong>{veicoloTitolo}</strong>
         </p>
+      )}
+
+      {config && (
+        <div className="mb-6 rounded-lg border border-oro/30 bg-oro/5 px-4 py-3 text-sm">
+          <p className="font-medium">La tua configurazione</p>
+          {config.rata_configurata ? (
+            <p className="mt-1 text-testo-chiaro/75">
+              Rata configurata: <strong className="tabular text-oro">€{numero(config.rata_configurata)}</strong>/mese + IVA
+              {config.durata ? ` · ${config.durata} mesi` : ""}
+              {config.km_anno ? ` · ${numero(config.km_anno)} km/anno` : ""}
+            </p>
+          ) : null}
+          {config.servizi_scelti?.length ? (
+            <p className="mt-1 text-testo-chiaro/70">Coperture: {titoliRischi(config.servizi_scelti).join(", ")}</p>
+          ) : null}
+          {config.servizi_interesse?.length ? (
+            <p className="mt-1 text-testo-chiaro/70">
+              Da valutare a preventivo: {titoliRischi(config.servizi_interesse).join(", ")}
+            </p>
+          ) : null}
+          {config.rischi_accettati?.length ? (
+            <p className="mt-1 text-testo-chiaro/55">
+              Rischi accettati: {titoliRischi(config.rischi_accettati).join(", ")}
+            </p>
+          ) : null}
+          <p className="mt-2 text-xs text-testo-chiaro/45">Allegata alla richiesta.</p>
+        </div>
       )}
 
       {/* Honeypot antispam — nascosto agli umani. */}

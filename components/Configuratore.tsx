@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { traccia } from "@/lib/traccia";
 import {
   RISCHI,
   KM_SCAGLIONI,
@@ -57,6 +58,14 @@ export function Configuratore({
   });
 
   const [mostraCalcolatore, setMostraCalcolatore] = useState(false);
+
+  // Traccia l'uso del configuratore (§3): il dettaglio vive nel lead, non nell'evento.
+  const tracciato = useRef(false);
+  useEffect(() => {
+    if (tracciato.current) return;
+    tracciato.current = true;
+    traccia("configuratore_usato", { veicolo_id: veicoloId });
+  }, [veicoloId]);
 
   const toggle = (r: Rischio) => {
     if (r.copertura.incluso_base) return; // non deselezionabile

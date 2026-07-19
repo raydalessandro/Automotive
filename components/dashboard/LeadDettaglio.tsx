@@ -11,6 +11,8 @@ import {
 } from "@/lib/lead/schema";
 import { cambiaStato, salvaNote, impostaRichiamo } from "@/app/app/(dash)/lead/actions";
 import { whatsappLink } from "@/lib/contatti";
+import { titoliRischi } from "@/lib/servizi.config";
+import { numero } from "@/lib/format";
 
 function isoToLocalInput(iso: string | null): string {
   if (!iso) return "";
@@ -123,6 +125,36 @@ export function LeadDettaglio({ lead, onChiudi }: { lead: Lead; onChiudi: () => 
           <Dato label="Ricevuto" valore={fmt(lead.created_at)} />
           <Dato label="Aggiornato" valore={fmt(lead.aggiornato_il)} />
         </dl>
+
+        {/* Configurazione dal configuratore (§3) */}
+        {lead.configurazione && (
+          <div className="mt-5 rounded-xl border border-oro/30 bg-oro/5 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-oro">Configurazione</p>
+            {lead.configurazione.rata_configurata ? (
+              <p className="mt-2 text-sm">
+                Rata configurata:{" "}
+                <strong className="tabular">€{numero(lead.configurazione.rata_configurata)}</strong>/mese + IVA
+                {lead.configurazione.durata ? ` · ${lead.configurazione.durata} mesi` : ""}
+                {lead.configurazione.km_anno ? ` · ${numero(lead.configurazione.km_anno)} km/anno` : ""}
+              </p>
+            ) : null}
+            {lead.configurazione.servizi_scelti?.length ? (
+              <p className="mt-1 text-sm text-testo-chiaro/75">
+                Coperture: {titoliRischi(lead.configurazione.servizi_scelti).join(", ")}
+              </p>
+            ) : null}
+            {lead.configurazione.servizi_interesse?.length ? (
+              <p className="mt-1 text-sm text-testo-chiaro/75">
+                Interessi (su preventivo): {titoliRischi(lead.configurazione.servizi_interesse).join(", ")}
+              </p>
+            ) : null}
+            {lead.configurazione.rischi_accettati?.length ? (
+              <p className="mt-1 text-sm text-testo-chiaro/55">
+                Rischi accettati: {titoliRischi(lead.configurazione.rischi_accettati).join(", ")}
+              </p>
+            ) : null}
+          </div>
+        )}
 
         {/* Richiamo */}
         <div className="mt-5">

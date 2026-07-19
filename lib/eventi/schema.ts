@@ -6,6 +6,7 @@ export const TIPI_EVENTO = [
   "pagina_vista",
   "veicolo_visto",
   "calcolatore_usato",
+  "configuratore_usato",
   "preventivo_inviato",
   "telefono_click",
   "whatsapp_click",
