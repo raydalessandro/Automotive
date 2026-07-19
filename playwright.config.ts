@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// E2E — funnel, landing, 404. Chromium preinstallato (executablePath esplicito).
+// E2E — funnel, landing, 404. Il browser lo risolve Playwright dall'installazione
+// locale (`npx playwright install chromium`): nessun path hardcoded, gira ovunque.
 // I test mockano /api/* → zero scritture e notifiche reali.
 export default defineConfig({
   testDir: "./e2e",
@@ -10,7 +11,6 @@ export default defineConfig({
   reporter: [["list"]],
   use: {
     baseURL: "http://localhost:3123",
-    launchOptions: { executablePath: "/opt/pw-browsers/chromium" },
     trace: "off",
   },
   projects: [{ name: "mobile", use: { ...devices["Pixel 5"] } }],
