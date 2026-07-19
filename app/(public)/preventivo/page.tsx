@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { FormPreventivo } from "@/components/FormPreventivo";
 import { veicoloById, titoloVeicolo } from "@/lib/catalogo";
 import { CONTATTI } from "@/lib/contatti";
@@ -45,6 +46,22 @@ export default function PreventivoPage({
               </a>
             </p>
           </div>
+
+          {/* Il momento del possesso — aggancia il filo "le chiavi sono tue". */}
+          <figure className="mt-8 hidden overflow-hidden rounded-2xl lg:block">
+            <div className="relative aspect-[3/2]">
+              <Image
+                src="/foto/foto-chiavi.webp"
+                alt="Consegna delle chiavi di un veicolo"
+                fill
+                sizes="40vw"
+                className="object-cover"
+              />
+            </div>
+            <figcaption className="mt-3 font-display text-lg font-semibold text-testo-chiaro">
+              Poi le chiavi sono <span className="text-oro">tue</span>.
+            </figcaption>
+          </figure>
         </div>
 
         <FormPreventivo
