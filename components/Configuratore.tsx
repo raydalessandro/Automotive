@@ -83,7 +83,6 @@ export function Configuratore({
   // Classificazione + rata via funzioni pure (§2), testate a parte.
   const attiviIds = useMemo(() => [...attivi], [attivi]);
   const classi = useMemo(() => classificaServizi(attiviIds), [attiviIds]);
-  const serviziScelti = classi.servizi_scelti.map((id) => rischioById(id)!);
   const serviziInteresse = classi.servizi_interesse.map((id) => rischioById(id)!);
   const rischiAccettati = classi.rischi_accettati.map((id) => rischioById(id)!);
   const rataConfigurata = useMemo(() => calcolaRata(canone, attiviIds), [canone, attiviIds]);
@@ -131,6 +130,8 @@ export function Configuratore({
                   step={5}
                   value={canone}
                   onChange={(e) => setCanone(Number(e.target.value))}
+                  aria-label="Canone base"
+                  aria-valuetext={`${euro(canone)} al mese`}
                   className="h-2 flex-1 cursor-pointer accent-oro"
                 />
                 <span className="w-20 shrink-0 text-right font-display text-lg font-semibold tabular">
@@ -175,6 +176,8 @@ export function Configuratore({
             step={1}
             value={kmIdx}
             onChange={(e) => setKmIdx(Number(e.target.value))}
+            aria-label="Km all'anno"
+            aria-valuetext={`${numero(kmAnno)} km`}
             className="mt-2 w-full cursor-pointer accent-oro"
           />
           <p className="mt-1 text-xs text-testo-chiaro/50">

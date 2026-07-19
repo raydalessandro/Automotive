@@ -22,7 +22,6 @@ export const STATI_AZIENDA = [
 ] as const;
 
 const idsSeg = SEGMENTI.map((s) => s.id) as [string, ...string[]];
-const idsStato = STATI_AZIENDA.map((s) => s.id) as [string, ...string[]];
 
 export type Azienda = {
   id: string;

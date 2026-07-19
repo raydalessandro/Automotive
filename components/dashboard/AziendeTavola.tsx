@@ -2,13 +2,7 @@
 
 import { Fragment, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import {
-  SEGMENTI,
-  STATI_AZIENDA,
-  labelSegmento,
-  labelStatoAzienda,
-  type Azienda,
-} from "@/lib/aziende/schema";
+import { SEGMENTI, STATI_AZIENDA, labelSegmento, type Azienda } from "@/lib/aziende/schema";
 import {
   importaAziende,
   aggiornaAzienda,
