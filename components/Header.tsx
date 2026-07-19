@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "./Wordmark";
+import { MenuMobile } from "./MenuMobile";
 
 const NAV = [
   { href: "/veicoli", label: "Veicoli" },
@@ -26,16 +27,13 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <Link href="/preventivo" className="btn-oro hidden sm:inline-flex">
-          Richiedi il preventivo
-        </Link>
-        <Link
-          href="/preventivo"
-          className="btn-oro sm:hidden"
-          aria-label="Richiedi il preventivo"
-        >
-          Preventivo
-        </Link>
+        <div className="flex items-center gap-1">
+          {/* Desktop: CTA sempre visibile. Mobile: la CTA vive dentro il menu. */}
+          <Link href="/preventivo" className="btn-oro hidden md:inline-flex">
+            Richiedi il preventivo
+          </Link>
+          <MenuMobile voci={NAV} />
+        </div>
       </div>
     </header>
   );
