@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { parseImport, chiaveCascata, type Scarto } from "./import";
+import { parseImport, chiaveCascata, dedupBatch, type Scarto } from "./import";
 import type { ImportRow, Azienda } from "./schema";
 
 // Logica import/export aziende, indipendente dal framework — "una logica, due porte"
@@ -110,18 +110,7 @@ export async function importaAziendeCore(
   if (valide.length === 0) return { ok: true, inserite: 0, arricchite: 0, duplicate: 0, scartate };
 
   // Dedup interno al batch con la cascata (prima occorrenza vince).
-  const vistiBatch = new Set<string>();
-  const unici: ImportRow[] = [];
-  let dupBatch = 0;
-  for (const r of valide) {
-    const k = chiaveCascata(r);
-    if (vistiBatch.has(k)) {
-      dupBatch++;
-      continue;
-    }
-    vistiBatch.add(k);
-    unici.push(r);
-  }
+  const { unici, duplicati: dupBatch } = dedupBatch(valide);
 
   const maps = await caricaEsistenti(supabase, unici);
 

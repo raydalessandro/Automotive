@@ -9,6 +9,9 @@ import {
   KM_DEFAULT,
   DURATE_CONFIG,
   DURATA_DEFAULT,
+  calcolaRata,
+  classificaServizi,
+  rischioById,
   type Rischio,
   type Segmento,
 } from "@/lib/servizi.config";
@@ -77,16 +80,13 @@ export function Configuratore({
     });
   };
 
-  // Classificazione (esclusi gli inclusi base):
-  const nonBase = RISCHI.filter((r) => !r.copertura.incluso_base);
-  const serviziScelti = nonBase.filter((r) => attivi.has(r.id) && r.copertura.prezzo_mese != null);
-  const serviziInteresse = nonBase.filter((r) => attivi.has(r.id) && r.copertura.prezzo_mese == null);
-  const rischiAccettati = nonBase.filter((r) => !attivi.has(r.id));
-
-  const rataConfigurata = useMemo(
-    () => canone + serviziScelti.reduce((tot, r) => tot + (r.copertura.prezzo_mese ?? 0), 0),
-    [canone, serviziScelti],
-  );
+  // Classificazione + rata via funzioni pure (§2), testate a parte.
+  const attiviIds = useMemo(() => [...attivi], [attivi]);
+  const classi = useMemo(() => classificaServizi(attiviIds), [attiviIds]);
+  const serviziScelti = classi.servizi_scelti.map((id) => rischioById(id)!);
+  const serviziInteresse = classi.servizi_interesse.map((id) => rischioById(id)!);
+  const rischiAccettati = classi.rischi_accettati.map((id) => rischioById(id)!);
+  const rataConfigurata = useMemo(() => calcolaRata(canone, attiviIds), [canone, attiviIds]);
 
   // Salva la configurazione per il form preventivo (letta in PR17).
   const salvaConfig = () => {
@@ -95,9 +95,9 @@ export function Configuratore({
         veicolo_id: veicoloId ?? null,
         durata,
         km_anno: kmAnno,
-        servizi_scelti: serviziScelti.map((r) => r.id),
-        servizi_interesse: serviziInteresse.map((r) => r.id),
-        rischi_accettati: rischiAccettati.map((r) => r.id),
+        servizi_scelti: classi.servizi_scelti,
+        servizi_interesse: classi.servizi_interesse,
+        rischi_accettati: classi.rischi_accettati,
         rata_configurata: Math.round(rataConfigurata),
       };
       sessionStorage.setItem(KEY_CONFIG, JSON.stringify(config));

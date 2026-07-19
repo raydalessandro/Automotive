@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseImport, chiaveCascata } from "./import";
+import { parseImport, chiaveCascata, dedupBatch } from "./import";
 import { isPec } from "./pec";
 
 describe("guardrail PEC", () => {
@@ -59,5 +59,28 @@ describe("chiaveCascata", () => {
     expect(chiaveCascata({ piva: "12345678903", email: "a@b.it", ragione_sociale: "X" })).toBe("piva:12345678903");
     expect(chiaveCascata({ email: "A@B.it", ragione_sociale: "X" })).toBe("email:a@b.it");
     expect(chiaveCascata({ ragione_sociale: "Rossi SRL", provincia: "MI" })).toBe("np:rossi srl|mi");
+  });
+});
+
+describe("dedupBatch", () => {
+  it("scarta i duplicati interni al batch (cascata), prima occorrenza vince", () => {
+    const rows = [
+      { ragione_sociale: "Alfa", email: "info@alfa.it" },
+      { ragione_sociale: "Alfa (dup email)", email: "INFO@alfa.it" }, // stessa email → dup
+      { ragione_sociale: "Beta", provincia: "MI" },
+      { ragione_sociale: "beta", provincia: "mi" }, // stesso nome+prov → dup
+      { ragione_sociale: "Gamma", piva: "12345678903" },
+    ];
+    const { unici, duplicati } = dedupBatch(rows);
+    expect(duplicati).toBe(2);
+    expect(unici.map((r) => r.ragione_sociale)).toEqual(["Alfa", "Beta", "Gamma"]);
+  });
+  it("righe senza chiave forte deduplicano su nome+provincia vuota", () => {
+    const { unici, duplicati } = dedupBatch([
+      { ragione_sociale: "Solo Nome" },
+      { ragione_sociale: "Solo Nome" },
+    ]);
+    expect(unici).toHaveLength(1);
+    expect(duplicati).toBe(1);
   });
 });

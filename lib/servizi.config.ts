@@ -231,3 +231,44 @@ export type Configurazione = {
 export function titoliRischi(ids: string[]): string[] {
   return ids.map((id) => rischioById(id)?.titolo ?? id);
 }
+
+// --- Logica pura del configuratore (§2), estratta per testabilità. ---
+
+// Forma minima letta dalle funzioni pure (Rischio la soddisfa). Iniettabile nei test.
+type RischioCalcolo = { id: string; copertura: { incluso_base: boolean; prezzo_mese: number | null } };
+
+/** Rata configurata = canone base + servizi attivi con prezzo (i null non incidono). */
+export function calcolaRata(
+  canone: number,
+  attiviIds: string[],
+  rischi: readonly RischioCalcolo[] = RISCHI,
+): number {
+  const attivi = new Set(attiviIds);
+  const extra = rischi
+    .filter((r) => !r.copertura.incluso_base && attivi.has(r.id) && r.copertura.prezzo_mese != null)
+    .reduce((tot, r) => tot + (r.copertura.prezzo_mese ?? 0), 0);
+  return canone + extra;
+}
+
+/**
+ * Classifica i rischi non-base secondo lo stato dei toggle:
+ * - servizi_scelti: attivi con prezzo (entrano nella rata)
+ * - servizi_interesse: attivi senza prezzo (→ "su preventivo", non cambiano la rata)
+ * - rischi_accettati: non attivi (coperture rifiutate)
+ */
+export function classificaServizi(
+  attiviIds: string[],
+  rischi: readonly RischioCalcolo[] = RISCHI,
+): { servizi_scelti: string[]; servizi_interesse: string[]; rischi_accettati: string[] } {
+  const attivi = new Set(attiviIds);
+  const nonBase = rischi.filter((r) => !r.copertura.incluso_base);
+  return {
+    servizi_scelti: nonBase
+      .filter((r) => attivi.has(r.id) && r.copertura.prezzo_mese != null)
+      .map((r) => r.id),
+    servizi_interesse: nonBase
+      .filter((r) => attivi.has(r.id) && r.copertura.prezzo_mese == null)
+      .map((r) => r.id),
+    rischi_accettati: nonBase.filter((r) => !attivi.has(r.id)).map((r) => r.id),
+  };
+}

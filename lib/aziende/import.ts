@@ -55,18 +55,37 @@ function normalizza(r: Record<string, unknown>): Record<string, unknown> {
   return out;
 }
 
-// Chiave di dedup a cascata (id → piva → email → nome+provincia) — Addendum §2.
-export function chiaveCascata(r: {
+type ChiaveCascata = {
   id?: string | null;
   piva?: string | null;
   email?: string | null;
   ragione_sociale: string;
   provincia?: string | null;
-}): string {
+};
+
+// Chiave di dedup a cascata (id → piva → email → nome+provincia) — Addendum §2.
+export function chiaveCascata(r: ChiaveCascata): string {
   if (r.id) return "id:" + r.id;
   if (r.piva) return "piva:" + r.piva;
   if (r.email) return "email:" + r.email.toLowerCase();
   return "np:" + r.ragione_sociale.toLowerCase().trim() + "|" + (r.provincia ?? "").toLowerCase().trim();
+}
+
+/** Dedup interno al batch con la cascata: la prima occorrenza vince. */
+export function dedupBatch<T extends ChiaveCascata>(rows: T[]): { unici: T[]; duplicati: number } {
+  const visti = new Set<string>();
+  const unici: T[] = [];
+  let duplicati = 0;
+  for (const r of rows) {
+    const k = chiaveCascata(r);
+    if (visti.has(k)) {
+      duplicati++;
+      continue;
+    }
+    visti.add(k);
+    unici.push(r);
+  }
+  return { unici, duplicati };
 }
 
 export function parseImport(testo: string): RisultatoParsing {
