@@ -31,6 +31,30 @@ const PASSI = [
   { n: "3", t: "Guidi", d: "Firma, ricevi il veicolo e pensa solo a lavorare." },
 ];
 
+// "Perché scegliere noi" — registro consulenza (icone-business). Claim veri, nessun numero inventato.
+const PERCHE = [
+  {
+    icona: "/asset/icone-business/consulenza-dedicata.svg",
+    t: "Un solo interlocutore",
+    d: "Dalla scelta alla consegna parli con una persona, non con un call center.",
+  },
+  {
+    icona: "/asset/icone-business/confronto-offerte.svg",
+    t: "Confrontiamo per te",
+    d: "Mettiamo a confronto i listini dei principali operatori NLT e ti portiamo la proposta più adatta.",
+  },
+  {
+    icona: "/asset/icone-business/risparmio-fiscale.svg",
+    t: "Ottimizzato sul tuo fisco",
+    d: "La formula giusta per la tua forma giuridica: deduzione e IVA al massimo che ti spetta.",
+  },
+  {
+    icona: "/asset/icone-business/gestione-flotta.svg",
+    t: "Anche per le flotte",
+    d: "Più veicoli, un unico canone e un unico referente per tutta la gestione.",
+  },
+];
+
 export default function Home() {
   const evidenza = veicoliInEvidenza().slice(0, 6);
 
@@ -132,6 +156,32 @@ export default function Home() {
                 </span>
                 <h3 className="mt-4 font-display text-xl font-semibold">{p.t}</h3>
                 <p className="mt-2 text-sm text-testo-chiaro/65">{p.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Perché scegliere noi — tono consulenza su fondo nero. Nessuna CTA: l'oro qui non compete con la conversione. */}
+      <section className="bg-nero text-testo-scuro">
+        <div className="container-content py-16 sm:py-20">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-widest text-oro">Perché {SITE.nomeBreve}</p>
+            <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
+              Un noleggio seguito da persone, non da un portale
+            </h2>
+            <p className="mt-4 text-testo-scuro/70">
+              Non vendiamo un&apos;auto e spariamo: costruiamo la formula giusta per la tua attività e
+              restiamo il tuo riferimento, prima e dopo la firma.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            {PERCHE.map((p) => (
+              <div key={p.t}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.icona} alt="" aria-hidden="true" className="h-12 w-12" />
+                <h3 className="mt-4 font-display text-lg font-semibold">{p.t}</h3>
+                <p className="mt-2 text-sm text-testo-scuro/65">{p.d}</p>
               </div>
             ))}
           </div>
