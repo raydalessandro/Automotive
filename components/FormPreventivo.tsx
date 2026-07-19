@@ -172,7 +172,7 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
         <SelectCampo label="Quanti veicoli ti servono" name="n_veicoli" opzioni={N_VEICOLI} errori={erroriCampo} required />
         <SelectCampo label="Km all'anno stimati" name="km_anno" opzioni={KM_ANNO} errori={erroriCampo} required />
         <Campo label="Provincia" name="provincia" errori={erroriCampo} required />
-        <Campo label="Telefono" name="telefono" type="tel" errori={erroriCampo} required />
+        <Campo label="Telefono" name="telefono" type="tel" errori={erroriCampo} required aiuto="Ci serve solo per richiamarti col preventivo." />
         <Campo label="Email" name="email" type="email" errori={erroriCampo} placeholder="Facoltativa" />
       </div>
 
@@ -221,6 +221,7 @@ function Campo({
   required = false,
   placeholder,
   errori,
+  aiuto,
 }: {
   label: string;
   name: string;
@@ -228,6 +229,8 @@ function Campo({
   required?: boolean;
   placeholder?: string;
   errori: Record<string, string[]>;
+  /** Microcopy rassicurante: spiegare perché si chiede un dato aumenta il completamento. */
+  aiuto?: string;
 }) {
   return (
     <label className="block text-sm">
@@ -241,6 +244,9 @@ function Campo({
         placeholder={placeholder}
         className="mt-1 w-full rounded-lg border border-nero/15 px-3 py-2.5 focus:border-oro focus:outline-none"
       />
+      {aiuto && !errori[name] && (
+        <span className="mt-1 block text-xs text-testo-chiaro/50">{aiuto}</span>
+      )}
       {errori[name] && <span className="mt-1 block text-xs text-red-600">{errori[name][0]}</span>}
     </label>
   );

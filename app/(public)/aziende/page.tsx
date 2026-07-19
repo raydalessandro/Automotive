@@ -63,6 +63,7 @@ export default function AziendePage() {
       titoloVeicoli="Per la tua flotta"
       faq={[...FAQ, ...FAQ_COMUNI]}
       ctaTesto="Parliamo della tua flotta"
+      foto={{ src: "/foto/foto-flotta.webp", alt: "Tre veicoli commerciali di una piccola flotta aziendale" }}
     >
       <section className="container-content py-14">
         <div className="grid gap-6 md:grid-cols-2">

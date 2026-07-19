@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { veicoliInEvidenza } from "@/lib/catalogo";
 import { VeicoloCard } from "@/components/VeicoloCard";
 import { SITE } from "@/lib/site";
@@ -37,7 +38,7 @@ export default function Home() {
     <>
       {/* Hero scuro */}
       <section className="overflow-hidden bg-nero text-testo-scuro">
-        <div className="container-content grid gap-10 pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:pt-28">
+        <div className="container-content grid gap-10 pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pt-28">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-oro">
               Noleggio a lungo termine · Partite IVA e aziende
@@ -54,37 +55,40 @@ export default function Home() {
                 Calcola il tuo costo reale
               </Link>
             </div>
+            {/* Micro-garanzie vicino alla CTA (trust nel punto di decisione). */}
+            <p className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-testo-scuro/55">
+              <span className="inline-flex items-center gap-1.5">
+                <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-oro" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 8l3 3 5-6" /></svg>
+                Preventivo gratuito
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-oro" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" /><path d="M5.5 7V5a2.5 2.5 0 015 0v2" /></svg>
+                Dati protetti
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-oro" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="8" cy="8" r="5.5" /><path d="M8 5v3l2 2" /></svg>
+                Risposta in 48h
+              </span>
+            </p>
           </div>
-          <ul className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-1">
-            {[
-              "Tutti i servizi inclusi in un unico canone",
-              "Anticipo zero disponibile su molti veicoli",
-              "Formule dedicate per flotte aziendali",
-              "Rata fissa, zero imprevisti",
-            ].map((x) => (
-              <li
-                key={x}
-                className="flex items-start gap-3 rounded-xl border border-testo-scuro/10 bg-grafite/40 p-4"
-              >
-                <svg
-                  viewBox="0 0 12 12"
-                  className="mt-1 h-3 w-3 shrink-0 text-oro"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M6 1 l5 5 -5 5 -5 -5 Z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                  />
-                </svg>
-                <span className="text-testo-scuro/85">{x}</span>
-              </li>
-            ))}
-          </ul>
+          {/* Visual: l'imprenditore e il suo mezzo. La CTA resta l'unico oro pieno. */}
+          <div className="relative">
+            <div className="relative aspect-[16/11] overflow-hidden rounded-2xl border border-testo-scuro/10">
+              <Image
+                src="/foto/foto-hero.webp"
+                alt="Imprenditore accanto al suo veicolo commerciale"
+                fill
+                priority
+                sizes="(min-width: 1024px) 45vw, 100vw"
+                className="object-cover"
+              />
+              {/* velo per far respirare il bordo scuro dell'hero */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-nero/40 via-transparent to-transparent" />
+            </div>
+          </div>
         </div>
         {/* Una sola linea: la firma del brand attraversa l'hero */}
-        <div className="container-content pb-10 pt-4 lg:pt-6">
+        <div className="container-content pb-10 pt-8 lg:pt-10">
           <LineaVeicoli className="w-full" />
         </div>
       </section>
@@ -154,9 +158,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA finale */}
-      <section className="bg-nero text-testo-scuro">
-        <div className="container-content flex flex-col items-center gap-6 py-16 text-center sm:py-20">
+      {/* Non ci pensi più — la corda emotiva: non compri un'auto, compri il non doverci pensare */}
+      <section className="bg-avorio">
+        <div className="container-content grid items-center gap-10 py-16 sm:py-20 lg:grid-cols-2">
+          <div className="relative order-last aspect-[16/11] overflow-hidden rounded-2xl lg:order-first">
+            <Image
+              src="/foto/foto-tranquillita.webp"
+              alt="Imprenditrice serena nel proprio studio"
+              fill
+              sizes="(min-width: 1024px) 45vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest text-oro">Perché il noleggio</p>
+            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight sm:text-4xl">
+              Non compri un&apos;auto.
+              <br />
+              Compri il non doverci <span className="italic text-oro">più pensare.</span>
+            </h2>
+            <p className="mt-5 max-w-lg text-testo-chiaro/70">
+              Assicurazione, bollo, manutenzione, imprevisti: tutto in un unico canone fisso. Tu pensi a lavorare,
+              del resto ci occupiamo noi.
+            </p>
+            <Link href="/calcolatore" className="mt-6 inline-block text-sm font-medium text-oro hover:underline">
+              Scopri quanto risparmi davvero →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA finale — sfondo materico scuro con riflessi d'oro, testo in overlay */}
+      <section className="relative overflow-hidden bg-nero text-testo-scuro">
+        <Image
+          src="/foto/foto-sfondo.webp"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover opacity-40"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-nero/60" />
+        <div className="container-content relative flex flex-col items-center gap-6 py-16 text-center sm:py-20">
           <h2 className="max-w-2xl font-display text-3xl font-semibold sm:text-4xl">
             Pronto a metterti al volante senza pensieri?
           </h2>

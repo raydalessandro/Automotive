@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Calcolatore } from "./Calcolatore";
 import { VeicoloCard } from "./VeicoloCard";
 import { Faq, type FaqItem } from "./Faq";
@@ -21,6 +22,8 @@ type Props = {
   faq: FaqItem[];
   ctaTesto: string;
   children?: React.ReactNode;
+  /** Foto editoriale del segmento: se presente, mostra una fascia visual sotto l'hero. */
+  foto?: { src: string; alt: string };
 };
 
 export function LandingSegmento({
@@ -38,6 +41,7 @@ export function LandingSegmento({
   faq,
   ctaTesto,
   children,
+  foto,
 }: Props) {
   return (
     <>
@@ -77,6 +81,23 @@ export function LandingSegmento({
           </div>
         </div>
       </section>
+
+      {foto && (
+        <section className="bg-nero">
+          <div className="container-content pb-16 lg:pb-20">
+            <div className="relative aspect-[21/9] overflow-hidden rounded-2xl border border-testo-scuro/10">
+              <Image
+                src={foto.src}
+                alt={foto.alt}
+                fill
+                sizes="(min-width: 1024px) 68rem, 100vw"
+                className="object-cover"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-nero/30 to-transparent" />
+            </div>
+          </div>
+        </section>
+      )}
 
       {children}
 
