@@ -1,15 +1,25 @@
 import { NextResponse } from "next/server";
 import { eventoSchema } from "@/lib/eventi/schema";
 import { getAdmin } from "@/lib/supabase/admin";
+import { rateLimit, chiaveClient } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
-// Insert eventi via service role (§5). Privacy-first: nessun IP, nessun cookie.
+// Insert eventi via service role (§5). Privacy-first: nessun IP salvato, nessun cookie.
 // Cap per sessione anti-flood: oltre soglia in finestra breve, si scarta silenziosamente.
 const CAP_SESSIONE = 300;
 const FINESTRA_MIN = 30;
 
+// Rate limit per IP (§7): l'IP è usato solo in memoria per il throttling, mai salvato.
+const RL_LIMITE = 40;
+const RL_FINESTRA_MS = 10_000;
+
 export async function POST(req: Request) {
+  // Throttle burst per IP prima di toccare il DB (best effort, silenzioso).
+  if (!rateLimit(chiaveClient(req, "eventi"), RL_LIMITE, RL_FINESTRA_MS)) {
+    return NextResponse.json({ ok: true, throttled: true }, { status: 200 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
