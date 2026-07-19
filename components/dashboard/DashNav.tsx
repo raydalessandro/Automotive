@@ -11,6 +11,7 @@ const VOCI = [
   { href: "/app/analytics", label: "Analytics" },
   { href: "/app/aziende", label: "Aziende" },
   { href: "/app/campagne", label: "Campagne" },
+  { href: "/app/blog", label: "Blog" },
 ];
 
 export function DashNav({ email }: { email: string | null }) {

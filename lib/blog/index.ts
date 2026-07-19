@@ -61,6 +61,12 @@ export function articoliPubblicati(): Articolo[] {
   return tutti().filter((a) => a.stato === "pubblicato");
 }
 
+/** Tutti gli articoli, bozze incluse. Solo per la dashboard (dietro auth): il
+ *  pubblico non passa mai di qui. */
+export function articoliTutti(): Articolo[] {
+  return tutti();
+}
+
 export function articoloBySlug(slug: string): Articolo | undefined {
   return articoliPubblicati().find((a) => a.slug === slug);
 }
