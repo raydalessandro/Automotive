@@ -5,6 +5,7 @@ import { VeicoloCard } from "@/components/VeicoloCard";
 import { SITE } from "@/lib/site";
 import { LineaVeicoli } from "@/components/design/LineaVeicoli";
 import { FasciaServizi } from "@/components/design/FasciaServizi";
+import { TabellaConfronto } from "@/components/design/TabellaConfronto";
 import { Filetto } from "@/components/design/RuotaGuilloche";
 
 const SEGMENTI = [
@@ -161,6 +162,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Confronto noleggio vs acquisto — sezione decisione (CRO). */}
+      <TabellaConfronto />
 
       {/* Perché scegliere noi — tono consulenza su fondo nero. Nessuna CTA: l'oro qui non compete con la conversione. */}
       <section className="bg-nero text-testo-scuro">
