@@ -10,6 +10,7 @@ import {
 import { calcolaDeduzione, prezzoIvaInclusa } from "@/lib/fiscale";
 import { euro } from "@/lib/format";
 import { traccia } from "@/lib/traccia";
+import { SITE } from "@/lib/site";
 
 const ORDINE_PROFILI: ProfiloId[] = [
   "srl_ordinaria",
@@ -303,13 +304,13 @@ function RisultatoForfettario({
         <div className="mt-3 rounded-lg bg-oro/10 px-4 py-3 text-sm">
           {diff > 0 ? (
             <>
-              Con Impero risparmi circa{" "}
+              Con {SITE.nomeBreve} risparmi circa{" "}
               <strong className="tabular text-oro">{euro(diff, 0)}/mese</strong>, a fronte di rata
               fissa e zero imprevisti.
             </>
           ) : (
             <>
-              La rata Impero è {euro(-diff, 0)}/mese in più della tua spesa attuale dichiarata, ma
+              La rata {SITE.nomeBreve} è {euro(-diff, 0)}/mese in più della tua spesa attuale dichiarata, ma
               con tutto incluso, rata fissa e zero capitale immobilizzato.
             </>
           )}

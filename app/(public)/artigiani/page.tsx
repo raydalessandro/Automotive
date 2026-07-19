@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LandingSegmento } from "@/components/LandingSegmento";
 import { veicoliAttivi } from "@/lib/catalogo";
+import { FAQ_COMUNI } from "@/lib/faq";
 
 export const metadata: Metadata = {
   title: "Noleggio furgoni e veicoli commerciali N1 per partita IVA",
@@ -54,7 +55,7 @@ export default function ArtigianiPage() {
       durataEsempio={48}
       veicoli={veicoli}
       titoloVeicoli="Veicoli commerciali N1"
-      faq={FAQ}
+      faq={[...FAQ, ...FAQ_COMUNI]}
       ctaTesto="Richiedi il preventivo N1"
     />
   );

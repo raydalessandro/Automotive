@@ -2,6 +2,8 @@
 
 export const SITE = {
   nome: "Impero Automotive",
+  // Forma breve del brand (usata nel copy discorsivo). Rebrand = cambio qui.
+  nomeBreve: "Impero",
   claim: "L'auto della tua attività. Rata fissa, tutto incluso, anticipo zero.",
   descrizione:
     "Noleggio a lungo termine per partite IVA e aziende. Assicurazione, bollo, manutenzione e assistenza in un unico canone mensile.",

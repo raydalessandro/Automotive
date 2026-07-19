@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LandingSegmento } from "@/components/LandingSegmento";
 import { veicoliAttivi } from "@/lib/catalogo";
+import { FAQ_COMUNI } from "@/lib/faq";
 
 export const metadata: Metadata = {
   title: "Noleggio a lungo termine per agenti di commercio",
@@ -15,15 +16,11 @@ const FAQ = [
   },
   {
     d: "Che tipo di veicoli sono più adatti?",
-    r: "Berline, SUV e station wagon comode per chi passa molte ore in strada e macina chilometri. Nel preventivo troviamo la formula chilometrica più adatta al tuo utilizzo.",
+    r: "Berline, SUV e station wagon comode per chi passa molte ore in strada. Indicaci i km annui che stimi: la percorrenza del contratto la definiamo nel preventivo.",
   },
   {
     d: "Cosa è incluso nel canone?",
-    r: "Assicurazione, bollo, manutenzione ordinaria e straordinaria, gomme e assistenza. Un'unica rata fissa mensile, senza imprevisti.",
-  },
-  {
-    d: "Posso avere formule con più chilometri?",
-    r: "Sì, prevediamo formule chilometriche dedicate a chi viaggia molto. Indicaci i km annui stimati nel preventivo e le calibriamo su di te.",
+    r: "Assicurazione, bollo, manutenzione ordinaria e straordinaria, primo treno gomme e assistenza. Un'unica rata fissa mensile, senza imprevisti.",
   },
   {
     d: "Serve un anticipo?",
@@ -47,7 +44,7 @@ export default function AgentiPage() {
       puntiChiave={[
         "Canone deducibile all'80% (tetto maggiorato)",
         "IVA detraibile al 100%",
-        "Formule chilometriche dedicate a chi viaggia molto",
+        "Auto comode per chi passa la giornata in strada",
         "Tutti i servizi inclusi, rata fissa",
       ]}
       profilo="agente_rappresentante"
@@ -56,7 +53,7 @@ export default function AgentiPage() {
       durataEsempio={48}
       veicoli={veicoli}
       titoloVeicoli="Veicoli pensati per la strada"
-      faq={FAQ}
+      faq={[...FAQ, ...FAQ_COMUNI]}
       ctaTesto="Richiedi il preventivo agente"
     />
   );

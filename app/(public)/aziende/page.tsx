@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LandingSegmento } from "@/components/LandingSegmento";
 import { veicoliAttivi } from "@/lib/catalogo";
+import { FAQ_COMUNI } from "@/lib/faq";
 
 export const metadata: Metadata = {
   title: "Noleggio a lungo termine per aziende e flotte",
@@ -60,7 +61,7 @@ export default function AziendePage() {
       durataEsempio={36}
       veicoli={veicoli}
       titoloVeicoli="Per la tua flotta"
-      faq={FAQ}
+      faq={[...FAQ, ...FAQ_COMUNI]}
       ctaTesto="Parliamo della tua flotta"
     >
       <section className="container-content py-14">

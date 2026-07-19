@@ -13,6 +13,7 @@ import { cambiaStato, salvaNote, impostaRichiamo } from "@/app/app/(dash)/lead/a
 import { whatsappLink } from "@/lib/contatti";
 import { titoliRischi } from "@/lib/servizi.config";
 import { numero } from "@/lib/format";
+import { SITE } from "@/lib/site";
 
 function isoToLocalInput(iso: string | null): string {
   if (!iso) return "";
@@ -45,7 +46,7 @@ export function LeadDettaglio({ lead, onChiudi }: { lead: Lead; onChiudi: () => 
       }
     });
 
-  const testoWa = `Ciao ${lead.referente}, la contatto da Impero Automotive riguardo alla sua richiesta di noleggio.`;
+  const testoWa = `Ciao ${lead.referente}, la contatto da ${SITE.nome} riguardo alla sua richiesta di noleggio.`;
 
   return (
     <div className="flex h-full flex-col">

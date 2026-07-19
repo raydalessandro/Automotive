@@ -24,7 +24,7 @@ export const CATEGORIE = [
 
 export const CAMBI = ["manuale", "automatico"] as const;
 
-export const DURATE_AMMESSE = [24, 36, 48, 60] as const;
+export const DURATE_AMMESSE = [12, 24, 36, 48] as const;
 
 export const veicoloSchema = z.object({
   id: z

@@ -1,13 +1,15 @@
 // Monogramma "IV" ridisegnato come SVG semplice (§8) — sostituisce la bozza watermarkata.
 // [APERTO: logo definitivo]
 
+import { SITE } from "@/lib/site";
+
 export function Monogramma({ className = "" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 48 48"
       className={className}
       role="img"
-      aria-label="Impero Automotive"
+      aria-label={SITE.nome}
       fill="none"
     >
       <rect

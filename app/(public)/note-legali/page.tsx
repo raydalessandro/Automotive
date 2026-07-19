@@ -12,12 +12,16 @@ export default function NoteLegaliPage() {
   return (
     <PaginaTesto titolo="Note legali">
       <p className="rounded-lg bg-oro/10 px-4 py-3 text-sm">
-        Bozza da completare. Il ruolo di Impero Automotive rispetto al fornitore del servizio di
+        Bozza da completare. Il ruolo di {SITE.nome} rispetto al fornitore del servizio di
         noleggio (intermediazione / mandato) è da definire con precisione prima del go-live.
       </p>
 
       <h2>Natura delle offerte</h2>
       <p>{SITE.footerLegale}</p>
+      <p>
+        Lavoriamo sui listini dei principali operatori di noleggio a lungo termine. I marchi
+        eventualmente citati appartengono ai rispettivi titolari.
+      </p>
 
       <h2>Canoni e condizioni</h2>
       <p>

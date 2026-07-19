@@ -22,7 +22,7 @@ const COLONNE = [
     ],
   },
   {
-    titolo: "Impero",
+    titolo: "Azienda",
     voci: [
       { href: "/chi-siamo", label: "Chi siamo" },
       { href: "/contatti", label: "Contatti" },

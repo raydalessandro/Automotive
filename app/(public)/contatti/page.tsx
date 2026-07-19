@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { CONTATTI, whatsappLink } from "@/lib/contatti";
 import { LinkTracciato } from "@/components/traccia/LinkTracciato";
+import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contatti",
-  description: "Contatta Impero Automotive: telefono, WhatsApp ed email per il tuo preventivo di noleggio a lungo termine.",
+  description: `Contatta ${SITE.nome}: telefono, WhatsApp ed email per il tuo preventivo di noleggio a lungo termine.`,
 };
 
 export default function ContattiPage() {

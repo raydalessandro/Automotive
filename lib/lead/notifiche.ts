@@ -11,7 +11,7 @@ import {
 } from "./schema";
 import { isHot } from "../scoring.config";
 import { CONTATTI } from "../contatti";
-import { siteUrl } from "../site";
+import { siteUrl, SITE } from "../site";
 import { titoliRischi, type Configurazione } from "../servizi.config";
 
 type Contesto = {
@@ -81,7 +81,7 @@ async function inviaEmailFallback(testo: string): Promise<void> {
   if (!resend || !to) return;
   try {
     await resend.emails.send({
-      from: "Impero Automotive <noreply@imperoautomotive.it>",
+      from: `${SITE.nome} <noreply@imperoautomotive.it>`,
       to,
       subject: "Nuovo lead dal sito",
       text: testo,
@@ -107,7 +107,7 @@ export async function emailCortesia(d: DatiLead): Promise<void> {
   const waNumero = CONTATTI.whatsapp;
   try {
     await resend.emails.send({
-      from: "Impero Automotive <noreply@imperoautomotive.it>",
+      from: `${SITE.nome} <noreply@imperoautomotive.it>`,
       to: d.email,
       subject: "Abbiamo ricevuto la tua richiesta",
       text: [
@@ -120,7 +120,7 @@ export async function emailCortesia(d: DatiLead): Promise<void> {
         `WhatsApp: https://wa.me/${waNumero}`,
         "",
         "A presto,",
-        "Il team di Impero Automotive",
+        `Il team di ${SITE.nome}`,
       ].join("\n"),
     });
   } catch {

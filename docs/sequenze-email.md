@@ -101,8 +101,7 @@ noleggio a lungo termine conviene di più, e spesso nessuno ve lo dice:
 deducete l'80% del canone e detraete il 100% dell'IVA.
 
 Con tutto incluso — assicurazione, manutenzione, gomme, bollo — l'auto
-diventa una voce fissa che lavora per voi, non un pensiero. E per chi macina
-chilometri esistono formule con percorrenze adeguate.
+diventa una voce fissa che lavora per voi, non un pensiero.
 
 Il costo reale sul vostro scaglione lo vedete qui in due minuti:
 https://[DOMINIO]/agenti
@@ -139,8 +138,7 @@ Buongiorno,
 ultimo messaggio. Se l'auto attuale va ancora bene, ottimo così.
 
 Quando sarà il momento di cambiarla, ricordatevi solo questo: 80% deducibile,
-IVA tutta detraibile, tutto incluso, e formule pensate per chi fa tanti
-chilometri. Il preventivo è rapido.
+IVA tutta detraibile, tutto incluso. Il preventivo è rapido.
 
 https://[DOMINIO]/agenti — o rispondete quando vi serve.
 

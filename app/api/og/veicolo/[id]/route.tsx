@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { veicoloById, kmAnno } from "@/lib/catalogo";
 import { euro, numero } from "@/lib/format";
+import { SITE } from "@/lib/site";
 
 export const runtime = "edge";
 
@@ -47,8 +48,10 @@ export function GET(_req: Request, { params }: { params: { id: string } }) {
             IV
           </div>
           <div style={{ display: "flex", gap: "8px", fontSize: "22px", letterSpacing: "6px", color: "#F2EEE6" }}>
-            <span>IMPERO</span>
-            <span style={{ color: "#B08D4F" }}>AUTOMOTIVE</span>
+            <span>{SITE.nome.toUpperCase().split(" ")[0]}</span>
+            <span style={{ color: "#B08D4F" }}>
+              {SITE.nome.toUpperCase().split(" ").slice(1).join(" ")}
+            </span>
           </div>
         </div>
 
