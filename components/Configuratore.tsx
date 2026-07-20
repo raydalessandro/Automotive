@@ -76,6 +76,20 @@ export function Configuratore({
 
   const [mostraCalcolatore, setMostraCalcolatore] = useState(false);
 
+  // Barra rata compatta: mentre si scorrono i servizi mostra solo la rata (non copre
+  // la schermata); sparisce quando il riepilogo completo (in fondo) entra in vista.
+  const [barraRata, setBarraRata] = useState(false);
+  const riepilogoRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = riepilogoRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setBarraRata(!e.isIntersecting), {
+      rootMargin: "0px 0px -60px 0px",
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   // Traccia l'uso del configuratore (§3): il dettaglio vive nel lead, non nell'evento.
   const tracciato = useRef(false);
   useEffect(() => {
@@ -226,8 +240,11 @@ export function Configuratore({
         </p>
       </div>
 
-      {/* Riepilogo sticky */}
-      <div className="sticky bottom-4 z-30 mt-6 rounded-2xl border border-oro/30 bg-carta p-5 shadow-lg sm:p-6">
+      {/* Riepilogo completo: nel flusso, in fondo. Compare tutto quando ci arrivi. */}
+      <div
+        ref={riepilogoRef}
+        className="mt-6 rounded-2xl border border-oro/30 bg-carta p-5 shadow-lg sm:p-6"
+      >
         <div className="flex items-baseline justify-between gap-4">
           <span className="text-sm font-medium">Rata configurata (indicativa)</span>
           <span className="font-display text-3xl font-semibold tabular text-nero">
@@ -274,6 +291,21 @@ export function Configuratore({
           Prezzi dei servizi indicativi, confermati nel preventivo.
         </p>
       </div>
+
+      {/* Barra rata compatta: fluttua mentre scorri, così i servizi restano leggibili.
+          Nasconde tutto tranne la rata; sparisce quando il riepilogo completo è in vista. */}
+      {barraRata && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none sticky bottom-4 z-30 mt-4 flex items-baseline justify-between gap-4 rounded-2xl border border-oro/30 bg-carta/95 px-5 py-4 shadow-lg backdrop-blur"
+        >
+          <span className="text-sm font-medium">Rata configurata (indicativa)</span>
+          <span className="font-display text-2xl font-semibold tabular text-nero">
+            {euro(rataConfigurata)}
+            <span className="ml-1 text-sm font-normal text-testo-chiaro/50">/mese + IVA</span>
+          </span>
+        </div>
+      )}
 
       {/* Calcolatore fiscale in coda */}
       {mostraCalcolatore && (
