@@ -51,6 +51,7 @@ export default function ConfiguratorePage({
       <div className="mx-auto max-w-3xl">
         <Configuratore
           canoneIniziale={veicolo?.canone_mese_iva_esclusa}
+          anticipoIniziale={veicolo?.anticipo_iva_esclusa}
           veicoloId={veicolo?.id}
           veicoloTitolo={veicolo ? titoloVeicolo(veicolo) : undefined}
           durataIniziale={veicolo?.durata_mesi}

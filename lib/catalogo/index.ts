@@ -12,6 +12,18 @@ export function canoneEquivalente(v: Pick<Veicolo, "canone_mese_iva_esclusa" | "
   return v.canone_mese_iva_esclusa + v.anticipo_iva_esclusa / v.durata_mesi;
 }
 
+/**
+ * Canone equivalente da MOSTRARE (§Anticipo zero): arrotondato, ma solo se c'è
+ * un anticipo. Con anticipo 0 non c'è nulla da mostrare → null. Applichiamo a noi
+ * stessi il criterio che predichiamo: il numero giusto per confrontare le offerte.
+ */
+export function canoneEquivalenteMostrato(
+  v: Pick<Veicolo, "canone_mese_iva_esclusa" | "anticipo_iva_esclusa" | "durata_mesi">,
+): number | null {
+  if (v.anticipo_iva_esclusa <= 0) return null;
+  return Math.round(canoneEquivalente(v));
+}
+
 /** Km/anno derivati (§2.1). */
 export function kmAnno(v: Pick<Veicolo, "km_totali" | "durata_mesi">): number {
   return Math.round(v.km_totali / (v.durata_mesi / 12));

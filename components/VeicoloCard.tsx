@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { VeicoloImg } from "./VeicoloImg";
+import { CanoneEquivalente } from "./CanoneEquivalente";
 import { badge, kmAnno, titoloVeicolo, type Veicolo } from "@/lib/catalogo";
 import { euro, numero } from "@/lib/format";
 
@@ -71,6 +72,12 @@ export function VeicoloCard({ v, priority = false }: { v: Veicolo; priority?: bo
             </span>
             <span className="text-sm text-testo-chiaro/60">/mese + IVA</span>
           </p>
+          <CanoneEquivalente
+            canone={v.canone_mese_iva_esclusa}
+            anticipo={v.anticipo_iva_esclusa}
+            durata={v.durata_mesi}
+            className="mt-0.5"
+          />
           <p className="mt-0.5 text-xs text-testo-chiaro/50">Tutti i servizi inclusi</p>
         </div>
       </div>

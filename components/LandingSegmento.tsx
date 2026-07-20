@@ -3,6 +3,8 @@ import Image from "next/image";
 import { Calcolatore } from "./Calcolatore";
 import { VeicoloCard } from "./VeicoloCard";
 import { Faq, type FaqItem } from "./Faq";
+import { FasciaAnticipo } from "./FasciaAnticipo";
+import { FAQ_ANTICIPO } from "@/lib/faq";
 import { MicroGaranzie } from "./design/MicroGaranzie";
 import { BannerFiscale } from "./design/BannerFiscale";
 import type { ProfiloId } from "@/lib/fiscale.config";
@@ -123,11 +125,14 @@ export function LandingSegmento({
         </section>
       )}
 
+      {/* Anticipo zero. Davvero. (§2) — anche sulle landing di segmento. */}
+      <FasciaAnticipo />
+
       <section className="bg-avorio">
         <div className="container-content py-16">
           <h2 className="font-display text-3xl font-semibold">Domande frequenti</h2>
           <div className="mt-8 max-w-3xl">
-            <Faq items={faq} />
+            <Faq items={[...FAQ_ANTICIPO, ...faq]} />
           </div>
         </div>
       </section>

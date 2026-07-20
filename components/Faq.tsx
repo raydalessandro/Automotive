@@ -1,4 +1,6 @@
-export type FaqItem = { d: string; r: string };
+import Link from "next/link";
+
+export type FaqItem = { d: string; r: string; cta?: { href: string; label: string } };
 
 // FAQ con <details> nativo (accessibile, nessun JS). Genera anche JSON-LD FAQPage.
 export function Faq({ items }: { items: FaqItem[] }) {
@@ -26,6 +28,11 @@ export function Faq({ items }: { items: FaqItem[] }) {
               <span className="text-oro transition-transform group-open:rotate-45">+</span>
             </summary>
             <p className="mt-3 text-sm text-testo-chiaro/70">{i.r}</p>
+            {i.cta && (
+              <Link href={i.cta.href} className="mt-3 inline-block text-sm font-medium text-oro hover:underline">
+                {i.cta.label} →
+              </Link>
+            )}
           </details>
         ))}
       </div>

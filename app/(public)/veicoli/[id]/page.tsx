@@ -12,6 +12,8 @@ import {
 } from "@/lib/catalogo";
 import { VeicoloImg } from "@/components/VeicoloImg";
 import { MicroGaranzie } from "@/components/design/MicroGaranzie";
+import { CanoneEquivalente } from "@/components/CanoneEquivalente";
+import { FasciaAnticipo } from "@/components/FasciaAnticipo";
 import { Calcolatore } from "@/components/Calcolatore";
 import { TracciaVeicolo } from "@/components/traccia/TracciaVeicolo";
 import { LinkTracciato } from "@/components/traccia/LinkTracciato";
@@ -161,6 +163,12 @@ export default function VeicoloPage({ params }: { params: { id: string } }) {
               </span>
               <span className="text-testo-chiaro/60">/mese + IVA</span>
             </p>
+            <CanoneEquivalente
+              canone={v.canone_mese_iva_esclusa}
+              anticipo={v.anticipo_iva_esclusa}
+              durata={v.durata_mesi}
+              className="mt-1"
+            />
             <p className="mt-1 text-sm text-oro">Tutti i servizi inclusi</p>
 
             <dl className="mt-5 space-y-2 text-sm">
@@ -193,6 +201,13 @@ export default function VeicoloPage({ params }: { params: { id: string } }) {
             </div>
             <MicroGaranzie className="mt-4 justify-center" />
           </div>
+
+          {/* Anticipo zero (§2): fascia compatta sulle schede senza anticipo. */}
+          {v.anticipo_iva_esclusa === 0 && (
+            <div className="mt-6">
+              <FasciaAnticipo compatta />
+            </div>
+          )}
 
           {/* Calcolatore inline preimpostato sul canone */}
           <div className="mt-6">

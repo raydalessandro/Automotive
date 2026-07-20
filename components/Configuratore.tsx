@@ -18,6 +18,7 @@ import {
 import { IconaServizio } from "@/components/design/FasciaServizi";
 import { Filetto } from "@/components/design/RuotaGuilloche";
 import { MicroGaranzie } from "@/components/design/MicroGaranzie";
+import { CanoneEquivalente } from "@/components/CanoneEquivalente";
 import { Calcolatore } from "@/components/Calcolatore";
 import { euro, numero } from "@/lib/format";
 import type { ProfiloId } from "@/lib/fiscale.config";
@@ -26,6 +27,7 @@ const KEY_CONFIG = "impero_config";
 
 type Props = {
   canoneIniziale?: number;
+  anticipoIniziale?: number;
   veicoloId?: string;
   veicoloTitolo?: string;
   durataIniziale?: number;
@@ -39,6 +41,7 @@ type Props = {
 
 export function Configuratore({
   canoneIniziale = 300,
+  anticipoIniziale = 0,
   veicoloId,
   veicoloTitolo,
   durataIniziale = DURATA_DEFAULT,
@@ -252,6 +255,14 @@ export function Configuratore({
             <span className="ml-1 text-sm font-normal text-testo-chiaro/50">/mese + IVA</span>
           </span>
         </div>
+
+        {/* Canone equivalente (§1): rata + anticipo del veicolo spalmato sulla durata. */}
+        <CanoneEquivalente
+          canone={Math.round(rataConfigurata)}
+          anticipo={anticipoIniziale}
+          durata={durata}
+          className="mt-1 text-right"
+        />
 
         <Filetto className="my-3 h-3 w-full text-oro/60" />
 

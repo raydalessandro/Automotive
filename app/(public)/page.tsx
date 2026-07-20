@@ -5,9 +5,12 @@ import { VeicoloCard } from "@/components/VeicoloCard";
 import { SITE } from "@/lib/site";
 import { LineaVeicoli } from "@/components/design/LineaVeicoli";
 import { FasciaServizi } from "@/components/design/FasciaServizi";
+import { FasciaAnticipo } from "@/components/FasciaAnticipo";
 import { TabellaConfronto } from "@/components/design/TabellaConfronto";
 import { MicroGaranzie } from "@/components/design/MicroGaranzie";
 import { Filetto } from "@/components/design/RuotaGuilloche";
+import { Faq } from "@/components/Faq";
+import { FAQ_ANTICIPO } from "@/lib/faq";
 
 const SEGMENTI = [
   {
@@ -132,6 +135,9 @@ export default function Home() {
       {/* Tutto nel canone */}
       <FasciaServizi />
 
+      {/* Anticipo zero. Davvero. (§2) — subito dopo "Tutto nel canone". */}
+      <FasciaAnticipo cta="consulente" />
+
       {/* Come funziona */}
       <section className="bg-avorio">
         <div className="container-content py-16 sm:py-20">
@@ -226,6 +232,17 @@ export default function Home() {
             <Link href="/calcolatore" className="mt-6 inline-block text-sm font-medium text-oro hover:underline">
               Scopri quanto risparmi davvero →
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Domande frequenti — canoni onesti (§3). Linkano il calcolatore. */}
+      <section className="bg-avorio">
+        <div className="container-content py-16 sm:py-20">
+          <h2 className="font-display text-3xl font-semibold">Domande frequenti</h2>
+          <p className="mt-1 text-testo-chiaro/60">I conti in chiaro, prima ancora di sentirci.</p>
+          <div className="mt-8 max-w-3xl">
+            <Faq items={FAQ_ANTICIPO} />
           </div>
         </div>
       </section>
