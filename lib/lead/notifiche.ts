@@ -32,6 +32,25 @@ function rigaConfig(c: Configurazione): string | null {
 }
 
 function messaggioTelegram(d: DatiLead, ctx: Contesto): string {
+  // Richiamo rapido (modal minimale): è il lead più caldo, ma i default sentinella
+  // gli danno score basso. Va marcato prioritario a prescindere dallo score, e senza
+  // mostrare i campi aziendali fittizi (verranno raccolti in chiamata).
+  if (d.note && d.note.includes("Richiamo rapido")) {
+    const righe = [
+      "⚡ RICHIAMO RAPIDO — chiamare subito",
+      `${d.referente}`,
+      `📞 ${d.telefono}`,
+    ];
+    if (ctx.veicoloTitolo) righe.push(`Veicolo: ${ctx.veicoloTitolo}`);
+    if (ctx.configurazione) {
+      const rc = rigaConfig(ctx.configurazione);
+      if (rc) righe.push(rc);
+    }
+    righe.push("ℹ️ Dati aziendali da raccogliere in chiamata.");
+    if (ctx.leadId) righe.push(`🔗 ${siteUrl()}/app/lead?apri=${ctx.leadId}`);
+    return righe.join("\n");
+  }
+
   const hot = isHot(ctx.score) ? " · HOT" : "";
   const fonte = d.fonte?.utm_source
     ? `${d.fonte.utm_source}/${d.fonte.utm_medium ?? "-"}`
@@ -113,7 +132,7 @@ export async function emailCortesia(d: DatiLead): Promise<void> {
       text: [
         `Ciao ${d.referente},`,
         "",
-        "grazie per averci contattato. Abbiamo ricevuto la tua richiesta e ti ricontatteremo entro poche ore lavorative con un preventivo su misura.",
+        "grazie per averci contattato. Abbiamo ricevuto la tua richiesta e ti ricontatteremo entro 24 ore lavorative con un preventivo su misura.",
         "",
         `Se vuoi anticipare i tempi, scrivici o chiamaci:`,
         `Telefono: ${CONTATTI.telefono}`,

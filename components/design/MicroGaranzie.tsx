@@ -15,7 +15,7 @@ const GARANZIE = [
     ),
   },
   {
-    t: "Risposta in 48h",
+    t: "Risposta in 24h",
     d: (
       <>
         <circle cx="8" cy="8" r="5.5" />

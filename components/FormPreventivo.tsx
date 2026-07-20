@@ -112,7 +112,7 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
     return (
       <div className="rounded-2xl border border-oro/30 bg-oro/10 p-8 text-center">
         <h2 className="font-display text-2xl font-semibold">Ricevuto.</h2>
-        <p className="mt-2 text-testo-chiaro/70">Ti richiamiamo entro poche ore lavorative.</p>
+        <p className="mt-2 text-testo-chiaro/70">Ti richiamiamo entro 24 ore lavorative.</p>
       </div>
     );
   }
@@ -208,7 +208,7 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
         {stato === "invio" ? "Invio in corso…" : "Richiedi il preventivo"}
       </button>
       <p className="mt-3 text-center text-xs text-testo-chiaro/45">
-        Ti richiamiamo entro poche ore lavorative. Nessun impegno.
+        Ti richiamiamo entro 24 ore lavorative. Nessun impegno.
       </p>
     </form>
   );

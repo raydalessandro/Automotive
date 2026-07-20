@@ -21,7 +21,7 @@ const LAVORO = [
   {
     icona: "/asset/icone-business/risposta-24h.svg",
     t: "Risposta rapida",
-    d: "Ti ricontattiamo in poche ore lavorative.",
+    d: "Ti ricontattiamo entro 24 ore lavorative.",
   },
   {
     icona: "/asset/icone-business/consegna-nazionale.svg",

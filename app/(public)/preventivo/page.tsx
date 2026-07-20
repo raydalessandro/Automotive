@@ -16,7 +16,7 @@ const PASSI = [
   {
     icona: "/asset/icone-business/risposta-24h.svg",
     t: "Ti rispondiamo entro 24h",
-    d: "Prepariamo la proposta e ti ricontattiamo in poche ore lavorative.",
+    d: "Prepariamo la proposta su misura per la tua attività e ti ricontattiamo noi.",
   },
   {
     icona: "/asset/icone-business/consulenza-dedicata.svg",

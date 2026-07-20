@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Configuratore } from "@/components/Configuratore";
+import { Filetto } from "@/components/design/RuotaGuilloche";
 import { veicoloById, titoloVeicolo } from "@/lib/catalogo";
 import type { Segmento } from "@/lib/servizi.config";
 
@@ -27,6 +28,7 @@ export default function ConfiguratorePage({
       <header className="mx-auto mb-8 max-w-2xl text-center">
         <h1 className="font-display text-4xl font-semibold">Nessuna sorpresa.</h1>
         <p className="mt-2 font-display text-2xl text-oro">Scegli tu cosa coprire.</p>
+        <Filetto className="mx-auto mt-4 h-4 w-40 text-oro" />
         <p className="mt-4 text-testo-chiaro/65">
           Per ogni rischio ti mostriamo cosa succede se sei scoperto e quanto costa la copertura.
           Decidi tu: o ti copri, o accetti il rischio con i conti in chiaro.
