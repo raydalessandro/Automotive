@@ -15,9 +15,13 @@ export function Avatar({
   size?: number;
   className?: string;
 }) {
+  // Le foto team hanno già l'anello oro inciso: non raddoppiarlo. L'anello lo
+  // aggiunge solo il segnaposto a iniziali.
   return (
     <span
-      className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-grafite ring-1 ring-oro/60 ${className}`}
+      className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-grafite ${
+        foto ? "" : "ring-1 ring-oro/60"
+      } ${className}`}
       style={{ width: size, height: size }}
     >
       {foto ? (

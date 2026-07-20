@@ -22,13 +22,13 @@ export const TEAM: Consulente[] = [
     nome: "Shery",
     ruolo: "Consulente clienti",
     bio: "Segue la tua pratica dal primo preventivo alla consegna.",
-    // foto: "/team/shery.webp", // da innestare quando arriva lo scatto
+    foto: "/team/shery.webp",
   },
   {
     nome: "Ahmed",
     ruolo: "Consulente clienti",
     bio: "Ti aiuta a scegliere la copertura giusta, senza venderti quello che non serve.",
-    // foto: "/team/ahmed.webp",
+    foto: "/team/ahmed.webp",
   },
   {
     nome: "Alessio",
