@@ -12,12 +12,17 @@ test("consulente: 5 risposte → soluzioni → configura (senza lasciare contatt
   await page.goto("/consulente");
   await expect(page.getByText("Che attività fai?")).toBeVisible();
 
-  // Le 5 risposte (selezionare avanza).
+  // Le 5 risposte: seleziona + Avanti (niente auto-avanzamento).
   await page.locator('input[name="attivita"][value="artigiano"]').click();
+  await page.getByRole("button", { name: "Avanti" }).click();
   await page.locator('input[name="km"][value="20_30"]').click();
+  await page.getByRole("button", { name: "Avanti" }).click();
   await page.locator('input[name="trasporto"][value="spesso"]').click();
+  await page.getByRole("button", { name: "Avanti" }).click();
   await page.locator('input[name="forfettario"][value="no"]').click();
+  await page.getByRole("button", { name: "Avanti" }).click();
   await page.locator('input[name="priorita"][value="fiscale"]').click();
+  await page.getByRole("button", { name: "Vedi le soluzioni" }).click();
 
   // Soluzioni visibili senza alcun form di contatto.
   await expect(page.getByRole("heading", { name: "Le tue soluzioni" })).toBeVisible();
@@ -48,10 +53,15 @@ test("consulente: 5 risposte → soluzioni → configura (senza lasciare contatt
 test("consulente: oltre 30.000 km → pannello su misura, niente card", async ({ page }) => {
   await page.goto("/consulente");
   await page.locator('input[name="attivita"][value="agente"]').click();
+  await page.getByRole("button", { name: "Avanti" }).click();
   await page.locator('input[name="km"][value="oltre_30"]').click();
+  await page.getByRole("button", { name: "Avanti" }).click();
   await page.locator('input[name="trasporto"][value="no"]').click();
+  await page.getByRole("button", { name: "Avanti" }).click();
   await page.locator('input[name="forfettario"][value="no"]').click();
+  await page.getByRole("button", { name: "Avanti" }).click();
   await page.locator('input[name="priorita"][value="rata"]').click();
+  await page.getByRole("button", { name: "Vedi le soluzioni" }).click();
 
   await expect(page.getByText(/Oltre i 30.000 km/i)).toBeVisible();
   await expect(page.getByText("La nostra proposta")).toHaveCount(0);

@@ -75,6 +75,8 @@ export function Consulente({ veicoli }: { veicoli: Veicolo[] }) {
   }, [consulto, risposte]);
 
   function scegli(chiave: keyof Risposte, valore: string) {
+    // Solo selezione: NON avanza (l'avanzamento è coi tasti Avanti/Indietro),
+    // così si può cambiare risposta senza attrito anche rientrando nel wizard.
     const nuove = { ...risposte, [chiave]: valore };
     setRisposte(nuove);
     try {
@@ -82,8 +84,10 @@ export function Consulente({ veicoli }: { veicoli: Veicolo[] }) {
     } catch {
       /* ignora */
     }
-    setStep((s) => Math.min(s + 1, CHIAVI.length));
   }
+
+  const avanti = () => setStep((s) => Math.min(s + 1, CHIAVI.length));
+  const indietro = () => setStep((s) => Math.max(s - 1, 0));
 
   function modifica() {
     trackato.current = false;
@@ -150,15 +154,24 @@ export function Consulente({ veicoli }: { veicoli: Veicolo[] }) {
           })}
         </div>
       </fieldset>
-      {step > 0 && (
+      <div className="mt-8 flex items-center justify-between gap-4">
         <button
           type="button"
-          onClick={() => setStep((s) => Math.max(s - 1, 0))}
-          className="mt-6 text-sm font-medium text-testo-chiaro/60 hover:text-oro"
+          onClick={indietro}
+          disabled={step === 0}
+          className="text-sm font-medium text-testo-chiaro/60 transition-colors hover:text-oro disabled:invisible"
         >
           ← Indietro
         </button>
-      )}
+        <button
+          type="button"
+          onClick={avanti}
+          disabled={!risposte[domanda.chiave]}
+          className="btn-oro disabled:opacity-40"
+        >
+          {step === CHIAVI.length - 1 ? "Vedi le soluzioni" : "Avanti"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -179,19 +192,27 @@ function Pallini({ totale, attivo }: { totale: number; attivo: number }) {
 }
 
 function RiepilogoRisposte({ risposte, onModifica }: { risposte: Risposte; onModifica: () => void }) {
-  const testo = [
+  const chips = [
     labelRisposta("attivita", risposte.attivita),
     labelRisposta("km", risposte.km),
-    `trasporto ${risposte.trasporto === "no" ? "no" : "sì"}`,
-  ].join(" · ");
+    `Trasporto ${risposte.trasporto === "no" ? "no" : "sì"}`,
+    labelRisposta("priorita", risposte.priorita),
+  ];
   return (
-    <div className="mx-auto max-w-3xl">
-      <p className="text-sm text-testo-chiaro/60">
-        {testo} —{" "}
-        <button type="button" onClick={onModifica} className="font-medium text-oro hover:underline">
-          modifica
+    <div className="mx-auto max-w-5xl">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-nero/10 bg-carta px-4 py-3 sm:px-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-widest text-oro">Le tue risposte</span>
+          {chips.map((c) => (
+            <span key={c} className="rounded-full bg-nero/5 px-3 py-1 text-xs font-medium text-testo-chiaro/75">
+              {c}
+            </span>
+          ))}
+        </div>
+        <button type="button" onClick={onModifica} className="btn-ghost shrink-0 px-4 py-2 text-sm">
+          Modifica le risposte
         </button>
-      </p>
+      </div>
     </div>
   );
 }
