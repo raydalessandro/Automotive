@@ -13,27 +13,34 @@ export type Consulente = {
   nome: string;
   ruolo: string;
   bio: string;
+  /** Riga umana, in prima persona. [DA CONFERMARE]: sono parole loro, non nostre. */
+  notaPersonale?: string;
   /** Path in public/. Assente => segnaposto a iniziali. */
   foto?: string;
 };
 
+// [DA CONFERMARE] le notaPersonale sono bozze da far correggere a Shery e Ahmed
+// (Alessio la sua); sostituire con le frasi vere quando arrivano.
 export const TEAM: Consulente[] = [
   {
     nome: "Shery",
     ruolo: "Consulente clienti",
     bio: "Segue la tua pratica dal primo preventivo alla consegna.",
+    notaPersonale: "Quello che mi piace? Togliere l'ansia dei conti a chi ha già mille pensieri di lavoro.",
     foto: "/team/shery.webp",
   },
   {
     nome: "Ahmed",
     ruolo: "Consulente clienti",
     bio: "Ti aiuta a scegliere la copertura giusta, senza venderti quello che non serve.",
+    notaPersonale: "Preferisco dirti cosa non ti serve: un cliente che si fida vale più di un extra venduto.",
     foto: "/team/ahmed.webp",
   },
   {
     nome: "Alessio",
     ruolo: "Ricerca e strumenti",
     bio: "Costruisce i calcolatori che vedi sul sito e tiene i conti onesti: se un numero è qui, è verificabile.",
+    notaPersonale: "Se un numero è sul sito, l'ho verificato. Odio le sorprese in fondo al contratto.",
     foto: "/team/alessio.webp",
   },
 ];

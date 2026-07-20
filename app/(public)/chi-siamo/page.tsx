@@ -97,22 +97,29 @@ export default function ChiSiamoPage() {
                 {c.ruolo}
               </p>
               <p className="mt-3 text-sm text-testo-chiaro/70">{c.bio}</p>
+              {c.notaPersonale && (
+                <p className="mt-2 text-sm italic text-testo-chiaro/55">{c.notaPersonale}</p>
+              )}
             </div>
           ))}
         </div>
 
         <MicroGaranzie className="mt-10 justify-center" />
 
-        {/*
-          [APERTO — da concordare con Ray prima di pubblicare] Blocco "Come guadagniamo":
-          trasparenza sul modello a provvigione. NON pubblicare senza ok esplicito.
-
-          Come guadagniamo
-          Non ti vendiamo noi l'auto: confrontiamo i listini degli operatori di noleggio e,
-          quando scegli, l'operatore ci riconosce una provvigione. Per te il prezzo non cambia,
-          e non abbiamo motivo di spingerti verso un'offerta invece che verso quella giusta:
-          il nostro interesse è che tu resti cliente, non che tu firmi in fretta.
-        */}
+        {/* Trasparenza sul modello a provvigione: disinnesca il dubbio "come guadagnano". */}
+        <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-nero/10 bg-avorio p-6 sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-widest text-oro">Trasparenza</p>
+          <h3 className="mt-2 font-display text-2xl font-semibold">
+            Come guadagniamo (e perché puoi fidarti dei conti)
+          </h3>
+          <p className="mt-3 text-testo-chiaro/75">
+            La consulenza per te è gratis. Guadagniamo dall&apos;operatore di noleggio che scegli, con una
+            provvigione riconosciuta a contratto firmato:{" "}
+            <strong className="text-testo-chiaro">il prezzo che paghi è identico a quello di listino</strong>,
+            con o senza di noi. Per questo non abbiamo motivo di spingerti su un&apos;offerta invece che su
+            quella giusta per te — ci conviene che tu resti cliente, non che tu firmi in fretta.
+          </p>
+        </div>
       </section>
 
       {/* CTA finale */}
