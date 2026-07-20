@@ -43,5 +43,6 @@ export type Lead = {
   richiamare_il: string | null;
   aggiornato_il: string | null;
   aggiornato_da: string | null;
+  valore_commissione: number | null;
   configurazione: Configurazione | null;
 };

@@ -9,7 +9,7 @@ import {
   labelNVeicoli,
   labelKm,
 } from "@/lib/lead/schema";
-import { cambiaStato, salvaNote, impostaRichiamo } from "@/app/app/(dash)/lead/actions";
+import { cambiaStato, salvaNote, impostaRichiamo, salvaCommissione } from "@/app/app/(dash)/lead/actions";
 import { whatsappLink } from "@/lib/contatti";
 import { titoliRischi } from "@/lib/servizi.config";
 import { DOMANDE } from "@/lib/consulente.config";
@@ -44,6 +44,9 @@ export function LeadDettaglio({ lead, onChiudi }: { lead: Lead; onChiudi: () => 
   const [pending, start] = useTransition();
   const [note, setNote] = useState(lead.note ?? "");
   const [richiamo, setRichiamo] = useState(isoToLocalInput(lead.richiamare_il));
+  const [commissione, setCommissione] = useState(
+    lead.valore_commissione != null ? String(lead.valore_commissione) : "",
+  );
   const [msg, setMsg] = useState<string | null>(null);
 
   const hot = lead.score != null && lead.score >= 3;
@@ -122,6 +125,42 @@ export function LeadDettaglio({ lead, onChiudi }: { lead: Lead; onChiudi: () => 
             ))}
           </div>
         </div>
+
+        {/* Valore commissione — solo a contratto chiuso (§PR30). Opzionale ma sollecitato. */}
+        {lead.stato === "chiuso" && (
+          <div className="mt-5 rounded-xl border border-oro/30 bg-oro/5 p-4">
+            <label className="text-xs font-semibold uppercase tracking-wide text-oro">
+              Valore commissione (€)
+            </label>
+            <p className="mt-1 text-xs text-testo-chiaro/55">
+              Quanto ci ha riconosciuto l&apos;operatore. Anche dopo: serve al valore medio a contratto.
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <input
+                type="number"
+                inputMode="decimal"
+                min={0}
+                step={1}
+                value={commissione}
+                onChange={(e) => setCommissione(e.target.value)}
+                placeholder="es. 450"
+                className="w-32 rounded-lg border border-nero/15 px-3 py-2 text-sm focus:border-oro focus:outline-none"
+              />
+              <button
+                disabled={pending}
+                onClick={() =>
+                  esegui(
+                    () => salvaCommissione(lead.id, commissione === "" ? null : Number(commissione)),
+                    "Commissione salvata",
+                  )
+                }
+                className="btn-oro px-4 py-2 text-sm disabled:opacity-50"
+              >
+                Salva
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Dati */}
         <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
