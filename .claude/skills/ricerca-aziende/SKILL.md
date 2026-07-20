@@ -59,3 +59,11 @@ si misura con la query SQL in PATTERN-settori.md (raggruppa su `fonte_ricerca`).
 Mai PEC, mai email personali o nominali, mai dati inventati o dedotti. Un campo vuoto si
 arricchisce domani; un'email sbagliata brucia il dominio d'invio oggi. I file in `batch/` si
 committano: sono l'audit trail delle sessioni di ricerca.
+
+## Modalità 4 — Primo contatto
+
+`npm run aziende:contatti` genera `strumenti/ricerca/contatti/lista-tiro.md`: per ogni azienda
+il canale (email / telefono / da arricchire), il gancio estratto dai segnali e il messaggio
+pronto. Regole e razionale in `docs/primo-contatto.md`. Alla risposta si passa a voce: il
+venditore richiama entro 30 minuti. La skill serve anche a rifornire la lista: 2 batch di
+raccolta al giorno tengono il ritmo di 30-50 contatti/giorno.

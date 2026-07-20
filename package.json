@@ -12,6 +12,7 @@
     "e2e": "playwright test",
     "check:catalogo": "tsx scripts/valida-catalogo.ts",
     "aziende:gate": "tsx scripts/aziende-gate.ts",
+    "aziende:contatti": "tsx scripts/aziende-primo-contatto.ts",
     "check:blog": "tsx scripts/valida-blog.ts",
     "aziende:importa": "tsx scripts/aziende-importa.ts",
     "aziende:esporta": "tsx scripts/aziende-esporta.ts",
