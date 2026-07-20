@@ -87,6 +87,15 @@ export const leadSchema = z.object({
       servizi_interesse: z.array(z.string().max(60)).max(50).optional(),
       rischi_accettati: z.array(z.string().max(60)).max(50).optional(),
       rata_configurata: z.number().optional(),
+      // Esito del Consulente (§PR23): risposte + soluzioni viste/scelta.
+      consulente: z
+        .object({
+          risposte: z.record(z.string().max(60)).optional(),
+          soluzione_vista: z.array(z.string().max(120)).max(10).optional(),
+          soluzione_scelta: z.string().max(120).nullable().optional(),
+        })
+        .nullable()
+        .optional(),
     })
     .nullable()
     .optional(),

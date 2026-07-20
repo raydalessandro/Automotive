@@ -13,6 +13,8 @@ import { isHot } from "../scoring.config";
 import { CONTATTI } from "../contatti";
 import { siteUrl, SITE } from "../site";
 import { titoliRischi, type Configurazione } from "../servizi.config";
+import { veicoloById, titoloVeicolo } from "../catalogo";
+import { DOMANDE } from "../consulente.config";
 
 type Contesto = {
   score: number;
@@ -31,6 +33,29 @@ function rigaConfig(c: Configurazione): string | null {
   return parti.length ? "🧩 " + parti.join(" · ") : null;
 }
 
+// Riga Consulente per Telegram (§5): il percorso a domande + la soluzione scelta.
+function etichettaConsulente(chiave: string, valore: string): string {
+  const dom = DOMANDE.find((x) => x.chiave === chiave);
+  return dom?.opzioni.find((o) => o.id === valore)?.label ?? valore;
+}
+function rigaConsulente(c: Configurazione): string | null {
+  const k = c.consulente;
+  if (!k?.risposte) return null;
+  const r = k.risposte;
+  const parti = [
+    r.attivita ? etichettaConsulente("attivita", r.attivita) : null,
+    r.km ? etichettaConsulente("km", r.km) : null,
+    r.trasporto ? `trasporto ${r.trasporto === "no" ? "no" : "sì"}` : null,
+    r.priorita ? etichettaConsulente("priorita", r.priorita) : null,
+  ].filter(Boolean);
+  let riga = `🧭 Consulente: ${parti.join(" · ")}`;
+  if (k.soluzione_scelta) {
+    const v = veicoloById(k.soluzione_scelta);
+    riga += ` → ${v ? titoloVeicolo(v) : k.soluzione_scelta}`;
+  }
+  return riga;
+}
+
 function messaggioTelegram(d: DatiLead, ctx: Contesto): string {
   // Richiamo rapido (modal minimale): è il lead più caldo, ma i default sentinella
   // gli danno score basso. Va marcato prioritario a prescindere dallo score, e senza
@@ -45,6 +70,8 @@ function messaggioTelegram(d: DatiLead, ctx: Contesto): string {
     if (ctx.configurazione) {
       const rc = rigaConfig(ctx.configurazione);
       if (rc) righe.push(rc);
+      const rk = rigaConsulente(ctx.configurazione);
+      if (rk) righe.push(rk);
     }
     righe.push("ℹ️ Dati aziendali da raccogliere in chiamata.");
     if (ctx.leadId) righe.push(`🔗 ${siteUrl()}/app/lead?apri=${ctx.leadId}`);
@@ -67,6 +94,8 @@ function messaggioTelegram(d: DatiLead, ctx: Contesto): string {
   if (ctx.configurazione) {
     const rc = rigaConfig(ctx.configurazione);
     if (rc) righe.push(rc);
+    const rk = rigaConsulente(ctx.configurazione);
+    if (rk) righe.push(rk);
   }
   // Deep link al dettaglio nella dashboard (§6): la dashboard è il posto di lavoro.
   if (ctx.leadId) righe.push(`🔗 ${siteUrl()}/app/lead?apri=${ctx.leadId}`);

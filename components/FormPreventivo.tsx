@@ -9,6 +9,7 @@ import {
   KM_ANNO,
 } from "@/lib/lead/schema";
 import { traccia } from "@/lib/traccia";
+import { leggiEsito } from "@/lib/consulente-esito";
 import { titoliRischi, type Configurazione } from "@/lib/servizi.config";
 import { numero } from "@/lib/format";
 
@@ -81,7 +82,11 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
       ts_apertura: tsApertura.current,
       fonte,
       pagina: typeof window !== "undefined" ? window.location.pathname : "",
-      configurazione: config,
+      configurazione: (() => {
+        const esito = leggiEsito();
+        if (!config && !esito) return null;
+        return { ...(config ?? {}), ...(esito ? { consulente: esito } : {}) };
+      })(),
     };
 
     try {

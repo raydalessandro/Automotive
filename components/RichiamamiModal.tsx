@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { traccia } from "@/lib/traccia";
+import { leggiEsito } from "@/lib/consulente-esito";
 import type { Configurazione } from "@/lib/servizi.config";
 
 // Modal "richiamami tu" — attrito minimo per il lead caldo: nome + telefono e
@@ -54,7 +55,11 @@ export function RichiamamiModal({
       telefono,
       consenso_privacy: fd.get("consenso_privacy") === "on",
       veicolo_id: veicoloId ?? config?.veicolo_id ?? "",
-      configurazione: config,
+      configurazione: (() => {
+        const esito = leggiEsito();
+        if (!config && !esito) return null;
+        return { ...(config ?? {}), ...(esito ? { consulente: esito } : {}) };
+      })(),
       note: "⚡ Richiamo rapido dal sito — dati aziendali da raccogliere in chiamata.",
       pagina: typeof window !== "undefined" ? window.location.pathname : "",
     };

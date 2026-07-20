@@ -12,8 +12,20 @@ import {
 import { cambiaStato, salvaNote, impostaRichiamo } from "@/app/app/(dash)/lead/actions";
 import { whatsappLink } from "@/lib/contatti";
 import { titoliRischi } from "@/lib/servizi.config";
+import { DOMANDE } from "@/lib/consulente.config";
 import { numero } from "@/lib/format";
 import { SITE } from "@/lib/site";
+
+// Etichette leggibili delle risposte del Consulente (§PR23).
+function etichetteConsulente(r: Record<string, string>): string {
+  return DOMANDE.map((d) => {
+    const v = r[d.chiave];
+    if (!v) return null;
+    return d.opzioni.find((o) => o.id === v)?.label ?? v;
+  })
+    .filter(Boolean)
+    .join(" · ");
+}
 
 function isoToLocalInput(iso: string | null): string {
   if (!iso) return "";
@@ -152,6 +164,18 @@ export function LeadDettaglio({ lead, onChiudi }: { lead: Lead; onChiudi: () => 
             {lead.configurazione.rischi_accettati?.length ? (
               <p className="mt-1 text-sm text-testo-chiaro/55">
                 Rischi accettati: {titoliRischi(lead.configurazione.rischi_accettati).join(", ")}
+              </p>
+            ) : null}
+            {lead.configurazione.consulente?.risposte ? (
+              <p className="mt-2 border-t border-oro/20 pt-2 text-sm text-testo-chiaro/75">
+                🧭 <span className="font-medium">Consulente:</span>{" "}
+                {etichetteConsulente(lead.configurazione.consulente.risposte)}
+                {lead.configurazione.consulente.soluzione_scelta ? (
+                  <>
+                    {" "}
+                    → scelta: <strong>{lead.configurazione.consulente.soluzione_scelta}</strong>
+                  </>
+                ) : null}
               </p>
             ) : null}
           </div>

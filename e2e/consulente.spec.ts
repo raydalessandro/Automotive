@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
 
-// Mock tracking: nessuna scrittura eventi reale.
+// Mock backend: nessuna scrittura DB, nessuna notifica reale.
 test.beforeEach(async ({ page }) => {
-  await page.route("**/api/eventi", (r) =>
-    r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }),
-  );
+  const ok = (r: import("@playwright/test").Route) =>
+    r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
+  await page.route("**/api/eventi", ok);
+  await page.route("**/api/lead", ok);
 });
 
 test("consulente: 5 risposte → soluzioni → configura (senza lasciare contatti)", async ({ page }) => {
@@ -25,6 +26,23 @@ test("consulente: 5 risposte → soluzioni → configura (senza lasciare contatt
   // "Configura questa" → configuratore preimpostato.
   await page.getByRole("link", { name: "Configura questa" }).first().click();
   await expect(page).toHaveURL(/\/configuratore\?.*veicolo=/);
+
+  // Configuratore → preventivo con la configurazione allegata.
+  await page.getByRole("link", { name: /Richiedi il preventivo con questa configurazione/i }).click();
+  await expect(page).toHaveURL(/\/preventivo/);
+
+  // Compila e invia: viaggio completo.
+  await page.fill('input[name="ragione_sociale"]', "Test Consulente SRL");
+  await page.fill('input[name="referente"]', "Mario Test");
+  await page.selectOption('select[name="forma_giuridica"]', "srl_spa");
+  await page.selectOption('select[name="anni_attivita"]', "oltre_5");
+  await page.selectOption('select[name="n_veicoli"]', "1");
+  await page.selectOption('select[name="km_anno"]', "15_30");
+  await page.fill('input[name="provincia"]', "MI");
+  await page.fill('input[name="telefono"]', "3331234567");
+  await page.check('input[name="consenso_privacy"]');
+  await page.locator('form button[type="submit"]').click();
+  await expect(page.getByText("Ricevuto.")).toBeVisible();
 });
 
 test("consulente: oltre 30.000 km → pannello su misura, niente card", async ({ page }) => {

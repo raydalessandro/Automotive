@@ -12,6 +12,7 @@ import { VeicoloImg } from "@/components/VeicoloImg";
 import { MicroGaranzie } from "@/components/design/MicroGaranzie";
 import { RichiamamiModal } from "@/components/RichiamamiModal";
 import { traccia } from "@/lib/traccia";
+import { salvaEsito, segnaScelta } from "@/lib/consulente-esito";
 import { euro, numero } from "@/lib/format";
 
 const KEY = "impero_consulente";
@@ -65,8 +66,13 @@ export function Consulente({ veicoli }: { veicoli: Veicolo[] }) {
     if (consulto && !trackato.current) {
       trackato.current = true;
       traccia("consulente_usato", { profilo_fiscale: consulto.profilo });
+      salvaEsito({
+        risposte: risposte as unknown as Record<string, string>,
+        soluzione_vista: consulto.soluzioni.map((s) => s.veicolo.id),
+        soluzione_scelta: null,
+      });
     }
-  }, [consulto]);
+  }, [consulto, risposte]);
 
   function scegli(chiave: keyof Risposte, valore: string) {
     const nuove = { ...risposte, [chiave]: valore };
@@ -288,7 +294,10 @@ function CardSoluzione({ s, profilo }: { s: Soluzione; profilo: string }) {
         <div className="mt-5 flex-1" />
         <Link
           href={s.linkConfiguratore}
-          onClick={() => traccia("consulente_soluzione_click", { veicolo_id: s.veicolo.id, profilo_fiscale: profilo })}
+          onClick={() => {
+            segnaScelta(s.veicolo.id);
+            traccia("consulente_soluzione_click", { veicolo_id: s.veicolo.id, profilo_fiscale: profilo });
+          }}
           className="btn-oro w-full"
         >
           Configura questa

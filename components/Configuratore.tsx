@@ -20,6 +20,7 @@ import { Filetto } from "@/components/design/RuotaGuilloche";
 import { MicroGaranzie } from "@/components/design/MicroGaranzie";
 import { Calcolatore } from "@/components/Calcolatore";
 import { euro, numero } from "@/lib/format";
+import type { ProfiloId } from "@/lib/fiscale.config";
 
 const KEY_CONFIG = "impero_config";
 
@@ -30,6 +31,10 @@ type Props = {
   durataIniziale?: number;
   segmentoEvidenza?: Segmento;
   canoneModificabile?: boolean;
+  /** Preset dal Consulente (§PR23): profilo fiscale, servizi consigliati, km. */
+  profiloEvidenza?: ProfiloId;
+  serviziPreset?: string[];
+  kmIniziale?: number;
 };
 
 export function Configuratore({
@@ -39,24 +44,32 @@ export function Configuratore({
   durataIniziale = DURATA_DEFAULT,
   segmentoEvidenza,
   canoneModificabile = false,
+  profiloEvidenza,
+  serviziPreset,
+  kmIniziale,
 }: Props) {
   const [canone, setCanone] = useState(canoneIniziale);
   const [durata, setDurata] = useState<number>(
     (DURATE_CONFIG as readonly number[]).includes(durataIniziale) ? durataIniziale : DURATA_DEFAULT,
   );
   const [kmIdx, setKmIdx] = useState(() => {
-    const i = KM_SCAGLIONI.indexOf(KM_DEFAULT as (typeof KM_SCAGLIONI)[number]);
-    return i >= 0 ? i : 1;
+    const target = kmIniziale != null ? kmIniziale : KM_DEFAULT;
+    const i = KM_SCAGLIONI.indexOf(target as (typeof KM_SCAGLIONI)[number]);
+    return i >= 0 ? i : KM_SCAGLIONI.indexOf(KM_DEFAULT as (typeof KM_SCAGLIONI)[number]);
   });
   const kmAnno = KM_SCAGLIONI[kmIdx];
 
-  // Stato iniziale dei toggle: inclusi base sempre on; default_on; consigliati del segmento.
+  // Stato iniziale dei toggle: inclusi base sempre on; default_on; poi i servizi
+  // preimpostati dal Consulente se presenti, altrimenti i consigliati del segmento.
   const [attivi, setAttivi] = useState<Set<string>>(() => {
+    const preset = serviziPreset && serviziPreset.length ? new Set(serviziPreset) : null;
     const s = new Set<string>();
     for (const r of RISCHI) {
       if (r.copertura.incluso_base) s.add(r.id);
       else if (r.default_on) s.add(r.id);
-      else if (segmentoEvidenza && r.segmenti_consigliati.includes(segmentoEvidenza)) s.add(r.id);
+      else if (preset) {
+        if (preset.has(r.id)) s.add(r.id);
+      } else if (segmentoEvidenza && r.segmenti_consigliati.includes(segmentoEvidenza)) s.add(r.id);
     }
     return s;
   });
@@ -268,7 +281,7 @@ export function Configuratore({
           <Calcolatore
             canoneIniziale={Math.round(rataConfigurata)}
             durataIniziale={durata}
-            profiloIniziale={segmentoEvidenza === "agenti" ? "agente_rappresentante" : undefined}
+            profiloIniziale={profiloEvidenza ?? (segmentoEvidenza === "agenti" ? "agente_rappresentante" : undefined)}
           />
         </div>
       )}

@@ -225,6 +225,11 @@ export type Configurazione = {
   servizi_interesse?: string[];
   rischi_accettati?: string[];
   rata_configurata?: number;
+  consulente?: {
+    risposte?: Record<string, string>;
+    soluzione_vista?: string[];
+    soluzione_scelta?: string | null;
+  } | null;
 };
 
 /** Mappa una lista di id-rischio nei loro titoli leggibili. */

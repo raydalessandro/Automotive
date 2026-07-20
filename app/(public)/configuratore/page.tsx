@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Configuratore } from "@/components/Configuratore";
 import { Filetto } from "@/components/design/RuotaGuilloche";
 import { veicoloById, titoloVeicolo } from "@/lib/catalogo";
-import type { Segmento } from "@/lib/servizi.config";
+import { PROFILI, type ProfiloId } from "@/lib/fiscale.config";
+import { RISCHI, type Segmento } from "@/lib/servizi.config";
 
 export const metadata: Metadata = {
   title: "Configura la tua rata — Nessuna sorpresa",
@@ -15,13 +16,25 @@ const SEGMENTI_VALIDI: Segmento[] = ["artigiani", "agenti", "pmi", "forfettari"]
 export default function ConfiguratorePage({
   searchParams,
 }: {
-  searchParams: { veicolo?: string; segmento?: string };
+  searchParams: { veicolo?: string; segmento?: string; profilo?: string; servizi?: string; km?: string };
 }) {
   const veicolo = searchParams.veicolo ? veicoloById(searchParams.veicolo) : undefined;
   const segmento =
     searchParams.segmento && SEGMENTI_VALIDI.includes(searchParams.segmento as Segmento)
       ? (searchParams.segmento as Segmento)
       : undefined;
+
+  // Preset dal Consulente (§PR23): profilo fiscale, servizi consigliati, km. Validati.
+  const profilo =
+    searchParams.profilo && searchParams.profilo in PROFILI
+      ? (searchParams.profilo as ProfiloId)
+      : undefined;
+  const idsRischi = new Set(RISCHI.map((r) => r.id));
+  const serviziPreset = searchParams.servizi
+    ? searchParams.servizi.split(",").filter((id) => idsRischi.has(id))
+    : undefined;
+  const km = searchParams.km ? Number(searchParams.km) : undefined;
+  const kmIniziale = km && Number.isFinite(km) ? km : undefined;
 
   return (
     <div className="container-content py-12 sm:py-16">
@@ -43,6 +56,9 @@ export default function ConfiguratorePage({
           durataIniziale={veicolo?.durata_mesi}
           segmentoEvidenza={segmento}
           canoneModificabile={!veicolo}
+          profiloEvidenza={profilo}
+          serviziPreset={serviziPreset}
+          kmIniziale={kmIniziale}
         />
       </div>
     </div>
