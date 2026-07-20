@@ -103,6 +103,11 @@ Dettagli operativi in `docs/mailing.md`. Servono tutte per far partire gli invii
 - [ ] Ricordarsi di **pulire i dati demo** (lead, eventi, aziende) prima del go-live.
       Basta chiedermelo: li rimuovo in un colpo.
 
+## 📈 Analytics fase 4 — Google Search Console (POST-LANCIO)
+- [ ] Proprietà verificata sul dominio definitivo → service account → cron che scarica
+      impression/CTR/query per pagina in tabella `gsc_metriche` → completa il blocco SEO
+      della dashboard (oggi il blog è misurato solo lato nostro).
+
 ---
 _Riferimenti: `docs/supabase.md` (progetto, migration, RLS), `docs/mailing.md` (motore invio),
 `docs/import-aziende.md` (import aziende)._
