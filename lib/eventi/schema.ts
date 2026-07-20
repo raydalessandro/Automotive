@@ -11,6 +11,8 @@ export const TIPI_EVENTO = [
   "telefono_click",
   "whatsapp_click",
   "condividi_click",
+  "consulente_usato",
+  "consulente_soluzione_click",
 ] as const;
 
 export type TipoEvento = (typeof TIPI_EVENTO)[number];

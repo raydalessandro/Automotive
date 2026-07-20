@@ -9,6 +9,14 @@ import type { ProfiloId } from "@/lib/fiscale.config";
 import type { Segmento } from "@/lib/servizi.config";
 import type { Veicolo } from "@/lib/catalogo";
 
+// Attività (domanda 1 del consulente) precompilata dal segmento della landing.
+const ATTIVITA_DA_SEGMENTO: Record<Segmento, string> = {
+  artigiani: "artigiano",
+  agenti: "agente",
+  pmi: "pmi",
+  forfettari: "professionista",
+};
+
 type Props = {
   occhiello: string;
   titolo: string;
@@ -64,8 +72,8 @@ export function LandingSegmento({
               ))}
             </ul>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/preventivo" className="btn-oro">
-                {ctaTesto}
+              <Link href={`/consulente?attivita=${ATTIVITA_DA_SEGMENTO[segmento]}`} className="btn-oro">
+                Trova la tua soluzione
               </Link>
               <Link href={`/configuratore?segmento=${segmento}`} className="btn-ghost">
                 Configura la tua rata

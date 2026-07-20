@@ -74,11 +74,11 @@ export default function Home() {
             </h1>
             <p className="mt-5 max-w-lg text-lg text-testo-scuro/75">{SITE.descrizione}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/preventivo" className="btn-oro">
-                Richiedi il preventivo
+              <Link href="/consulente" className="btn-oro">
+                Fai i conti con noi · 60 secondi
               </Link>
               <Link href="/calcolatore" className="btn-ghost">
-                Calcola il tuo costo reale
+                Scopri quanto risparmi davvero
               </Link>
             </div>
             {/* Micro-garanzie vicino alla CTA (trust nel punto di decisione). */}

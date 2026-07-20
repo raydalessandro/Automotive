@@ -3,6 +3,7 @@ import { Wordmark } from "./Wordmark";
 import { MenuMobile } from "./MenuMobile";
 
 const NAV = [
+  { href: "/consulente", label: "Trova la soluzione" },
   { href: "/veicoli", label: "Veicoli" },
   { href: "/calcolatore", label: "Calcolatore" },
   { href: "/agenti", label: "Agenti" },
