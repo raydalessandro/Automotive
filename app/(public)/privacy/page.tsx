@@ -40,6 +40,17 @@ export default function PrivacyPage() {
         tempo necessario a gestire la relazione e adempiere agli obblighi di legge.
       </p>
 
+      <h2>Misurazioni del sito</h2>
+      <p>
+        Per capire come viene usato il sito e migliorarlo, raccogliamo misurazioni aggregate in
+        prima persona (first-party), <strong>senza cookie</strong> e{" "}
+        <strong>senza registrare il tuo indirizzo IP</strong>: pagine viste, sezioni lette, uso degli
+        strumenti (calcolatore, configuratore, consulente) e provenienza della visita. A ogni visita è
+        associato un identificativo casuale temporaneo, valido solo per la sessione: non permette di
+        risalire alla tua identità né di seguirti tra siti diversi. Se il tuo browser invia il segnale
+        &laquo;Do Not Track&raquo;, non effettuiamo alcuna misurazione.
+      </p>
+
       <h2>I tuoi diritti</h2>
       <p>
         Puoi chiedere accesso, rettifica, cancellazione, limitazione e portabilità dei tuoi dati, e
