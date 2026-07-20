@@ -5,6 +5,16 @@ funzioni "vive"). Non urgenti finché non incontri l'agente e decidete di partir
 
 ---
 
+## 🎨 Design — prossimo giro (rimandati)
+- [ ] **Ribbon "offerta"** sui badge veicolo (nastro angolare): richiede portare
+      `componenti/badge-etichette.svg` dal catalogo. Basso impatto, solo estetica.
+- [ ] **Asset "copertura Italia"** (mappa stilizzata single-line, oro, viewBox quadrato,
+      tratto 1.8) accanto a `consegna-nazionale` sulla pagina contatti. Da **creare** coerente
+      col sistema. L'icona `consegna-nazionale` già copre il concetto: nice-to-have.
+- [ ] Riguardare il menù hamburger mobile (estetica) nel giro di design.
+
+---
+
 ## 🛠️ Giornata di manutenzione e robustezza — 2026-07-19
 
 Giornata di sola manutenzione (nessuna feature nuova, contratti intoccabili invariati:
