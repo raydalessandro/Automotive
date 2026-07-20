@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { SITE } from "@/lib/site";
+import { TEAM } from "@/lib/team";
 
 export const metadata: Metadata = {
   title: "Chi siamo",
@@ -67,12 +68,37 @@ export default function ChiSiamoPage() {
             </div>
           </div>
 
-          <p className="mt-8 text-sm text-testo-chiaro/50">
-            {/* Placeholder onesto finché non arrivano i testi definitivi. */}
-            Contenuti in aggiornamento.
-          </p>
+          {/* Il team — un volto alla consulenza (§11). Foto di Ahmed e Shery provvisorie. */}
+          <section className="mt-12">
+            <h2 className="font-display text-2xl font-semibold">Le persone</h2>
+            <p className="mt-2 text-testo-chiaro/70">
+              Un nome e un volto: con noi parli sempre con una persona, non con un portale.
+            </p>
+            <div className="mt-6 grid gap-6 sm:grid-cols-3">
+              {TEAM.map((c) => (
+                <div key={c.nome} className="overflow-hidden rounded-2xl border border-nero/10 bg-carta">
+                  <div className="relative aspect-[4/5] bg-avorio">
+                    <Image
+                      src={c.foto}
+                      alt={c.nome}
+                      fill
+                      sizes="(min-width: 640px) 15rem, 100vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-display text-lg font-semibold leading-tight">{c.nome}</h3>
+                    <p className="mt-0.5 text-xs font-semibold uppercase tracking-widest text-oro">
+                      {c.ruolo}
+                    </p>
+                    <p className="mt-2 text-sm text-testo-chiaro/70">{c.bio}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
 
-          <div className="mt-8">
+          <div className="mt-12">
             <Link href="/preventivo" className="btn-oro">
               Richiedi il preventivo
             </Link>
