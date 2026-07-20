@@ -1,0 +1,65 @@
+[
+ {
+  "ragione_sociale": "Ecogas Service",
+  "segmento": "pmi",
+  "settore": "manutenzione caldaie e climatizzazione",
+  "provincia": "MI",
+  "citta": "Milano",
+  "sito": "www.ecogasservice.com",
+  "telefono": "02 34691104",
+  "email": "info@ecogasservice.com",
+  "dimensione_stimata": "10-30",
+  "segnali": "contratti di manutenzione programmata su MI-MB-BG, assistenza autorizzata, tecnici in trasferta (worker ChatGPT, verificato a campione) (P.IVA da worker Grok, checksum ok)",
+  "score": 4,
+  "fonte_ricerca": "batch-clima-mi-01",
+  "piva": "03468430164"
+ },
+ {
+  "ragione_sociale": "Clima Service",
+  "segmento": "pmi",
+  "settore": "manutenzione climatizzazione",
+  "provincia": "MI",
+  "citta": "Sesto San Giovanni",
+  "sito": "www.climaservice.mi.it",
+  "dimensione_stimata": "10-30",
+  "segnali": "oltre 25 anni, climatizzazione civile e industriale su Milano e Brianza, tecnici itineranti (worker ChatGPT, da verificare)",
+  "score": 3,
+  "fonte_ricerca": "batch-clima-mi-01"
+ },
+ {
+  "ragione_sociale": "Climatech Service Srl",
+  "segmento": "pmi",
+  "settore": "manutenzione caldaie e climatizzazione",
+  "provincia": "MI",
+  "citta": "Lainate",
+  "sito": "www.assistenzaclimatech.it",
+  "dimensione_stimata": "10-30",
+  "segnali": "assistenza caldaie e condizionatori su MI e MB, servizio 24 ore (worker ChatGPT, da verificare)",
+  "score": 3,
+  "fonte_ricerca": "batch-clima-mi-01"
+ },
+ {
+  "ragione_sociale": "Giesse Milano Srls",
+  "segmento": "artigiani",
+  "settore": "manutenzione climatizzazione",
+  "provincia": "MI",
+  "citta": "Milano",
+  "telefono": "02 36560688",
+  "dimensione_stimata": "2-9",
+  "segnali": "manutenzione climatizzatori chiller e pompe di calore presso aziende (worker ChatGPT, da verificare)",
+  "score": 3,
+  "fonte_ricerca": "batch-clima-mi-01"
+ },
+ {
+  "ragione_sociale": "3C Assistenza Caldaie",
+  "segmento": "artigiani",
+  "settore": "manutenzione caldaie",
+  "provincia": "MI",
+  "citta": "Milano",
+  "telefono": "02 58311760",
+  "dimensione_stimata": "2-9",
+  "segnali": "centro assistenza caldaie su Milano e provincia (worker ChatGPT, da verificare)",
+  "score": 3,
+  "fonte_ricerca": "batch-clima-mi-01"
+ }
+]

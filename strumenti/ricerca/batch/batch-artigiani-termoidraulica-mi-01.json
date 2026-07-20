@@ -1,0 +1,31 @@
+[
+ {
+  "ragione_sociale": "F.lli Cortinovis",
+  "segmento": "artigiani",
+  "settore": "termoidraulica",
+  "provincia": "MI",
+  "segnali": "manutenzione caldaie con copertura hinterland milanese (raccolta Kimi, da verificare) (arricchita da Grok: email completa che Kimi aveva troncato, centro autorizzato Bosch Junkers)",
+  "score": 4,
+  "fonte_ricerca": "batch-artigiani-termoidraulica-mi-01",
+  "sito": "www.cortinovisfratelli.it",
+  "email": "info@cortinovisfratelli.it",
+  "telefono": "02 314798",
+  "piva": "09914930152",
+  "citta": "Milano",
+  "dimensione_stimata": "2-9"
+ },
+ {
+  "ragione_sociale": "Triples Srl",
+  "segmento": "artigiani",
+  "settore": "termoidraulica",
+  "provincia": "MI",
+  "citta": "Milano",
+  "segnali": "manutenzione caldaie, condizionamento e idraulica (raccolta Kimi, da verificare) (arricchita da Grok: piu sedi, partner Bosch Ariston)",
+  "score": 3,
+  "fonte_ricerca": "batch-artigiani-termoidraulica-mi-01",
+  "sito": "www.triplessrl.it",
+  "telefono": "02 6888696",
+  "piva": "05081700964",
+  "dimensione_stimata": "31+"
+ }
+]

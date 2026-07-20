@@ -1,0 +1,64 @@
+[
+ {
+  "ragione_sociale": "Balzarotti Ascensori Srl",
+  "segmento": "pmi",
+  "settore": "manutenzione ascensori",
+  "provincia": "MB",
+  "citta": "Cogliate",
+  "sito": "www.balzarottiascensori.it",
+  "email": "info@balzarottiascensori.it",
+  "telefono": "800 999933",
+  "piva": "01057960963",
+  "dimensione_stimata": "10-30",
+  "segnali": "tecnico dedicato per micro-area su raggio 60 km (MI-MB-CO-VA), pronto intervento h24, oltre 2000 impianti gestiti, nessun subappalto (riconfermata da worker Grok: P.IVA ed email identiche — terza verifica indipendente)",
+  "score": 5,
+  "fonte_ricerca": "batch-pmi-ascensori-mimb-01"
+ },
+ {
+  "ragione_sociale": "Ascensori Vezzoli Srl",
+  "segmento": "pmi",
+  "settore": "manutenzione ascensori",
+  "provincia": "MI",
+  "citta": "Milano",
+  "segnali": "sede operativa via Ripamonti, magazzino ricambi, centro controllo h24, tecnici (raccolta Kimi, da verificare; casella nominale esclusa per policy) (arricchita da worker Grok: casella generica e P.IVA con checksum ok)",
+  "score": 4,
+  "fonte_ricerca": "batch-pmi-ascensori-mimb-01",
+  "sito": "ascensorivezzoli.it",
+  "email": "info@ascensorivezzoli.it",
+  "telefono": "02 5391658",
+  "piva": "11652180156",
+  "dimensione_stimata": "10-30"
+ },
+ {
+  "ragione_sociale": "SAE Ascensori Srl",
+  "segmento": "pmi",
+  "settore": "manutenzione ascensori",
+  "provincia": "MI",
+  "citta": "Milano",
+  "telefono": "800 192885",
+  "segnali": "numero verde h24, oltre 50 anni di attivita (raccolta Kimi, da verificare)",
+  "score": 3,
+  "fonte_ricerca": "batch-pmi-ascensori-mimb-01"
+ },
+ {
+  "ragione_sociale": "Dallagiovanna e C.",
+  "segmento": "pmi",
+  "settore": "manutenzione ascensori",
+  "provincia": "MI",
+  "citta": "Milano",
+  "segnali": "manutenzione ascensori su tutta la Lombardia, storica dal 1918 (raccolta Kimi, da verificare)",
+  "score": 3,
+  "fonte_ricerca": "batch-pmi-ascensori-mimb-01"
+ },
+ {
+  "ragione_sociale": "Neulift SpA",
+  "segmento": "pmi",
+  "settore": "manutenzione ascensori",
+  "provincia": "MI",
+  "citta": "Milano",
+  "dimensione_stimata": "31+",
+  "segnali": "presenza capillare nazionale, tecnici e responsabili commerciali (raccolta Kimi, da verificare; probabilmente sopra il target 10-30)",
+  "score": 3,
+  "fonte_ricerca": "batch-pmi-ascensori-mimb-01"
+ }
+]
