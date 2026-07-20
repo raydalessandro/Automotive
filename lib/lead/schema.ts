@@ -74,6 +74,8 @@ export const leadSchema = z.object({
       utm_medium: z.string().optional(),
       utm_campaign: z.string().optional(),
       referrer: z.string().optional(),
+      // Tag ambiente (§0.2): la dashboard conta solo i lead prod.
+      env: z.string().max(20).optional(),
     })
     .optional(),
   pagina: z.string().max(300).optional().or(z.literal("")),

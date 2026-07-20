@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { traccia } from "@/lib/traccia";
+import { traccia, tracciaStrumentoAperto, tracciaStrumentoCompletato } from "@/lib/traccia";
 import {
   RISCHI,
   KM_SCAGLIONI,
@@ -86,9 +86,14 @@ export function Configuratore({
   useEffect(() => {
     const el = riepilogoRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => setBarraRata(!e.isIntersecting), {
-      rootMargin: "0px 0px -60px 0px",
-    });
+    const io = new IntersectionObserver(
+      ([e]) => {
+        setBarraRata(!e.isIntersecting);
+        // Completato (§PR29) = riepilogo raggiunto (entrato in vista).
+        if (e.isIntersecting) tracciaStrumentoCompletato("configuratore");
+      },
+      { rootMargin: "0px 0px -60px 0px" },
+    );
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -99,6 +104,7 @@ export function Configuratore({
     if (tracciato.current) return;
     tracciato.current = true;
     traccia("configuratore_usato", { veicolo_id: veicoloId });
+    tracciaStrumentoAperto("configuratore");
   }, [veicoloId]);
 
   const toggle = (r: Rischio) => {

@@ -19,7 +19,7 @@ test("funnel: home → scheda → configuratore → calcolatore → form inviato
   // Scheda → configuratore
   await page.getByRole("link", { name: /Configura la tua rata/i }).first().click();
   await expect(page).toHaveURL(/\/configuratore/);
-  await expect(page.getByText(/Rata configurata/i)).toBeVisible();
+  await expect(page.getByText(/Rata configurata/i).first()).toBeVisible();
 
   // Configuratore → calcolatore fiscale in coda
   await page.getByRole("button", { name: /Vedi il costo reale fiscale/i }).click();

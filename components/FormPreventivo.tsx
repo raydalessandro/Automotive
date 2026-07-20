@@ -8,7 +8,7 @@ import {
   N_VEICOLI,
   KM_ANNO,
 } from "@/lib/lead/schema";
-import { traccia } from "@/lib/traccia";
+import { traccia, env } from "@/lib/traccia";
 import { leggiEsito } from "@/lib/consulente-esito";
 import { titoliRischi, type Configurazione } from "@/lib/servizi.config";
 import { numero } from "@/lib/format";
@@ -18,6 +18,7 @@ type Fonte = {
   utm_medium?: string;
   utm_campaign?: string;
   referrer?: string;
+  env?: string;
 };
 
 const UTM_KEY = "impero_utm";
@@ -52,7 +53,8 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
     tsApertura.current = Date.now();
   }, []);
 
-  const fonte = useMemo(leggiFonte, []);
+  // Tag ambiente dentro fonte del lead (§0.2 / §PR29).
+  const fonte = useMemo(() => ({ ...leggiFonte(), env: env() }), []);
   const [config, setConfig] = useState<Configurazione | null>(null);
   useEffect(() => {
     setConfig(leggiConfig());

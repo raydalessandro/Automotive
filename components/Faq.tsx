@@ -1,8 +1,23 @@
+"use client";
+
 import Link from "next/link";
+import { tracciaFaq } from "@/lib/traccia";
 
 export type FaqItem = { d: string; r: string; cta?: { href: string; label: string } };
 
-// FAQ con <details> nativo (accessibile, nessun JS). Genera anche JSON-LD FAQPage.
+// Slug stabile della domanda per l'evento faq_aperta (§PR29).
+function slug(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+// FAQ con <details> nativo (accessibile). Genera JSON-LD FAQPage e traccia
+// faq_aperta all'apertura (dedup per domanda lato helper).
 export function Faq({ items }: { items: FaqItem[] }) {
   return (
     <div>
@@ -22,7 +37,13 @@ export function Faq({ items }: { items: FaqItem[] }) {
       />
       <div className="divide-y divide-nero/10 rounded-2xl border border-nero/10 bg-carta">
         {items.map((i) => (
-          <details key={i.d} className="group p-5">
+          <details
+            key={i.d}
+            className="group p-5"
+            onToggle={(e) => {
+              if ((e.currentTarget as HTMLDetailsElement).open) tracciaFaq(slug(i.d));
+            }}
+          >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
               {i.d}
               <span className="text-oro transition-transform group-open:rotate-45">+</span>

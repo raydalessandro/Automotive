@@ -58,6 +58,7 @@ export async function POST(req: Request) {
     veicolo_id: e.veicolo_id || null,
     profilo_fiscale: e.profilo_fiscale || null,
     fonte: e.fonte ?? null,
+    dati: e.dati ?? null,
   });
 
   return NextResponse.json({ ok: true }, { status: 200 });

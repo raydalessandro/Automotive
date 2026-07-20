@@ -1,14 +1,22 @@
-// Tracking first-party client-side — §5 spec dashboard.
+// Tracking first-party client-side — §5/§PR29 spec Analytics.
 // Privacy-first: sessione anonima non persistente tra visite, niente cookie,
 // rispetta Do Not Track. UTM/referrer solo sul primo evento della sessione.
+// Ogni evento porta dati.env (prod/preview/dev): la dashboard conta solo prod.
 
 import type { TipoEvento } from "./eventi/schema";
+import { unaVolta } from "./traccia/dedup";
+import type { CtaId } from "./traccia/cta";
 
 const KEY_SESSIONE = "impero_sess";
 const KEY_FONTE_INVIATA = "impero_fonte_inviata";
 const KEY_CAP = "impero_evt_count";
 const KEY_UTM = "impero_utm"; // condiviso con UtmCapture
 const CAP_CLIENT = 200;
+
+/** Ambiente da Vercel (prod/preview/dev). Fallback "dev". */
+export function env(): string {
+  return process.env.NEXT_PUBLIC_VERCEL_ENV ?? "dev";
+}
 
 function dnt(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -37,10 +45,17 @@ function leggiFonte(): Record<string, string> | undefined {
   }
 }
 
-export function traccia(
-  tipo: TipoEvento,
-  dati: { pagina?: string; veicolo_id?: string; profilo_fiscale?: string } = {},
-): void {
+type DatiEvento = Record<string, string | number>;
+
+type TracciaOpts = {
+  pagina?: string;
+  veicolo_id?: string;
+  profilo_fiscale?: string;
+  /** Proprietà strutturate del nuovo evento; env viene aggiunto in automatico. */
+  dati?: DatiEvento;
+};
+
+export function traccia(tipo: TipoEvento, opts: TracciaOpts = {}): void {
   if (typeof window === "undefined" || dnt()) return;
 
   try {
@@ -61,10 +76,12 @@ export function traccia(
     const payload = {
       sessione,
       tipo,
-      pagina: dati.pagina ?? window.location.pathname,
-      veicolo_id: dati.veicolo_id,
-      profilo_fiscale: dati.profilo_fiscale,
+      pagina: opts.pagina ?? window.location.pathname,
+      veicolo_id: opts.veicolo_id,
+      profilo_fiscale: opts.profilo_fiscale,
       fonte,
+      // Tag ambiente su OGNI evento (§0.2).
+      dati: { env: env(), ...(opts.dati ?? {}) },
     };
 
     const body = JSON.stringify(payload);
@@ -76,4 +93,62 @@ export function traccia(
   } catch {
     // il tracking non deve mai rompere il sito
   }
+}
+
+// ————————————————————————————————————————————————————————————————
+// Helper tipizzati per gli eventi v2 (§PR29). La dedup è esplicita per ognuno.
+// ————————————————————————————————————————————————————————————————
+
+function pathname(pagina?: string): string {
+  return pagina ?? (typeof window !== "undefined" ? window.location.pathname : "");
+}
+
+/** Sezione entrata in vista. Dedup: una volta per sezione per pagina. */
+export function tracciaSezione(sezione: string, pagina?: string): void {
+  const p = pathname(pagina);
+  if (!unaVolta("sezione_vista", `${p}:${sezione}`)) return;
+  traccia("sezione_vista", { pagina: p, dati: { sezione, pagina: p } });
+}
+
+/** Soglia di scroll superata. Dedup: una volta per soglia per pagina. */
+export function tracciaScroll(soglia: 25 | 50 | 75, pagina?: string): void {
+  const p = pathname(pagina);
+  if (!unaVolta("scroll_soglia", `${p}:${soglia}`)) return;
+  traccia("scroll_soglia", { pagina: p, dati: { soglia, pagina: p } });
+}
+
+/** Click su una CTA registrata. Nessuna dedup: ogni click conta. */
+export function tracciaCta(cta: CtaId): void {
+  traccia("cta_click", { dati: { cta } });
+}
+
+/** Apertura di una FAQ. Dedup: una volta per domanda. */
+export function tracciaFaq(domanda: string): void {
+  if (!unaVolta("faq_aperta", domanda)) return;
+  traccia("faq_aperta", { dati: { domanda } });
+}
+
+export type Strumento = "calcolatore" | "configuratore" | "consulente";
+
+/** Strumento aperto. Dedup: una volta per strumento. */
+export function tracciaStrumentoAperto(strumento: Strumento): void {
+  if (!unaVolta("strumento_aperto", strumento)) return;
+  traccia("strumento_aperto", { dati: { strumento } });
+}
+
+/** Strumento completato (definizioni §PR29). Dedup: una volta per strumento. */
+export function tracciaStrumentoCompletato(strumento: Strumento): void {
+  if (!unaVolta("strumento_completato", strumento)) return;
+  traccia("strumento_completato", { dati: { strumento } });
+}
+
+/**
+ * Permanenza sulla pagina (stima). Dedup: una per pagina. Conta solo ≥3s, cap 1800.
+ * Inviata con sendBeacon su pagehide/visibilitychange (dentro traccia).
+ */
+export function tracciaTempoPagina(pagina: string, secondi: number): void {
+  if (secondi < 3) return;
+  const sec = Math.min(Math.round(secondi), 1800);
+  if (!unaVolta("tempo_pagina", pagina)) return;
+  traccia("tempo_pagina", { pagina, dati: { pagina, secondi: sec } });
 }

@@ -9,7 +9,7 @@ import {
 } from "@/lib/fiscale.config";
 import { calcolaDeduzione, prezzoIvaInclusa } from "@/lib/fiscale";
 import { euro } from "@/lib/format";
-import { traccia } from "@/lib/traccia";
+import { traccia, tracciaStrumentoAperto, tracciaStrumentoCompletato } from "@/lib/traccia";
 import { SITE } from "@/lib/site";
 
 const ORDINE_PROFILI: ProfiloId[] = [
@@ -45,14 +45,23 @@ export function Calcolatore({
 
   const profilo = PROFILI[profiloId];
 
+  // Strumento aperto (§PR29): al mount, dedup per strumento.
+  useEffect(() => {
+    tracciaStrumentoAperto("calcolatore");
+  }, []);
+
   // Traccia l'uso del calcolatore al cambio profilo, debounced, saltando il mount (§5).
+  // Completato (§PR29) = risultato visibile col profilo scelto dall'utente.
   const mount = useRef(true);
   useEffect(() => {
     if (mount.current) {
       mount.current = false;
       return;
     }
-    const t = setTimeout(() => traccia("calcolatore_usato", { profilo_fiscale: profiloId }), 600);
+    const t = setTimeout(() => {
+      traccia("calcolatore_usato", { profilo_fiscale: profiloId });
+      tracciaStrumentoCompletato("calcolatore");
+    }, 600);
     return () => clearTimeout(t);
   }, [profiloId]);
 

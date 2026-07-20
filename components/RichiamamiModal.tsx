@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { traccia } from "@/lib/traccia";
+import { traccia, env } from "@/lib/traccia";
 import { leggiEsito } from "@/lib/consulente-esito";
 import { CardRichiamo } from "@/components/CardRichiamo";
 import type { Configurazione } from "@/lib/servizi.config";
@@ -63,6 +63,7 @@ export function RichiamamiModal({
       })(),
       note: "⚡ Richiamo rapido dal sito — dati aziendali da raccogliere in chiamata.",
       pagina: typeof window !== "undefined" ? window.location.pathname : "",
+      fonte: { env: env() },
     };
 
     try {

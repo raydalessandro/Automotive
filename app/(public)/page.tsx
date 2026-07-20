@@ -11,6 +11,8 @@ import { MicroGaranzie } from "@/components/design/MicroGaranzie";
 import { Filetto } from "@/components/design/RuotaGuilloche";
 import { CardRichiamo } from "@/components/CardRichiamo";
 import { ProvaSociale } from "@/components/ProvaSociale";
+import { CtaLink } from "@/components/traccia/CtaLink";
+import type { CtaId } from "@/lib/traccia/cta";
 import { Faq } from "@/components/Faq";
 import { FAQ_ANTICIPO } from "@/lib/faq";
 
@@ -34,18 +36,20 @@ const SEGMENTI = [
 
 // Il metodo in 60 secondi (§2.2). I primi due passi con link agli strumenti; il
 // terzo è la CardRichiamo compatta (i volti). Filetto sotto il titolo.
-const METODO = [
+const METODO: { t: string; d: string; href: string; cta: string; ctaId: CtaId }[] = [
   {
     t: "Prima i conti",
     d: "Cinque domande sulla tua attività, il costo reale sul tuo regime fiscale. Gratis, senza lasciare contatti.",
     href: "/consulente",
     cta: "Fai i conti",
+    ctaId: "metodo_consulente",
   },
   {
     t: "Nessuna sorpresa",
     d: "Ogni rischio del noleggio, a viso aperto: lo copri o lo accetti, decidi tu.",
     href: "/configuratore",
     cta: "Configura la rata",
+    ctaId: "metodo_configuratore",
   },
 ];
 
@@ -66,12 +70,12 @@ export default function Home() {
             </h1>
             <p className="mt-5 max-w-lg text-lg text-testo-scuro/75">{SITE.descrizione}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/consulente" className="btn-oro">
+              <CtaLink cta="hero_consulente" href="/consulente" className="btn-oro">
                 Fai i conti con noi · 60 secondi
-              </Link>
-              <Link href="/calcolatore" className="btn-ghost">
+              </CtaLink>
+              <CtaLink cta="hero_calcolatore" href="/calcolatore" className="btn-ghost">
                 Scopri quanto risparmi davvero
-              </Link>
+              </CtaLink>
             </div>
             {/* Micro-garanzie vicino alla CTA (trust nel punto di decisione). */}
             <MicroGaranzie scuro className="mt-6" />
@@ -99,7 +103,7 @@ export default function Home() {
       </section>
 
       {/* Come lavoriamo con te (§2.2) — sostituisce "Come funziona" e assorbe "Perché scegliere noi". */}
-      <section className="bg-avorio">
+      <section data-sezione="metodo" className="bg-avorio">
         <div className="container-content py-16 sm:py-20">
           <h2 className="text-center font-display text-3xl font-semibold">Come lavoriamo con te</h2>
           <Filetto className="mx-auto mt-4 h-4 w-52 text-oro" />
@@ -111,12 +115,13 @@ export default function Home() {
                 </span>
                 <h3 className="mt-4 font-display text-xl font-semibold">{p.t}</h3>
                 <p className="mt-2 text-sm text-testo-chiaro/65">{p.d}</p>
-                <Link
+                <CtaLink
+                  cta={p.ctaId}
                   href={p.href}
                   className="mt-3 inline-block text-sm font-medium text-oro hover:underline"
                 >
                   {p.cta} →
-                </Link>
+                </CtaLink>
               </div>
             ))}
             {/* Passo 3: i volti, con la CardRichiamo compatta. */}
@@ -137,7 +142,7 @@ export default function Home() {
       </section>
 
       {/* Per la tua attività — i segmenti (§2.3), parlano del lavoro. */}
-      <section className="container-content py-16 sm:py-20">
+      <section data-sezione="segmenti" className="container-content py-16 sm:py-20">
         <h2 className="font-display text-3xl font-semibold">Su misura per la tua attività</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {SEGMENTI.map((s) => (
@@ -157,7 +162,7 @@ export default function Home() {
       </section>
 
       {/* I conti già fatti (§2.4) — i veicoli, col canone chiaro. */}
-      <section className="bg-avorio">
+      <section data-sezione="veicoli" className="bg-avorio">
         <div className="container-content py-16 sm:py-20">
           <div className="flex items-end justify-between gap-4">
             <div>
@@ -184,16 +189,22 @@ export default function Home() {
       </section>
 
       {/* Tutto nel canone (§2.5) */}
-      <FasciaServizi />
+      <div data-sezione="servizi">
+        <FasciaServizi />
+      </div>
 
       {/* Confronto noleggio vs acquisto (§2.6) — l'argomento di decisione (CRO). */}
-      <TabellaConfronto />
+      <div data-sezione="confronto">
+        <TabellaConfronto />
+      </div>
 
       {/* Anticipo zero. Davvero. (§2.7) */}
-      <FasciaAnticipo cta="consulente" />
+      <div data-sezione="anticipo">
+        <FasciaAnticipo cta="consulente" />
+      </div>
 
       {/* Non ci pensi più (§2.8) — la corda emotiva: non compri un'auto, compri il non doverci pensare */}
-      <section className="bg-avorio">
+      <section data-sezione="non_ci_pensi" className="bg-avorio">
         <div className="container-content grid items-center gap-10 py-16 sm:py-20 lg:grid-cols-2">
           <div className="relative order-last aspect-[16/11] overflow-hidden rounded-2xl lg:order-first">
             <Image
@@ -226,7 +237,7 @@ export default function Home() {
       <ProvaSociale />
 
       {/* Domande frequenti (§2.10) — gestione obiezioni. Linkano il calcolatore. */}
-      <section className="bg-avorio">
+      <section data-sezione="faq" className="bg-avorio">
         <div className="container-content py-16 sm:py-20">
           <h2 className="font-display text-3xl font-semibold">Domande frequenti</h2>
           <p className="mt-1 text-testo-chiaro/60">I conti in chiaro, prima ancora di sentirci.</p>
@@ -237,7 +248,7 @@ export default function Home() {
       </section>
 
       {/* CTA finale (§2.11) — sfondo materico scuro con riflessi d'oro, testo in overlay */}
-      <section className="relative overflow-hidden bg-nero text-testo-scuro">
+      <section data-sezione="cta_finale" className="relative overflow-hidden bg-nero text-testo-scuro">
         <Image
           src="/foto/foto-sfondo.webp"
           alt=""

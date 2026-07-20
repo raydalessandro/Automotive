@@ -11,7 +11,7 @@ import { rischioById } from "@/lib/servizi.config";
 import { VeicoloImg } from "@/components/VeicoloImg";
 import { MicroGaranzie } from "@/components/design/MicroGaranzie";
 import { RichiamamiModal } from "@/components/RichiamamiModal";
-import { traccia } from "@/lib/traccia";
+import { traccia, tracciaStrumentoAperto, tracciaStrumentoCompletato } from "@/lib/traccia";
 import { salvaEsito, segnaScelta } from "@/lib/consulente-esito";
 import { euro, numero } from "@/lib/format";
 
@@ -61,11 +61,17 @@ export function Consulente({ veicoli }: { veicoli: Veicolo[] }) {
     [tutteDate, risposte, veicoli],
   );
 
-  // Evento consulente_usato: una volta, al completamento.
+  // Strumento aperto (§PR29): al mount, dedup per strumento.
+  useEffect(() => {
+    tracciaStrumentoAperto("consulente");
+  }, []);
+
+  // Evento consulente_usato: una volta, al completamento (= pagina Soluzioni vista).
   useEffect(() => {
     if (consulto && !trackato.current) {
       trackato.current = true;
       traccia("consulente_usato", { profilo_fiscale: consulto.profilo });
+      tracciaStrumentoCompletato("consulente");
       salvaEsito({
         risposte: risposte as unknown as Record<string, string>,
         soluzione_vista: consulto.soluzioni.map((s) => s.veicolo.id),
