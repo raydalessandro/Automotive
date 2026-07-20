@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   tuttiVeicoli,
@@ -17,6 +18,12 @@ import { LinkTracciato } from "@/components/traccia/LinkTracciato";
 import { euro, numero } from "@/lib/format";
 import { siteUrl } from "@/lib/site";
 import { whatsappLink } from "@/lib/contatti";
+
+const COME_LAVORIAMO = [
+  { icona: "/asset/icone-business/consulenza-dedicata.svg", t: "Un interlocutore" },
+  { icona: "/asset/icone-business/risposta-24h.svg", t: "Risposta rapida" },
+  { icona: "/asset/icone-business/consegna-nazionale.svg", t: "In tutta Italia" },
+];
 
 export function generateStaticParams() {
   return tuttiVeicoli().map((v) => ({ id: v.id }));
@@ -132,6 +139,17 @@ export default function VeicoloPage({ params }: { params: { id: string } }) {
               </div>
             ))}
           </dl>
+
+          {/* Come lavoriamo — registro consulenza (icone-business). */}
+          <div className="mt-6 grid grid-cols-3 gap-3">
+            {COME_LAVORIAMO.map((c) => (
+              <div key={c.t} className="flex flex-col items-center gap-2 rounded-xl border border-nero/10 bg-carta p-3 text-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={c.icona} alt="" aria-hidden="true" className="h-8 w-8" />
+                <span className="text-xs font-medium text-testo-chiaro/70">{c.t}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="lg:sticky lg:top-20 lg:h-fit">
@@ -185,6 +203,28 @@ export default function VeicoloPage({ params }: { params: { id: string } }) {
               profiloIniziale={v.n1 ? "n1_strumentale" : "srl_ordinaria"}
             />
           </div>
+        </div>
+      </div>
+
+      {/* Il momento del possesso — "le chiavi sono tue". */}
+      <div className="mt-14 grid overflow-hidden rounded-2xl border border-nero/10 bg-carta sm:grid-cols-2 sm:items-center">
+        <div className="relative aspect-[3/2]">
+          <Image
+            src="/foto/foto-chiavi.webp"
+            alt="Consegna delle chiavi di un veicolo"
+            fill
+            sizes="(min-width: 640px) 45vw, 100vw"
+            className="object-cover"
+          />
+        </div>
+        <div className="p-6 sm:p-8">
+          <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+            Poi le chiavi sono <span className="text-oro">tue</span>.
+          </h2>
+          <p className="mt-3 max-w-md text-testo-chiaro/65">
+            Scegli, firma e parti. Ad assicurazione, bollo, manutenzione e imprevisti pensiamo noi:
+            tu pensa solo a lavorare.
+          </p>
         </div>
       </div>
     </div>

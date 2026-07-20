@@ -248,6 +248,8 @@ export function Configuratore({
             onClick={() => setMostraCalcolatore((v) => !v)}
             className="btn-ghost flex-1"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/asset/icone-business/risparmio-fiscale.svg" alt="" aria-hidden="true" className="h-5 w-5" />
             {mostraCalcolatore ? "Nascondi costo reale fiscale" : "Vedi il costo reale fiscale"}
           </button>
           <Link href={linkPreventivo} onClick={salvaConfig} className="btn-oro flex-1">
