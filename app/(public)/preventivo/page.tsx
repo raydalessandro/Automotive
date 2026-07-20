@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { FormPreventivo } from "@/components/FormPreventivo";
 import { CanaliPreventivo } from "@/components/CanaliPreventivo";
+import { CardRichiamo } from "@/components/CardRichiamo";
 import { veicoloById, titoloVeicolo } from "@/lib/catalogo";
 import { CONTATTI } from "@/lib/contatti";
 import { Filetto } from "@/components/design/RuotaGuilloche";
@@ -49,6 +50,7 @@ export default function PreventivoPage({
           la tua attività.
         </p>
         <Filetto className="mx-auto mt-5 h-4 w-52 text-oro" />
+        <CardRichiamo className="mx-auto mt-6 max-w-md text-left" />
       </header>
 
       {/* Canali di invio */}

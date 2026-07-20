@@ -1,110 +1,139 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { SITE } from "@/lib/site";
 import { TEAM } from "@/lib/team";
+import { Avatar } from "@/components/Avatar";
+import { MicroGaranzie } from "@/components/design/MicroGaranzie";
+import { Filetto } from "@/components/design/RuotaGuilloche";
 
 export const metadata: Metadata = {
-  title: "Chi siamo",
-  description: `${SITE.nome}: noleggio, vendita e acquisto di auto, moto e veicoli commerciali per partite IVA e aziende.`,
+  title: "Chi risponde quando chiedi un preventivo",
+  description:
+    "Niente call center, niente ticket. Tre persone e un metodo: prima facciamo i conti, poi scegliamo la macchina. Ti richiama Shery o Ahmed, in giornata.",
 };
+
+// Il metodo — riusa il pattern PASSI della home, con link agli strumenti.
+const METODO = [
+  {
+    n: "1",
+    t: "Prima i conti",
+    d: "Cinque domande sulla tua attività, il costo reale sul tuo regime fiscale. Gratis, senza lasciare nessun contatto.",
+    href: "/consulente",
+    cta: "Fai i conti",
+  },
+  {
+    n: "2",
+    t: "Nessuna sorpresa",
+    d: "Ogni rischio del noleggio, a viso aperto: lo copri o lo accetti, decidi tu.",
+    href: "/configuratore",
+    cta: "Configura la rata",
+  },
+  {
+    n: "3",
+    t: "Una persona, in giornata",
+    d: "Quando chiedi il preventivo ti richiama Shery o Ahmed. Persone vere, che seguono la tua pratica dalla prima chiamata alla consegna.",
+    href: "/preventivo",
+    cta: "Richiedi il preventivo",
+  },
+];
 
 export default function ChiSiamoPage() {
   return (
     <>
-      {/* Immagine istituzionale: la promessa di uno studio di consulenza */}
-      <section className="bg-nero">
-        <div className="container-content pt-10">
-          <div className="relative aspect-[21/9] overflow-hidden rounded-2xl">
-            <Image
-              src="/foto/foto-studio.webp"
-              alt="Interno di uno studio di consulenza"
-              fill
-              priority
-              sizes="(min-width: 1024px) 68rem, 100vw"
-              className="object-cover"
-            />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-nero/50 to-transparent" />
+      <div className="container-content py-12 sm:py-16">
+        <header className="mx-auto max-w-3xl text-center">
+          <h1 className="font-display text-4xl font-semibold sm:text-5xl">
+            Chi risponde quando chiedi un preventivo
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-testo-chiaro/70">
+            Niente call center, niente ticket. Tre persone, un metodo, una promessa: prima facciamo
+            i conti, poi scegliamo la macchina.
+          </p>
+          <Filetto className="mx-auto mt-6 h-4 w-52 text-oro" />
+        </header>
+      </div>
+
+      {/* Il metodo — tre passi con link agli strumenti */}
+      <section className="bg-avorio">
+        <div className="container-content py-16 sm:py-20">
+          <h2 className="text-center font-display text-3xl font-semibold">Il metodo</h2>
+          <div className="mx-auto mt-10 grid max-w-5xl gap-8 sm:grid-cols-3">
+            {METODO.map((p) => (
+              <div key={p.n} className="flex flex-col text-center">
+                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-oro font-display text-xl font-semibold text-nero">
+                  {p.n}
+                </span>
+                <h3 className="mt-4 font-display text-xl font-semibold">{p.t}</h3>
+                <p className="mt-2 text-sm text-testo-chiaro/65">{p.d}</p>
+                <Link
+                  href={p.href}
+                  className="mt-3 inline-block text-sm font-medium text-oro hover:underline"
+                >
+                  {p.cta} →
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <div className="container-content py-12 sm:py-16">
-        <div className="mx-auto max-w-3xl">
-          <h1 className="font-display text-4xl font-semibold">Chi siamo</h1>
-
-          {/* TODO §11: testi definitivi dal cliente (storia, affidabilità). */}
-          <div className="mt-6 space-y-4 text-testo-chiaro/75">
-            <p>
-              {SITE.nome} accompagna partite IVA e aziende nella scelta del veicolo giusto in
-              noleggio a lungo termine: un'unica rata mensile con tutti i servizi inclusi, senza
-              capitale immobilizzato e senza pensieri di gestione.
-            </p>
-            <p>
-              Ci occupiamo di noleggio, vendita e acquisto di auto, moto e veicoli commerciali,
-              costruendo per ogni cliente la formula più efficiente in base alla sua forma giuridica e
-              al suo utilizzo.
-            </p>
-          </div>
-
-          {/* La relazione 1:1, con il visual della consulenza dedicata */}
-          <div className="mt-10 grid items-center gap-8 rounded-2xl border border-nero/10 bg-carta p-6 sm:grid-cols-2 sm:p-8">
-            <div className="relative aspect-[3/2] overflow-hidden rounded-xl">
-              <Image
-                src="/foto/foto-consulenza.webp"
-                alt="Consulente e cliente esaminano una proposta"
-                fill
-                sizes="(min-width: 640px) 30rem, 100vw"
-                className="object-cover"
-              />
-            </div>
-            <div>
-              <h2 className="font-display text-2xl font-semibold">Un unico interlocutore</h2>
-              <p className="mt-3 text-testo-chiaro/75">
-                Lavoriamo sui listini dei principali operatori di noleggio a lungo termine:
-                confrontiamo le proposte e portiamo al cliente quella più adatta, con una consulenza
-                dedicata dall'inizio alla consegna.
+      {/* Le persone — tre card identiche */}
+      <section className="container-content py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="font-display text-3xl font-semibold">Le persone</h2>
+          <p className="mt-2 text-testo-chiaro/70">
+            Un nome e un volto: con noi parli sempre con una persona, non con un portale.
+          </p>
+        </div>
+        <div className="mx-auto mt-10 grid max-w-5xl gap-6 sm:grid-cols-3">
+          {TEAM.map((c) => (
+            <div
+              key={c.nome}
+              className="rounded-2xl border border-nero/10 bg-carta p-6 text-center"
+            >
+              <Avatar nome={c.nome} foto={c.foto} size={128} className="mx-auto" />
+              <h3 className="mt-4 font-display text-xl font-semibold leading-tight">{c.nome}</h3>
+              <p className="mt-0.5 text-xs font-semibold uppercase tracking-widest text-oro">
+                {c.ruolo}
               </p>
+              <p className="mt-3 text-sm text-testo-chiaro/70">{c.bio}</p>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Il team — un volto alla consulenza (§11). Foto di Ahmed e Shery provvisorie. */}
-          <section className="mt-12">
-            <h2 className="font-display text-2xl font-semibold">Le persone</h2>
-            <p className="mt-2 text-testo-chiaro/70">
-              Un nome e un volto: con noi parli sempre con una persona, non con un portale.
-            </p>
-            <div className="mt-6 grid gap-6 sm:grid-cols-3">
-              {TEAM.map((c) => (
-                <div key={c.nome} className="overflow-hidden rounded-2xl border border-nero/10 bg-carta">
-                  <div className="relative aspect-[4/5] bg-avorio">
-                    <Image
-                      src={c.foto}
-                      alt={c.nome}
-                      fill
-                      sizes="(min-width: 640px) 15rem, 100vw"
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-display text-lg font-semibold leading-tight">{c.nome}</h3>
-                    <p className="mt-0.5 text-xs font-semibold uppercase tracking-widest text-oro">
-                      {c.ruolo}
-                    </p>
-                    <p className="mt-2 text-sm text-testo-chiaro/70">{c.bio}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+        <MicroGaranzie className="mt-10 justify-center" />
 
-          <div className="mt-12">
-            <Link href="/preventivo" className="btn-oro">
+        {/*
+          [APERTO — da concordare con Ray prima di pubblicare] Blocco "Come guadagniamo":
+          trasparenza sul modello a provvigione. NON pubblicare senza ok esplicito.
+
+          Come guadagniamo
+          Non ti vendiamo noi l'auto: confrontiamo i listini degli operatori di noleggio e,
+          quando scegli, l'operatore ci riconosce una provvigione. Per te il prezzo non cambia,
+          e non abbiamo motivo di spingerti verso un'offerta invece che verso quella giusta:
+          il nostro interesse è che tu resti cliente, non che tu firmi in fretta.
+        */}
+      </section>
+
+      {/* CTA finale */}
+      <section className="bg-nero text-testo-scuro">
+        <div className="container-content flex flex-col items-center gap-5 py-16 text-center sm:py-20">
+          <h2 className="max-w-2xl font-display text-3xl font-semibold sm:text-4xl">
+            Facciamo due conti sul tuo prossimo veicolo?
+          </h2>
+          <p className="max-w-xl text-testo-scuro/70">
+            {SITE.nome}: prima i conti, poi la macchina. In giornata ti richiama una persona vera.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href="/consulente" className="btn-oro">
+              Fai i conti con noi
+            </Link>
+            <Link href="/preventivo" className="btn-ghost">
               Richiedi il preventivo
             </Link>
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

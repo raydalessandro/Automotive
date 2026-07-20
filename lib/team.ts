@@ -1,38 +1,49 @@
-// Il team di consulenti. Dà un volto alla "voce del responsabile noleggio"
-// (blog guida-intervista, consulente). Foto in public/foto/team/.
+// Il team di consulenti (§spec chi-siamo). Dà un volto alla consulenza nel funnel.
+// Nessuna gerarchia: card identiche, mai "responsabile/titolare/fondatore".
 //
-// [DA CONFERMARE] ruoli, cognomi e bio: testi provvisori finché non arrivano
-// quelli definitivi dal cliente. Le foto di Ahmed e Shery sono un segnaposto
-// (template "consulente") da sostituire con gli scatti veri.
+// Le foto vivono in public/team/<nome>.webp (800×800, pipeline scripts/foto-team.ts).
+// Il campo `foto` si valorizza SOLO quando il file esiste davvero: finché manca,
+// la UI mostra il segnaposto a iniziali (components/Avatar). Il build non dipende
+// dai file foto.
+//
+// TODO: aggiungere una riga personale per ciascuno (cosa piace del lavoro coi
+// clienti) quando la manda Ray.
 
 export type Consulente = {
   nome: string;
   ruolo: string;
   bio: string;
-  foto: string;
-  /** true finché la foto è il segnaposto template. */
-  fotoProvvisoria?: boolean;
+  /** Path in public/. Assente => segnaposto a iniziali. */
+  foto?: string;
 };
 
 export const TEAM: Consulente[] = [
   {
-    nome: "Alessio",
-    ruolo: "Responsabile noleggio", // [DA CONFERMARE]
-    bio: "Segue i clienti dalla prima domanda alla consegna: capisce l'attività, confronta le proposte e costruisce la formula giusta.",
-    foto: "/foto/team/alessio.webp",
+    nome: "Shery",
+    ruolo: "Consulente clienti",
+    bio: "Segue la tua pratica dal primo preventivo alla consegna.",
+    // foto: "/team/shery.webp", // da innestare quando arriva lo scatto
   },
   {
     nome: "Ahmed",
-    ruolo: "Consulente noleggio", // [DA CONFERMARE]
-    bio: "Affianca partite IVA e aziende nella scelta del veicolo e nella gestione del contratto, con un solo interlocutore di riferimento.",
-    foto: "/foto/team/placeholder-consulente.webp",
-    fotoProvvisoria: true,
+    ruolo: "Consulente clienti",
+    bio: "Ti aiuta a scegliere la copertura giusta, senza venderti quello che non serve.",
+    // foto: "/team/ahmed.webp",
   },
   {
-    nome: "Shery",
-    ruolo: "Consulente noleggio", // [DA CONFERMARE]
-    bio: "Affianca partite IVA e aziende nella scelta del veicolo e nella gestione del contratto, con un solo interlocutore di riferimento.",
-    foto: "/foto/team/placeholder-consulente.webp",
-    fotoProvvisoria: true,
+    nome: "Alessio",
+    ruolo: "Ricerca e strumenti",
+    bio: "Costruisce i calcolatori che vedi sul sito e tiene i conti onesti: se un numero è qui, è verificabile.",
+    foto: "/team/alessio.webp",
   },
 ];
+
+/** I due che richiamano il cliente (§2 CardRichiamo): Shery e Ahmed. */
+export const RICHIAMO: Consulente[] = TEAM.slice(0, 2);
+
+// Iniziali per il segnaposto avatar: prime due lettere (o iniziali di nome+cognome).
+export function iniziali(nome: string): string {
+  const parti = nome.trim().split(/\s+/).filter(Boolean);
+  if (parti.length >= 2) return (parti[0][0] + parti[1][0]).toUpperCase();
+  return nome.trim().slice(0, 2).toUpperCase();
+}

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { traccia } from "@/lib/traccia";
 import { leggiEsito } from "@/lib/consulente-esito";
+import { CardRichiamo } from "@/components/CardRichiamo";
 import type { Configurazione } from "@/lib/servizi.config";
 
 // Modal "richiamami tu" — attrito minimo per il lead caldo: nome + telefono e
@@ -114,6 +115,8 @@ export function RichiamamiModal({
             <p className="mt-2 text-sm text-testo-chiaro/65">
               Ti richiamiamo noi con la proposta. Niente form lungo: solo l&apos;essenziale.
             </p>
+
+            <CardRichiamo className="mt-4" />
 
             <label className="mt-5 block text-sm">
               <span className="font-medium">

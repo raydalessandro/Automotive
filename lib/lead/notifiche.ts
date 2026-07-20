@@ -15,6 +15,7 @@ import { siteUrl, SITE } from "../site";
 import { titoliRischi, type Configurazione } from "../servizi.config";
 import { veicoloById, titoloVeicolo } from "../catalogo";
 import { DOMANDE } from "../consulente.config";
+import { RICHIAMO, iniziali, type Consulente } from "../team";
 
 type Contesto = {
   score: number;
@@ -148,28 +149,53 @@ export async function notificaVenditore(d: DatiLead, ctx: Contesto): Promise<voi
   }
 }
 
+// Avatar 48px per la firma email (§2): foto via URL assoluto, altrimenti segnaposto
+// a iniziali (cerchio grafite, iniziali oro) — resta identico anche senza foto.
+function avatarEmail(c: Consulente, base: string): string {
+  if (c.foto) {
+    return `<img src="${base}${c.foto}" width="48" height="48" alt="${c.nome}" style="border-radius:24px;display:block;border:1px solid #B08D4F;" />`;
+  }
+  return `<span style="display:inline-block;width:48px;height:48px;line-height:48px;border-radius:24px;background-color:#26231E;color:#B08D4F;font-family:Georgia,'Times New Roman',serif;font-weight:bold;font-size:18px;text-align:center;">${iniziali(c.nome)}</span>`;
+}
+
+// Firma "CardRichiamo" per l'email: avatar affiancati + testo fisso.
+function firmaRichiamoHtml(base: string): string {
+  const avatars = RICHIAMO.map((c) => `<td style="padding-right:6px;">${avatarEmail(c, base)}</td>`).join("");
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:20px;padding-top:16px;border-top:1px solid #E7E1D6;"><tr>${avatars}<td style="padding-left:8px;font-size:14px;color:#2B2925;">Ti richiama <strong>Shery</strong> o <strong>Ahmed</strong><br/>persone vere, in giornata.</td></tr></table>`;
+}
+
 /** Email di cortesia al lead, se ha lasciato l'email (§6.3). */
 export async function emailCortesia(d: DatiLead): Promise<void> {
   const resend = getResend();
   if (!resend || !d.email) return;
   const waNumero = CONTATTI.whatsapp;
+  const base = siteUrl();
+  const text = [
+    `Ciao ${d.referente},`,
+    "",
+    "grazie per averci contattato. Abbiamo ricevuto la tua richiesta e ti ricontatteremo entro 24 ore lavorative con un preventivo su misura.",
+    "",
+    `Se vuoi anticipare i tempi, scrivici o chiamaci:`,
+    `Telefono: ${CONTATTI.telefono}`,
+    `WhatsApp: https://wa.me/${waNumero}`,
+    "",
+    "Ti richiama Shery o Ahmed — persone vere, in giornata.",
+    `Il team di ${SITE.nome}`,
+  ].join("\n");
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;color:#2B2925;max-width:520px;line-height:1.5;">
+    <p>Ciao ${d.referente},</p>
+    <p>grazie per averci contattato. Abbiamo ricevuto la tua richiesta e ti ricontatteremo entro 24 ore lavorative con un preventivo su misura.</p>
+    <p>Se vuoi anticipare i tempi, scrivici o chiamaci:<br/>Telefono: ${CONTATTI.telefono}<br/>WhatsApp: <a href="https://wa.me/${waNumero}" style="color:#B08D4F;">wa.me/${waNumero}</a></p>
+    ${firmaRichiamoHtml(base)}
+    <p style="margin-top:12px;color:#8a8378;font-size:13px;">Il team di ${SITE.nome}</p>
+  </div>`;
   try {
     await resend.emails.send({
       from: `${SITE.nome} <noreply@imperoautomotive.it>`,
       to: d.email,
       subject: "Abbiamo ricevuto la tua richiesta",
-      text: [
-        `Ciao ${d.referente},`,
-        "",
-        "grazie per averci contattato. Abbiamo ricevuto la tua richiesta e ti ricontatteremo entro 24 ore lavorative con un preventivo su misura.",
-        "",
-        `Se vuoi anticipare i tempi, scrivici o chiamaci:`,
-        `Telefono: ${CONTATTI.telefono}`,
-        `WhatsApp: https://wa.me/${waNumero}`,
-        "",
-        "A presto,",
-        `Il team di ${SITE.nome}`,
-      ].join("\n"),
+      text,
+      html,
     });
   } catch {
     // best effort

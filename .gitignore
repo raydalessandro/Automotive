@@ -13,3 +13,6 @@ next-env.d.ts
 /test-results
 /playwright-report
 /playwright/.cache
+
+# Sorgenti foto grezze (ottimizzate finiscono in public/)
+scripts/_assets-src/
