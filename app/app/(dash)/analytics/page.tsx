@@ -24,6 +24,10 @@ import {
   blog,
   tasso,
   delta,
+  qualificatiSuSessioni,
+  qualificatiSuLead,
+  tempoPrimoContattoSecondi,
+  funnelForm,
 } from "@/lib/metriche";
 
 export const dynamic = "force-dynamic";
@@ -122,6 +126,12 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: { 
   const lead = conteggioLead(leads, da, a);
   const leadPrev = conteggioLead(leads, daPrec, da);
   const qual = qualificati(leads, da, a);
+  const qSuSess = qualificatiSuSessioni(leads, da, a, sess);
+  const qSuSessPrev = qualificatiSuSessioni(leads, daPrec, da, sessPrev);
+  const qSuLead = qualificatiSuLead(leads, da, a);
+  const qSuLeadPrev = qualificatiSuLead(leads, daPrec, da);
+  const richiamoMediano = tempoPrimoContattoSecondi(storia, leads, da, a);
+  const formFunnel = funnelForm(evCur);
   const funnelStages = [
     { label: "Sessioni", n: sess },
     { label: "Strumento aperto", n: sessioniConTipo(evCur, "strumento_aperto") },
@@ -218,8 +228,31 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: { 
           <>
             <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <Metrica label="Qualificati (score ≥ 3)" valore={fmtNum(qual)} />
+              <Metrica
+                label="Qualificati / sessioni"
+                valore={fmtPct(qSuSess)}
+                delta={qSuSess == null ? null : delta(qSuSess, qSuSessPrev)}
+              />
+              <Metrica
+                label="Qualificati / lead"
+                valore={fmtPct(qSuLead)}
+                delta={qSuLead == null ? null : delta(qSuLead, qSuLeadPrev)}
+              />
+              <Metrica label="Richiamo mediano" valore={fmtDurata(richiamoMediano)} />
             </div>
+
             <Funnel stages={funnelStages} />
+
+            <h3 className="mt-6 font-display text-base font-semibold">Funnel form</h3>
+            <p className="text-xs text-testo-chiaro/50">Sessioni che iniziano un form → che lo inviano.</p>
+            <div className="mt-3">
+              <Funnel
+                stages={[
+                  { label: "Form iniziati", n: formFunnel.iniziati },
+                  { label: "Inviati", n: formFunnel.inviati },
+                ]}
+              />
+            </div>
           </>
         )}
       </Blocco>

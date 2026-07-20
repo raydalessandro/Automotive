@@ -256,6 +256,61 @@ export function tempoChiusuraSecondi(
   return mediana(durate);
 }
 
+/** Qualificati ÷ sessioni (§PR32). null se sessioni 0. */
+export function qualificatiSuSessioni(
+  leads: LeadRow[],
+  da: string,
+  a: string,
+  sessioniN: number,
+): number | null {
+  return tasso(qualificati(leads, da, a), sessioniN);
+}
+
+/** Qualificati ÷ lead (§PR32). null se nessun lead. */
+export function qualificatiSuLead(leads: LeadRow[], da: string, a: string): number | null {
+  return tasso(qualificati(leads, da, a), conteggioLead(leads, da, a));
+}
+
+/**
+ * Tempo al primo contatto in secondi (§PR32) = mediana di (primo 'contattato' −
+ * created_at) per i lead il cui PRIMO passaggio a 'contattato' cade nel periodo.
+ * Mediana: gli outlier non contano ("richiamo mediano").
+ */
+export function tempoPrimoContattoSecondi(
+  storia: StoriaRow[],
+  leads: LeadRow[],
+  da: string,
+  a: string,
+): number | null {
+  const prodIds = idLeadProd(leads);
+  const creato = new Map(soloProdLead(leads).map((l) => [l.id, l.created_at]));
+  // Primo 'contattato' per lead.
+  const primoContatto = new Map<string, string>();
+  for (const r of storia) {
+    if (r.stato !== "contattato" || !prodIds.has(r.lead_id)) continue;
+    const cur = primoContatto.get(r.lead_id);
+    if (!cur || r.ts < cur) primoContatto.set(r.lead_id, r.ts);
+  }
+  const durate: number[] = [];
+  for (const [id, ts] of primoContatto) {
+    if (!inPeriodo(ts, da, a)) continue;
+    const c = creato.get(id);
+    if (!c) continue;
+    const sec = (new Date(ts).getTime() - new Date(c).getTime()) / 1000;
+    if (sec >= 0) durate.push(sec);
+  }
+  return mediana(durate);
+}
+
+export type FunnelForm = { iniziati: number; inviati: number; tasso: number | null };
+
+/** Funnel del form (§PR32): sessioni che iniziano un form → sessioni che inviano. */
+export function funnelForm(eventi: EvtRow[]): FunnelForm {
+  const iniziati = sessioniConTipo(eventi, "lead_iniziato");
+  const inviati = sessioniConTipo(eventi, "preventivo_inviato");
+  return { iniziati, inviati, tasso: tasso(inviati, iniziati) };
+}
+
 // ————————————————————————————————— Business —————————————————————————————————
 
 export type Business = { contratti: number; commissioni: number; valoreMedio: number | null };

@@ -22,6 +22,7 @@ export const TIPI_EVENTO = [
   "strumento_aperto",
   "strumento_completato",
   "tempo_pagina",
+  "lead_iniziato",
 ] as const;
 
 export type TipoEvento = (typeof TIPI_EVENTO)[number];
@@ -51,6 +52,7 @@ export const eventoSchema = z.object({
       domanda: z.string().max(200).optional(),
       strumento: z.string().max(40).optional(),
       secondi: z.number().int().optional(),
+      form: z.string().max(20).optional(),
     })
     .passthrough()
     .optional(),

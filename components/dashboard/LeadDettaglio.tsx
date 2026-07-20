@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { STATI_LEAD, LABEL_STATO_LEAD, type Lead } from "@/lib/dashboard/tipi";
 import {
@@ -9,7 +9,14 @@ import {
   labelNVeicoli,
   labelKm,
 } from "@/lib/lead/schema";
-import { cambiaStato, salvaNote, impostaRichiamo, salvaCommissione } from "@/app/app/(dash)/lead/actions";
+import {
+  cambiaStato,
+  salvaNote,
+  impostaRichiamo,
+  salvaCommissione,
+  caricaTimeline,
+  type EventoTimeline,
+} from "@/app/app/(dash)/lead/actions";
 import { whatsappLink } from "@/lib/contatti";
 import { titoliRischi } from "@/lib/servizi.config";
 import { DOMANDE } from "@/lib/consulente.config";
@@ -48,6 +55,18 @@ export function LeadDettaglio({ lead, onChiudi }: { lead: Lead; onChiudi: () => 
     lead.valore_commissione != null ? String(lead.valore_commissione) : "",
   );
   const [msg, setMsg] = useState<string | null>(null);
+
+  // Timeline della visita pre-lead (§PR32): caricata all'apertura, se c'è la sessione.
+  const sessione = lead.fonte?.sessione;
+  const [timeline, setTimeline] = useState<EventoTimeline[]>([]);
+  useEffect(() => {
+    let vivo = true;
+    if (sessione) caricaTimeline(sessione).then((t) => vivo && setTimeline(t));
+    else setTimeline([]);
+    return () => {
+      vivo = false;
+    };
+  }, [sessione]);
 
   const hot = lead.score != null && lead.score >= 3;
   const esegui = (fn: () => Promise<{ ok?: boolean; error?: string }>, ok: string) =>
@@ -273,10 +292,80 @@ export function LeadDettaglio({ lead, onChiudi }: { lead: Lead; onChiudi: () => 
           </button>
         </div>
 
+        {/* Timeline della visita pre-lead (§PR32) */}
+        {sessione && (
+          <div className="mt-5">
+            <p className="text-xs font-medium uppercase tracking-wide text-testo-chiaro/50">
+              Percorso prima del contatto
+            </p>
+            {timeline.length === 0 ? (
+              <p className="mt-2 text-sm text-testo-chiaro/45">Nessun evento registrato per questa visita.</p>
+            ) : (
+              <ol className="mt-2 space-y-1.5 border-l border-nero/10 pl-4">
+                {timeline.map((e, i) => (
+                  <li key={i} className="relative text-sm">
+                    <span className="absolute -left-[21px] top-1.5 h-2 w-2 rounded-full bg-oro/60" />
+                    <span className="text-testo-chiaro/80">{descriviEvento(e)}</span>
+                    <span className="ml-2 text-xs text-testo-chiaro/40">
+                      {new Date(e.ts).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        )}
+
         {msg && <p className="mt-4 text-sm text-oro">{msg}</p>}
       </div>
     </div>
   );
+}
+
+// Descrizione leggibile di un evento della timeline (§PR32).
+function descriviEvento(e: EventoTimeline): string {
+  const d = e.dati ?? {};
+  const s = (k: string) => (d[k] != null ? String(d[k]) : "");
+  switch (e.tipo) {
+    case "pagina_vista":
+      return `Ha visto ${e.pagina ?? "una pagina"}`;
+    case "veicolo_visto":
+      return "Ha aperto la scheda di un veicolo";
+    case "sezione_vista":
+      return `Ha letto la sezione «${s("sezione")}»`;
+    case "scroll_soglia":
+      return `Ha scrollato al ${s("soglia")}%`;
+    case "cta_click":
+      return `Ha cliccato la CTA «${s("cta")}»`;
+    case "faq_aperta":
+      return "Ha aperto una FAQ";
+    case "strumento_aperto":
+      return `Ha aperto ${s("strumento")}`;
+    case "strumento_completato":
+      return `Ha completato ${s("strumento")}`;
+    case "calcolatore_usato":
+      return "Ha usato il calcolatore";
+    case "configuratore_usato":
+      return "Ha usato il configuratore";
+    case "consulente_usato":
+      return "Ha completato il consulente";
+    case "consulente_soluzione_click":
+      return "Ha scelto una soluzione del consulente";
+    case "lead_iniziato":
+      return `Ha iniziato il form ${s("form")}`;
+    case "preventivo_inviato":
+      return "Ha inviato la richiesta";
+    case "telefono_click":
+      return "Ha cliccato il telefono";
+    case "whatsapp_click":
+      return "Ha cliccato WhatsApp";
+    case "condividi_click":
+      return "Ha condiviso un veicolo";
+    case "tempo_pagina":
+      return `È rimasto ${s("secondi")}s su ${e.pagina ?? "una pagina"}`;
+    default:
+      return e.tipo;
+  }
 }
 
 function Dato({ label, valore }: { label: string; valore: string }) {

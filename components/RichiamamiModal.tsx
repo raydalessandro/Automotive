@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { traccia, env } from "@/lib/traccia";
+import { traccia, env, sessioneCorrente, tracciaLeadIniziato } from "@/lib/traccia";
 import { leggiEsito } from "@/lib/consulente-esito";
 import { CardRichiamo } from "@/components/CardRichiamo";
 import type { Configurazione } from "@/lib/servizi.config";
@@ -63,7 +63,7 @@ export function RichiamamiModal({
       })(),
       note: "⚡ Richiamo rapido dal sito — dati aziendali da raccogliere in chiamata.",
       pagina: typeof window !== "undefined" ? window.location.pathname : "",
-      fonte: { env: env() },
+      fonte: { env: env(), sessione: sessioneCorrente() ?? undefined },
     };
 
     try {
@@ -108,7 +108,7 @@ export function RichiamamiModal({
             </button>
           </div>
         ) : (
-          <form onSubmit={onSubmit} noValidate>
+          <form onSubmit={onSubmit} onFocus={() => tracciaLeadIniziato("richiamo")} noValidate>
             <p className="text-xs font-semibold uppercase tracking-widest text-oro">Richiamami tu</p>
             <h2 id="richiamami-titolo" className="mt-1 font-display text-2xl font-semibold">
               Lasciaci nome e numero

@@ -20,6 +20,10 @@ import {
   classificaFonte,
   fonti,
   blog,
+  qualificatiSuSessioni,
+  qualificatiSuLead,
+  tempoPrimoContattoSecondi,
+  funnelForm,
   type EvtRow,
   type LeadRow,
   type StoriaRow,
@@ -222,6 +226,33 @@ describe("acquisizione: fonti (§PR31)", () => {
     expect(byCanale.social).toMatchObject({ sessioni: 1, lead: 1 }); // s2 fb / L2
     expect(byCanale.diretto).toMatchObject({ sessioni: 1, lead: 1 }); // s3 / L3
     expect(byCanale.email).toMatchObject({ sessioni: 0, lead: 0 });
+  });
+});
+
+describe("addendum PR32", () => {
+  it("qualificati/sessioni e qualificati/lead (denom 0 → null)", () => {
+    // qualificati nel periodo = 2 (L1,L3); sessioni prod = 3; lead = 3.
+    expect(qualificatiSuSessioni(LEADS, DA, A, 3)).toBeCloseTo(2 / 3);
+    expect(qualificatiSuSessioni(LEADS, DA, A, 0)).toBeNull();
+    expect(qualificatiSuLead(LEADS, DA, A)).toBeCloseTo(2 / 3);
+  });
+
+  it("tempo al primo contatto: mediana(primo contattato − created_at)", () => {
+    // L1: 2026-07-10T10:00 − 2026-07-10T00:00 = 36000s
+    // L2: 2026-07-12T12:00 − 2026-07-12T00:00 = 43200s
+    // L3: 2026-07-15T11:00 − 2026-07-15T00:00 = 39600s
+    // mediana(36000, 43200, 39600) = 39600
+    expect(tempoPrimoContattoSecondi(STORIA, LEADS, DA, A)).toBe(39600);
+  });
+
+  it("funnel form: iniziati → inviati; dedup per sessione", () => {
+    const ev2: EvtRow[] = [
+      ev("f1", "lead_iniziato", { dati: { form: "preventivo" } }),
+      ev("f1", "lead_iniziato", { dati: { form: "preventivo" } }), // duplicato → 1 sessione
+      ev("f1", "preventivo_inviato"),
+      ev("f2", "lead_iniziato", { dati: { form: "richiamo" } }), // iniziato, non inviato
+    ];
+    expect(funnelForm(ev2)).toEqual({ iniziati: 2, inviati: 1, tasso: 0.5 });
   });
 });
 

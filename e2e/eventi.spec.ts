@@ -92,6 +92,39 @@ test("eventi: click CTA hero → 1 cta_click con id giusto", async ({ page }) =>
   expect(cta.filter((e) => e.dati?.cta === "hero_consulente")).toHaveLength(1);
 });
 
+test("eventi: focus sul form → 1 lead_iniziato, submit non duplica", async ({ page }) => {
+  const eventi = await preparaPagina(page);
+  // Mock del POST lead così il submit va a buon fine senza DB.
+  await page.route("**/api/lead", (r) =>
+    r.fulfill({ status: 200, contentType: "application/json", body: '{"ok":true}' }),
+  );
+  await page.goto("/preventivo#form");
+
+  // Primo focus su un campo → 1 evento lead_iniziato {form: preventivo}.
+  await page.locator('input[name="ragione_sociale"]').click();
+  await page.locator('input[name="referente"]').click(); // secondo focus: nessun duplicato
+  await page.waitForTimeout(200);
+
+  const iniziati = eventi.filter((e) => e.tipo === "lead_iniziato");
+  expect(iniziati).toHaveLength(1);
+  expect(iniziati[0].dati?.form).toBe("preventivo");
+
+  // Compila e invia → nessun nuovo lead_iniziato.
+  await page.fill('input[name="ragione_sociale"]', "Test E2E SRL");
+  await page.fill('input[name="referente"]', "Mario Test");
+  await page.selectOption('select[name="forma_giuridica"]', "srl_spa");
+  await page.selectOption('select[name="anni_attivita"]', "oltre_5");
+  await page.selectOption('select[name="n_veicoli"]', "2_5");
+  await page.selectOption('select[name="km_anno"]', "15_30");
+  await page.fill('input[name="provincia"]', "MI");
+  await page.fill('input[name="telefono"]', "3331234567");
+  await page.check('input[name="consenso_privacy"]');
+  await page.locator('form button[type="submit"]').click();
+  await page.waitForTimeout(300);
+
+  expect(eventi.filter((e) => e.tipo === "lead_iniziato")).toHaveLength(1);
+});
+
 test("eventi: DNT attivo → zero richieste", async ({ page }) => {
   const eventi = await preparaPagina(page, { dnt: true });
   await page.goto("/");

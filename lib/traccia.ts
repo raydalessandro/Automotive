@@ -128,6 +128,24 @@ export function tracciaFaq(domanda: string): void {
   traccia("faq_aperta", { dati: { domanda } });
 }
 
+/** Id sessione corrente (per allegare al lead e ricostruire la timeline della visita). */
+export function sessioneCorrente(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return sessionStorage.getItem(KEY_SESSIONE);
+  } catch {
+    return null;
+  }
+}
+
+export type FormLead = "preventivo" | "richiamo";
+
+/** Form iniziato (primo focus/input). Dedup: una volta per form per sessione. */
+export function tracciaLeadIniziato(form: FormLead): void {
+  if (!unaVolta("lead_iniziato", form)) return;
+  traccia("lead_iniziato", { dati: { form } });
+}
+
 export type Strumento = "calcolatore" | "configuratore" | "consulente";
 
 /** Strumento aperto. Dedup: una volta per strumento. */

@@ -8,7 +8,7 @@ import {
   N_VEICOLI,
   KM_ANNO,
 } from "@/lib/lead/schema";
-import { traccia, env } from "@/lib/traccia";
+import { traccia, env, sessioneCorrente, tracciaLeadIniziato } from "@/lib/traccia";
 import { leggiEsito } from "@/lib/consulente-esito";
 import { titoliRischi, type Configurazione } from "@/lib/servizi.config";
 import { numero } from "@/lib/format";
@@ -53,8 +53,8 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
     tsApertura.current = Date.now();
   }, []);
 
-  // Tag ambiente dentro fonte del lead (§0.2 / §PR29).
-  const fonte = useMemo(() => ({ ...leggiFonte(), env: env() }), []);
+  // Fonte del lead: env (§0.2) + id sessione (§PR32, per la timeline pre-lead).
+  const fonte = useMemo(() => ({ ...leggiFonte(), env: env(), sessione: sessioneCorrente() ?? undefined }), []);
   const [config, setConfig] = useState<Configurazione | null>(null);
   useEffect(() => {
     setConfig(leggiConfig());
@@ -125,7 +125,12 @@ export function FormPreventivo({ veicoloId, veicoloTitolo }: { veicoloId?: strin
   }
 
   return (
-    <form onSubmit={onSubmit} className="rounded-2xl border border-nero/10 bg-carta p-6 sm:p-8" noValidate>
+    <form
+      onSubmit={onSubmit}
+      onFocus={() => tracciaLeadIniziato("preventivo")}
+      className="rounded-2xl border border-nero/10 bg-carta p-6 sm:p-8"
+      noValidate
+    >
       {veicoloTitolo && (
         <p className="mb-6 rounded-lg bg-avorio px-4 py-3 text-sm">
           Richiesta per: <strong>{veicoloTitolo}</strong>

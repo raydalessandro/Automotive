@@ -60,6 +60,28 @@ export async function salvaCommissione(id: string, valore: number | null): Promi
   return aggiorna(id, { valore_commissione: pulito });
 }
 
+// Timeline della visita pre-lead (§PR32): gli eventi della sessione che ha generato
+// il lead, in ordine cronologico, max 50.
+export type EventoTimeline = {
+  tipo: string;
+  pagina: string | null;
+  ts: string;
+  dati: Record<string, unknown> | null;
+};
+
+export async function caricaTimeline(sessione: string): Promise<EventoTimeline[]> {
+  if (!supabaseConfigurato() || !sessione) return [];
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("eventi")
+    .select("tipo, pagina, ts, dati")
+    .eq("sessione", sessione)
+    .order("ts", { ascending: true })
+    .limit(50);
+  if (error) return [];
+  return (data ?? []) as EventoTimeline[];
+}
+
 export async function impostaRichiamo(id: string, quando: string | null): Promise<RisultatoAzione> {
   // quando: datetime-local (ISO senza timezone) oppure null per rimuovere.
   const valore = quando ? new Date(quando).toISOString() : null;

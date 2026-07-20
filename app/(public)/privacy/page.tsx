@@ -50,6 +50,11 @@ export default function PrivacyPage() {
         risalire alla tua identità né di seguirti tra siti diversi. Se il tuo browser invia il segnale
         &laquo;Do Not Track&raquo;, non effettuiamo alcuna misurazione.
       </p>
+      <p>
+        Se ci invii una richiesta di preventivo, colleghiamo alla richiesta le misurazioni della
+        visita da cui è partita (l&apos;identificativo di sessione), al solo scopo di capire il
+        percorso che ti ha portato a contattarci e migliorare il servizio.
+      </p>
 
       <h2>I tuoi diritti</h2>
       <p>

@@ -76,6 +76,8 @@ export const leadSchema = z.object({
       referrer: z.string().optional(),
       // Tag ambiente (§0.2): la dashboard conta solo i lead prod.
       env: z.string().max(20).optional(),
+      // Id sessione della visita (§PR32): ricostruisce la timeline pre-lead.
+      sessione: z.string().max(64).optional(),
     })
     .optional(),
   pagina: z.string().max(300).optional().or(z.literal("")),
