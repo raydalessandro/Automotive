@@ -70,6 +70,28 @@ query_secondarie[], tag[], stato ("bozza"|"pubblicato"), in_evidenza, cta
   strumento/landing (`/calcolatore`, `/configuratore`, `/preventivo`, `/agenti`, `/artigiani`,
   `/aziende`, `/veicoli`). Senza, `check:blog` rompe il build.
 
+## Formato: guida-intervista
+
+Accanto alla guida classica, un secondo formato per i pezzi che rispondono alle domande
+vere dei clienti. Serve quando la query è una domanda ("conviene il noleggio per una
+flotta?", "come leggo un'offerta di noleggio?") e la risposta guadagna dalla voce di chi
+il noleggio lo fa tutti i giorni.
+
+- **Struttura a domande.** Ogni `H2` è una domanda del cliente, posta come la porrebbe lui
+  ("Quanto mi conviene davvero?", "E se cambio idea a metà?"). Sotto, la risposta.
+- **Voce esperta interna.** Le risposte sono attribuite a **"il nostro responsabile noleggio"**
+  (nome proprio solo quando autorizzato per iscritto — **[APERTO]** finché non arriva).
+  Tono da persona competente che ti spiega le cose, non da brochure.
+- **Autore e date visibili.** Il pezzo mostra autore, `data` e, se rivisto, `aggiornato_il`.
+  Una guida-intervista è utile perché è firmata e datata: dà fiducia.
+- **Regole ferree invariate.** Valgono tutte quelle sopra: zero cifre inventate, zero nomi
+  di fornitori o concorrenti, disclaimer fiscale, "IVA esclusa". La voce è più calda, i
+  fatti restano gli stessi.
+- **Chiusura sullo strumento.** L'ultima domanda porta alla `cta` ("E adesso come faccio i
+  conti sulla mia situazione?" → calcolatore/configuratore).
+
+Il frontmatter è lo stesso; `categoria` più adatta di solito `guide` o `flotte`.
+
 ## Il flusso
 
 1. Scegli la query dal piano (§2 della spec: cluster fisco / guide / flotte / mestieri).
