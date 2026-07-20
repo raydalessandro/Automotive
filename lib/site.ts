@@ -6,7 +6,7 @@ export const SITE = {
   nomeBreve: "Impero",
   claim: "Prima facciamo i conti. Poi scegliamo la macchina.",
   descrizione:
-    "Noleggio a lungo termine per partite IVA e aziende. Assicurazione, bollo, manutenzione e assistenza in un unico canone mensile.",
+    "Ti aiutiamo a prendere la decisione economicamente giusta sull'auto della tua attività: conti fatti davanti a te, costo reale sul tuo regime fiscale, una persona vera che ti richiama in giornata.",
   // Micro-copy fisso ovunque compaia un prezzo (§10).
   microPrezzo: "al mese + IVA · tutti i servizi inclusi",
   footerLegale:

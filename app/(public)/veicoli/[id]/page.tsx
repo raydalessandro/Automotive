@@ -226,7 +226,7 @@ export default function VeicoloPage({ params }: { params: { id: string } }) {
         <div className="relative aspect-[3/2]">
           <Image
             src="/foto/foto-chiavi.webp"
-            alt="Consegna delle chiavi di un veicolo"
+            alt="Un cliente riceve le chiavi della sua nuova auto aziendale"
             fill
             sizes="(min-width: 640px) 45vw, 100vw"
             className="object-cover"

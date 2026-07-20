@@ -106,7 +106,7 @@ export default function PreventivoPage({
             <div className="relative aspect-[3/2]">
               <Image
                 src="/foto/foto-chiavi.webp"
-                alt="Consegna delle chiavi di un veicolo"
+                alt="Un cliente riceve le chiavi della sua nuova auto aziendale"
                 fill
                 sizes="35vw"
                 className="object-cover"

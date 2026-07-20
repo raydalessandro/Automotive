@@ -9,6 +9,8 @@ import { FasciaAnticipo } from "@/components/FasciaAnticipo";
 import { TabellaConfronto } from "@/components/design/TabellaConfronto";
 import { MicroGaranzie } from "@/components/design/MicroGaranzie";
 import { Filetto } from "@/components/design/RuotaGuilloche";
+import { CardRichiamo } from "@/components/CardRichiamo";
+import { ProvaSociale } from "@/components/ProvaSociale";
 import { Faq } from "@/components/Faq";
 import { FAQ_ANTICIPO } from "@/lib/faq";
 
@@ -30,33 +32,20 @@ const SEGMENTI = [
   },
 ];
 
-const PASSI = [
-  { n: "1", t: "Scegli il veicolo", d: "Sfoglia il listino o dicci cosa ti serve." },
-  { n: "2", t: "Ti richiamiamo", d: "Prepariamo il preventivo su misura e ti contattiamo." },
-  { n: "3", t: "Guidi", d: "Firma, ricevi il veicolo e pensa solo a lavorare." },
-];
-
-// "Perché scegliere noi" — registro consulenza (icone-business). Claim veri, nessun numero inventato.
-const PERCHE = [
+// Il metodo in 60 secondi (§2.2). I primi due passi con link agli strumenti; il
+// terzo è la CardRichiamo compatta (i volti). Filetto sotto il titolo.
+const METODO = [
   {
-    icona: "/asset/icone-business/consulenza-dedicata.svg",
-    t: "Un solo interlocutore",
-    d: "Dalla scelta alla consegna parli con una persona, non con un call center.",
+    t: "Prima i conti",
+    d: "Cinque domande sulla tua attività, il costo reale sul tuo regime fiscale. Gratis, senza lasciare contatti.",
+    href: "/consulente",
+    cta: "Fai i conti",
   },
   {
-    icona: "/asset/icone-business/confronto-offerte.svg",
-    t: "Confrontiamo per te",
-    d: "Mettiamo a confronto i listini dei principali operatori NLT e ti portiamo la proposta più adatta.",
-  },
-  {
-    icona: "/asset/icone-business/risparmio-fiscale.svg",
-    t: "Ottimizzato sul tuo fisco",
-    d: "La formula giusta per la tua forma giuridica: deduzione e IVA al massimo che ti spetta.",
-  },
-  {
-    icona: "/asset/icone-business/gestione-flotta.svg",
-    t: "Anche per le flotte",
-    d: "Più veicoli, un unico canone e un unico referente per tutta la gestione.",
+    t: "Nessuna sorpresa",
+    d: "Ogni rischio del noleggio, a viso aperto: lo copri o lo accetti, decidi tu.",
+    href: "/configuratore",
+    cta: "Configura la rata",
   },
 ];
 
@@ -70,7 +59,7 @@ export default function Home() {
         <div className="container-content grid gap-10 pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pt-28">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-oro">
-              Noleggio a lungo termine · Partite IVA e aziende
+              Consulenti del noleggio a lungo termine · Partite IVA e aziende
             </p>
             <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.1] sm:text-5xl lg:text-6xl">
               {SITE.claim}
@@ -87,12 +76,12 @@ export default function Home() {
             {/* Micro-garanzie vicino alla CTA (trust nel punto di decisione). */}
             <MicroGaranzie scuro className="mt-6" />
           </div>
-          {/* Visual: l'imprenditore e il suo mezzo. La CTA resta l'unico oro pieno. */}
+          {/* Visual: il protagonista è la persona al lavoro (§3). La CTA resta l'unico oro pieno. */}
           <div className="relative">
             <div className="relative aspect-[16/11] overflow-hidden rounded-2xl border border-testo-scuro/10">
               <Image
                 src="/foto/foto-hero.webp"
-                alt="Imprenditore accanto al suo veicolo commerciale"
+                alt="Il titolare di un'attività inizia la sua giornata di lavoro"
                 fill
                 priority
                 sizes="(min-width: 1024px) 45vw, 100vw"
@@ -109,84 +98,45 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Veicoli in evidenza */}
-      <section className="container-content py-16 sm:py-20">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h2 className="font-display text-3xl font-semibold">In evidenza</h2>
-            <p className="mt-1 text-testo-chiaro/60">Le offerte del momento, canoni IVA esclusa.</p>
-          </div>
-          <Link href="/veicoli" className="hidden shrink-0 text-sm font-medium text-oro hover:underline sm:block">
-            Tutti i veicoli →
-          </Link>
-        </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {evidenza.map((v, i) => (
-            <VeicoloCard key={v.id} v={v} priority={i < 3} />
-          ))}
-        </div>
-        <div className="mt-8 sm:hidden">
-          <Link href="/veicoli" className="text-sm font-medium text-oro hover:underline">
-            Tutti i veicoli →
-          </Link>
-        </div>
-      </section>
-
-      {/* Tutto nel canone */}
-      <FasciaServizi />
-
-      {/* Anticipo zero. Davvero. (§2) — subito dopo "Tutto nel canone". */}
-      <FasciaAnticipo cta="consulente" />
-
-      {/* Come funziona */}
+      {/* Come lavoriamo con te (§2.2) — sostituisce "Come funziona" e assorbe "Perché scegliere noi". */}
       <section className="bg-avorio">
         <div className="container-content py-16 sm:py-20">
-          <h2 className="text-center font-display text-3xl font-semibold">Come funziona</h2>
+          <h2 className="text-center font-display text-3xl font-semibold">Come lavoriamo con te</h2>
           <Filetto className="mx-auto mt-4 h-4 w-52 text-oro" />
-          <div className="mx-auto mt-10 grid max-w-4xl gap-8 sm:grid-cols-3">
-            {PASSI.map((p) => (
-              <div key={p.n} className="text-center">
+          <div className="mx-auto mt-10 grid max-w-5xl gap-8 sm:grid-cols-3">
+            {METODO.map((p, i) => (
+              <div key={p.t} className="flex flex-col text-center">
                 <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-oro font-display text-xl font-semibold text-nero">
-                  {p.n}
+                  {i + 1}
                 </span>
                 <h3 className="mt-4 font-display text-xl font-semibold">{p.t}</h3>
                 <p className="mt-2 text-sm text-testo-chiaro/65">{p.d}</p>
+                <Link
+                  href={p.href}
+                  className="mt-3 inline-block text-sm font-medium text-oro hover:underline"
+                >
+                  {p.cta} →
+                </Link>
               </div>
             ))}
+            {/* Passo 3: i volti, con la CardRichiamo compatta. */}
+            <div className="flex flex-col text-center">
+              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-oro font-display text-xl font-semibold text-nero">
+                3
+              </span>
+              <h3 className="mt-4 font-display text-xl font-semibold">Una persona, in giornata</h3>
+              <CardRichiamo compatta className="mt-3" />
+            </div>
           </div>
+          {/* Riga assorbita da "Perché scegliere noi": il posizionamento da consulenti. */}
+          <p className="mx-auto mt-10 max-w-2xl text-center text-sm text-testo-chiaro/70">
+            Confrontiamo per te i listini dei principali operatori di noleggio e ti portiamo la
+            proposta giusta: siamo consulenti del noleggio, non ti vendiamo un&apos;auto.
+          </p>
         </div>
       </section>
 
-      {/* Confronto noleggio vs acquisto — sezione decisione (CRO). */}
-      <TabellaConfronto />
-
-      {/* Perché scegliere noi — tono consulenza su fondo nero. Nessuna CTA: l'oro qui non compete con la conversione. */}
-      <section className="bg-nero text-testo-scuro">
-        <div className="container-content py-16 sm:py-20">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-widest text-oro">Perché {SITE.nomeBreve}</p>
-            <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
-              Un noleggio seguito da persone, non da un portale
-            </h2>
-            <p className="mt-4 text-testo-scuro/70">
-              Non vendiamo un&apos;auto e spariamo: costruiamo la formula giusta per la tua attività e
-              restiamo il tuo riferimento, prima e dopo la firma.
-            </p>
-          </div>
-          <div className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-            {PERCHE.map((p) => (
-              <div key={p.t}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.icona} alt="" aria-hidden="true" className="h-12 w-12" />
-                <h3 className="mt-4 font-display text-lg font-semibold">{p.t}</h3>
-                <p className="mt-2 text-sm text-testo-scuro/65">{p.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Segmenti */}
+      {/* Per la tua attività — i segmenti (§2.3), parlano del lavoro. */}
       <section className="container-content py-16 sm:py-20">
         <h2 className="font-display text-3xl font-semibold">Su misura per la tua attività</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
@@ -206,13 +156,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Non ci pensi più — la corda emotiva: non compri un'auto, compri il non doverci pensare */}
+      {/* I conti già fatti (§2.4) — i veicoli, col canone chiaro. */}
+      <section className="bg-avorio">
+        <div className="container-content py-16 sm:py-20">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display text-3xl font-semibold">I conti già fatti</h2>
+              <p className="mt-1 text-testo-chiaro/60">
+                Ogni veicolo col suo canone chiaro, IVA esclusa dichiarata e costo reale a un click.
+              </p>
+            </div>
+            <Link href="/veicoli" className="hidden shrink-0 text-sm font-medium text-oro hover:underline sm:block">
+              Tutti i veicoli →
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {evidenza.map((v, i) => (
+              <VeicoloCard key={v.id} v={v} priority={i < 3} />
+            ))}
+          </div>
+          <div className="mt-8 sm:hidden">
+            <Link href="/veicoli" className="text-sm font-medium text-oro hover:underline">
+              Tutti i veicoli →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Tutto nel canone (§2.5) */}
+      <FasciaServizi />
+
+      {/* Confronto noleggio vs acquisto (§2.6) — l'argomento di decisione (CRO). */}
+      <TabellaConfronto />
+
+      {/* Anticipo zero. Davvero. (§2.7) */}
+      <FasciaAnticipo cta="consulente" />
+
+      {/* Non ci pensi più (§2.8) — la corda emotiva: non compri un'auto, compri il non doverci pensare */}
       <section className="bg-avorio">
         <div className="container-content grid items-center gap-10 py-16 sm:py-20 lg:grid-cols-2">
           <div className="relative order-last aspect-[16/11] overflow-hidden rounded-2xl lg:order-first">
             <Image
               src="/foto/foto-tranquillita.webp"
-              alt="Imprenditrice serena nel proprio studio"
+              alt="Un'imprenditrice al lavoro nel proprio studio"
               fill
               sizes="(min-width: 1024px) 45vw, 100vw"
               className="object-cover"
@@ -236,7 +222,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Domande frequenti — canoni onesti (§3). Linkano il calcolatore. */}
+      {/* Prova sociale (§2.9 / §4) — slot onesto: renderizza solo con clienti veri. */}
+      <ProvaSociale />
+
+      {/* Domande frequenti (§2.10) — gestione obiezioni. Linkano il calcolatore. */}
       <section className="bg-avorio">
         <div className="container-content py-16 sm:py-20">
           <h2 className="font-display text-3xl font-semibold">Domande frequenti</h2>
@@ -247,7 +236,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA finale — sfondo materico scuro con riflessi d'oro, testo in overlay */}
+      {/* CTA finale (§2.11) — sfondo materico scuro con riflessi d'oro, testo in overlay */}
       <section className="relative overflow-hidden bg-nero text-testo-scuro">
         <Image
           src="/foto/foto-sfondo.webp"

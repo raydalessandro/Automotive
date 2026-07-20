@@ -57,7 +57,7 @@ export default function ArtigianiPage() {
       titoloVeicoli="Veicoli commerciali N1"
       faq={[...FAQ, ...FAQ_COMUNI]}
       ctaTesto="Richiedi il preventivo N1"
-      foto={{ src: "/foto/foto-artigiano.webp", alt: "Furgone commerciale davanti a un laboratorio artigiano" }}
+      foto={{ src: "/foto/foto-artigiano.webp", alt: "Il furgone di un artigiano davanti al laboratorio, pronto per la giornata di lavoro" }}
     />
   );
 }

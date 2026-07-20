@@ -55,7 +55,7 @@ export default function AgentiPage() {
       titoloVeicoli="Veicoli pensati per la strada"
       faq={[...FAQ, ...FAQ_COMUNI]}
       ctaTesto="Richiedi il preventivo agente"
-      foto={{ src: "/foto/foto-agente.webp", alt: "Agente di commercio che sale sulla propria berlina" }}
+      foto={{ src: "/foto/foto-agente.webp", alt: "Un agente di commercio inizia la sua giornata di lavoro su strada" }}
     />
   );
 }
