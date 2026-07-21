@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { STATI_LEAD, LABEL_STATO_LEAD, type Lead } from "@/lib/dashboard/tipi";
+import { type Lead } from "@/lib/dashboard/tipi";
 import {
   labelForma,
   labelAnni,
@@ -10,13 +10,19 @@ import {
   labelKm,
 } from "@/lib/lead/schema";
 import {
-  cambiaStato,
   salvaNote,
   impostaRichiamo,
   salvaCommissione,
   caricaTimeline,
+  caricaAzienda,
+  riapriLead,
+  chiudiLead,
+  scartaLead,
   type EventoTimeline,
+  type AziendaBrief,
 } from "@/app/app/(dash)/lead/actions";
+import { PillStato } from "./PillStato";
+import { SmistaMenu, type VenditoreOpt } from "./SmistaMenu";
 import { whatsappLink } from "@/lib/contatti";
 import { titoliRischi } from "@/lib/servizi.config";
 import { DOMANDE } from "@/lib/consulente.config";
@@ -46,15 +52,36 @@ function fmt(iso: string | null): string {
   return iso ? new Date(iso).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" }) : "—";
 }
 
-export function LeadDettaglio({ lead, onChiudi }: { lead: Lead; onChiudi: () => void }) {
+export function LeadDettaglio({
+  lead,
+  venditori = [],
+  onChiudi,
+}: {
+  lead: Lead;
+  venditori?: VenditoreOpt[];
+  onChiudi: () => void;
+}) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [note, setNote] = useState(lead.note ?? "");
+  const [notaAzione, setNotaAzione] = useState("");
   const [richiamo, setRichiamo] = useState(isoToLocalInput(lead.richiamare_il));
   const [commissione, setCommissione] = useState(
     lead.valore_commissione != null ? String(lead.valore_commissione) : "",
   );
   const [msg, setMsg] = useState<string | null>(null);
+
+  // Brief azienda (§PR-3): dati dal magazzino via azienda_id, caricati all'apertura.
+  const aziendaId = lead.azienda_id;
+  const [azienda, setAzienda] = useState<AziendaBrief | null>(null);
+  useEffect(() => {
+    let vivo = true;
+    if (aziendaId) caricaAzienda(aziendaId).then((a) => vivo && setAzienda(a));
+    else setAzienda(null);
+    return () => {
+      vivo = false;
+    };
+  }, [aziendaId]);
 
   // Timeline della visita pre-lead (§PR32): caricata all'apertura, se c'è la sessione.
   const sessione = lead.fonte?.sessione;
@@ -124,24 +151,79 @@ export function LeadDettaglio({ lead, onChiudi }: { lead: Lead; onChiudi: () => 
           )}
         </div>
 
-        {/* Stato */}
+        {/* Brief azienda (§PR-3, blocchi 1-2) — solo per i lead da risposta outreach. */}
+        {lead.azienda_id && (
+          <div className="mt-5 rounded-xl border border-nero/10 bg-avorio/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-testo-chiaro/50">
+              Dal magazzino
+            </p>
+            {azienda ? (
+              <>
+                <p className="mt-2 text-sm">
+                  <strong>{azienda.ragione_sociale}</strong>
+                  {azienda.citta ? ` · ${azienda.citta}` : ""}
+                  {azienda.provincia ? ` (${azienda.provincia})` : ""}
+                </p>
+                <p className="mt-0.5 text-sm text-testo-chiaro/70">
+                  {azienda.settore ?? "—"} · {azienda.dimensione_stimata ?? "—"} · score{" "}
+                  {azienda.score ?? "—"}
+                  {azienda.sito ? (
+                    <>
+                      {" · "}
+                      <a href={azienda.sito} target="_blank" rel="noopener noreferrer" className="text-oro underline">
+                        sito
+                      </a>
+                    </>
+                  ) : null}
+                </p>
+                {azienda.segnali && (
+                  <p className="mt-2 text-sm text-testo-chiaro/75">
+                    <span className="text-testo-chiaro/45">Perché li abbiamo contattati: </span>
+                    {azienda.segnali}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-testo-chiaro/45">Caricamento…</p>
+            )}
+          </div>
+        )}
+
+        {/* Azioni operatore (§PR-3): stato attuale + Riassegna · Riapri · Chiudi · Scarta. */}
         <div className="mt-5">
-          <p className="text-xs font-medium uppercase tracking-wide text-testo-chiaro/50">Stato</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {STATI_LEAD.map((s) => (
-              <button
-                key={s}
-                disabled={pending}
-                onClick={() => esegui(() => cambiaStato(lead.id, s), "Stato aggiornato")}
-                className={`rounded-full border px-3 py-1 text-xs transition-colors disabled:opacity-50 ${
-                  lead.stato === s
-                    ? "border-nero bg-nero text-testo-scuro"
-                    : "border-nero/15 text-testo-chiaro/70 hover:border-oro/50"
-                }`}
-              >
-                {LABEL_STATO_LEAD[s]}
-              </button>
-            ))}
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-testo-chiaro/50">Azioni</p>
+            <PillStato stato={lead.stato} />
+          </div>
+          <input
+            value={notaAzione}
+            onChange={(e) => setNotaAzione(e.target.value)}
+            placeholder="Nota per questa azione (opzionale)"
+            className="mt-2 w-full rounded-lg border border-nero/15 px-3 py-2 text-sm focus:border-oro focus:outline-none"
+          />
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <SmistaMenu leadId={lead.id} venditori={venditori} label="Riassegna a ▾" />
+            <button
+              disabled={pending}
+              onClick={() => esegui(() => riapriLead(lead.id, notaAzione || undefined), "Riaperto")}
+              className="rounded-full border border-nero/15 px-3 py-1.5 text-sm hover:border-oro/50 disabled:opacity-50"
+            >
+              Riapri
+            </button>
+            <button
+              disabled={pending}
+              onClick={() => esegui(() => chiudiLead(lead.id, notaAzione || undefined), "Chiuso")}
+              className="btn-scuro px-3 py-1.5 text-sm disabled:opacity-50"
+            >
+              Chiudi
+            </button>
+            <button
+              disabled={pending}
+              onClick={() => esegui(() => scartaLead(lead.id, notaAzione || undefined), "Scartato")}
+              className="rounded-full border border-nero/15 px-3 py-1.5 text-sm text-testo-chiaro/60 hover:border-oro/50 disabled:opacity-50"
+            >
+              Scarta
+            </button>
           </div>
         </div>
 

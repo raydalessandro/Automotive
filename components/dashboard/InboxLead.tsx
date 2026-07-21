@@ -3,29 +3,58 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { STATI_LEAD, LABEL_STATO_LEAD, type Lead, type StatoLead } from "@/lib/dashboard/tipi";
+import { type Lead, type StatoLead } from "@/lib/dashboard/tipi";
+import {
+  raggruppaViste,
+  vistaDi,
+  giorniNelloStato,
+  alertGestione,
+  sorgenteDi,
+  type Vista,
+} from "@/lib/dashboard/viste-lead";
 import { LeadDettaglio } from "./LeadDettaglio";
+import { PillStato } from "./PillStato";
+import { SmistaMenu, type VenditoreOpt } from "./SmistaMenu";
+import { scartaLead } from "@/app/app/(dash)/lead/actions";
 
-type Filtro = StatoLead | "tutti";
+// Arricchimento card dal magazzino aziende (§PR-3): risposta outreach.
+export type AziendaCard = {
+  ragione_sociale: string;
+  segmento: string | null;
+  settore: string | null;
+  score: number | null;
+  segnali: string | null;
+  citta: string | null;
+};
+
+const TAB: { id: Vista; label: string }[] = [
+  { id: "da_smistare", label: "Da smistare" },
+  { id: "in_gestione", label: "In gestione" },
+  { id: "chiusi", label: "Chiusi" },
+];
 
 export function InboxLead({
   iniziali,
-  statoIniziale = "tutti",
+  venditori,
+  aziende,
+  statoIniziale,
   apriIniziale,
 }: {
   iniziali: Lead[];
-  statoIniziale?: Filtro;
+  venditori: VenditoreOpt[];
+  aziende: Record<string, AziendaCard>;
+  statoIniziale?: StatoLead;
   apriIniziale?: string;
 }) {
   const router = useRouter();
   const [leads, setLeads] = useState<Lead[]>(iniziali);
-  const [filtro, setFiltro] = useState<Filtro>(statoIniziale);
+  // ?stato= resta funzionante: apre la vista che contiene quello stato.
+  const [tab, setTab] = useState<Vista>(statoIniziale ? vistaDi(statoIniziale) : "da_smistare");
   const [selezionato, setSelezionato] = useState<string | null>(apriIniziale ?? null);
 
-  // Ri-seed quando il server rifornisce dati aggiornati (azioni, polling).
   useEffect(() => setLeads(iniziali), [iniziali]);
 
-  // Realtime: nuovi lead e aggiornamenti compaiono senza refresh (§3).
+  // Realtime: nuovi lead e aggiornamenti compaiono senza refresh.
   useEffect(() => {
     const supabase = createClient();
     const canale = supabase
@@ -39,99 +68,67 @@ export function InboxLead({
         setLeads((prev) => prev.map((l) => (l.id === agg.id ? agg : l)));
       })
       .subscribe();
-
-    // Fallback: polling 60s (rifetch server) se il realtime non riceve.
     const timer = setInterval(() => router.refresh(), 60000);
-
     return () => {
       supabase.removeChannel(canale);
       clearInterval(timer);
     };
   }, [router]);
 
-  const conteggi = useMemo(() => {
-    const c: Record<string, number> = { tutti: leads.length };
-    for (const s of STATI_LEAD) c[s] = 0;
-    for (const l of leads) c[l.stato] = (c[l.stato] ?? 0) + 1;
-    return c;
-  }, [leads]);
-
-  const visibili = useMemo(
-    () => (filtro === "tutti" ? leads : leads.filter((l) => l.stato === filtro)),
-    [leads, filtro],
-  );
+  const viste = useMemo(() => raggruppaViste(leads), [leads]);
+  const nomeVenditore = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const v of venditori) m.set(v.id, v.nome ?? "Senza nome");
+    return m;
+  }, [venditori]);
 
   const lead = selezionato ? leads.find((l) => l.id === selezionato) ?? null : null;
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold">Inbox lead</h1>
+      <h1 className="font-display text-2xl font-semibold">Lead</h1>
 
-      {/* Filtri stato */}
+      {/* Tab delle tre viste, con contatore su Da smistare */}
       <div className="mt-4 flex flex-wrap gap-1.5">
-        <Chip label={`Tutti (${conteggi.tutti})`} attivo={filtro === "tutti"} onClick={() => setFiltro("tutti")} />
-        {STATI_LEAD.map((s) => (
-          <Chip
-            key={s}
-            label={`${LABEL_STATO_LEAD[s]} (${conteggi[s] ?? 0})`}
-            attivo={filtro === s}
-            onClick={() => setFiltro(s)}
-          />
+        {TAB.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors ${
+              tab === t.id ? "bg-nero text-testo-scuro" : "bg-nero/5 text-testo-chiaro/70 hover:bg-nero/10"
+            }`}
+          >
+            {t.label}
+            {t.id === "da_smistare" && ` (${viste.da_smistare.length})`}
+          </button>
         ))}
       </div>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-        {/* Lista */}
+      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <div className={selezionato ? "hidden lg:block" : ""}>
-          {visibili.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-nero/15 bg-carta p-8 text-center text-sm text-testo-chiaro/55">
-              Nessun lead in questa vista.
-            </p>
-          ) : (
-            <ul className="divide-y divide-nero/10 overflow-hidden rounded-2xl border border-nero/10 bg-carta">
-              {visibili.map((l) => {
-                const hot = l.score != null && l.score >= 3;
-                return (
-                  <li key={l.id}>
-                    <button
-                      onClick={() => setSelezionato(l.id)}
-                      className={`flex w-full items-center justify-between gap-3 p-4 text-left hover:bg-avorio/60 ${
-                        selezionato === l.id ? "bg-avorio" : ""
-                      }`}
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate font-medium">
-                          {l.ragione_sociale}
-                          {hot && (
-                            <span className="ml-2 rounded-full bg-oro/15 px-2 py-0.5 text-xs font-semibold text-oro">
-                              HOT
-                            </span>
-                          )}
-                        </p>
-                        <p className="truncate text-xs text-testo-chiaro/55">
-                          {l.provincia} · {l.telefono} · {LABEL_STATO_LEAD[l.stato] ?? l.stato}
-                        </p>
-                      </div>
-                      <span className="shrink-0 text-xs text-testo-chiaro/40">
-                        {new Date(l.created_at).toLocaleDateString("it-IT")}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+          {tab === "da_smistare" && (
+            <ListaDaSmistare
+              leads={viste.da_smistare}
+              aziende={aziende}
+              venditori={venditori}
+              onApri={setSelezionato}
+              onScarta={(id) => scartaLead(id).then(() => router.refresh())}
+            />
           )}
+          {tab === "in_gestione" && (
+            <ListaGestione leads={viste.in_gestione} nomeVenditore={nomeVenditore} onApri={setSelezionato} />
+          )}
+          {tab === "chiusi" && <ListaChiusi leads={viste.chiusi} onApri={setSelezionato} />}
         </div>
 
-        {/* Dettaglio */}
         <div className={selezionato ? "" : "hidden lg:block"}>
           {lead ? (
             <div className="rounded-2xl border border-nero/10 bg-carta lg:sticky lg:top-32 lg:max-h-[calc(100vh-9rem)]">
-              <LeadDettaglio lead={lead} onChiudi={() => setSelezionato(null)} />
+              <LeadDettaglio lead={lead} venditori={venditori} onChiudi={() => setSelezionato(null)} />
             </div>
           ) : (
             <div className="hidden h-full items-center justify-center rounded-2xl border border-dashed border-nero/15 bg-carta p-8 text-center text-sm text-testo-chiaro/45 lg:flex">
-              Seleziona un lead per vederne il dettaglio.
+              Seleziona un lead per vederne il brief.
             </div>
           )}
         </div>
@@ -140,15 +137,156 @@ export function InboxLead({
   );
 }
 
-function Chip({ label, attivo, onClick }: { label: string; attivo: boolean; onClick: () => void }) {
+// ————————————————————————————————— Vista 1: Da smistare —————————————————————————————————
+
+function ListaDaSmistare({
+  leads,
+  aziende,
+  venditori,
+  onApri,
+  onScarta,
+}: {
+  leads: Lead[];
+  aziende: Record<string, AziendaCard>;
+  venditori: VenditoreOpt[];
+  onApri: (id: string) => void;
+  onScarta: (id: string) => void;
+}) {
+  if (leads.length === 0) return <Vuoto testo="Nessun lead da smistare." />;
   return (
-    <button
-      onClick={onClick}
-      className={`whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors ${
-        attivo ? "bg-nero text-testo-scuro" : "bg-nero/5 text-testo-chiaro/70 hover:bg-nero/10"
-      }`}
-    >
-      {label}
-    </button>
+    <div className="space-y-3">
+      {leads.map((l) => {
+        const az = l.azienda_id ? aziende[l.azienda_id] : undefined;
+        const sorgente = sorgenteDi(l);
+        const citta = az?.citta ?? l.provincia;
+        const segmento = az?.segmento ?? "—";
+        const settore = az?.settore ?? l.settore ?? "—";
+        const score = az?.score ?? l.score;
+        const segnali = az?.segnali;
+        return (
+          <div key={l.id} className="rounded-2xl border border-nero/10 bg-carta p-4">
+            <button onClick={() => onApri(l.id)} className="block w-full text-left">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-medium">
+                  {l.ragione_sociale} <span className="text-testo-chiaro/50">· {citta}</span>
+                </p>
+                <span className="shrink-0 rounded-full bg-nero/5 px-2 py-0.5 text-xs text-testo-chiaro/60">
+                  {sorgente === "risposta" ? "risposta ✉" : "form sito"}
+                </span>
+              </div>
+              <p className="mt-0.5 text-xs text-testo-chiaro/55">
+                {segmento} · {settore} · score {score ?? "—"}
+              </p>
+              {segnali && <p className="mt-1 truncate text-sm text-testo-chiaro/70">{segnali}</p>}
+              {sorgente === "risposta" && l.note && (
+                <p className="mt-1 truncate text-sm text-testo-chiaro/80">
+                  Ha risposto: &laquo;{l.note}&raquo;
+                </p>
+              )}
+            </button>
+            <div className="mt-3 flex items-center justify-end gap-2">
+              <button
+                onClick={() => onScarta(l.id)}
+                className="rounded-full border border-nero/15 px-3 py-1.5 text-sm text-testo-chiaro/60 hover:border-oro/50"
+              >
+                Scarta
+              </button>
+              <SmistaMenu leadId={l.id} venditori={venditori} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ————————————————————————————————— Vista 2: In gestione —————————————————————————————————
+
+function ListaGestione({
+  leads,
+  nomeVenditore,
+  onApri,
+}: {
+  leads: Lead[];
+  nomeVenditore: Map<string, string>;
+  onApri: (id: string) => void;
+}) {
+  if (leads.length === 0) return <Vuoto testo="Nessun lead in gestione." />;
+  const now = Date.now();
+  // Raggruppa per venditore assegnato.
+  const gruppi = new Map<string, Lead[]>();
+  for (const l of leads) {
+    const k = l.assegnato_a ?? "—";
+    if (!gruppi.has(k)) gruppi.set(k, []);
+    gruppi.get(k)!.push(l);
+  }
+  return (
+    <div className="space-y-5">
+      {[...gruppi.entries()].map(([k, ls]) => (
+        <div key={k}>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-testo-chiaro/50">
+            {k === "—" ? "Non assegnati" : nomeVenditore.get(k) ?? "Venditore"}
+          </p>
+          <ul className="divide-y divide-nero/10 overflow-hidden rounded-2xl border border-nero/10 bg-carta">
+            {ls.map((l) => {
+              const g = giorniNelloStato(l, now);
+              const alert = alertGestione(l, now);
+              return (
+                <li key={l.id}>
+                  <button
+                    onClick={() => onApri(l.id)}
+                    className="flex w-full items-center justify-between gap-3 p-3 text-left hover:bg-avorio/60"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">
+                        {alert && <span className="mr-1 text-oro">●</span>}
+                        {l.ragione_sociale}
+                      </p>
+                      <p className="truncate text-xs text-testo-chiaro/50">{l.note ?? "—"}</p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <PillStato stato={l.stato} />
+                      <span className="w-12 text-right text-xs tabular text-testo-chiaro/45">{g} gg</span>
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ————————————————————————————————— Vista 3: Chiusi —————————————————————————————————
+
+function ListaChiusi({ leads, onApri }: { leads: Lead[]; onApri: (id: string) => void }) {
+  if (leads.length === 0) return <Vuoto testo="Nessun lead chiuso in questo periodo." />;
+  return (
+    <ul className="divide-y divide-nero/10 overflow-hidden rounded-2xl border border-nero/10 bg-carta">
+      {leads.map((l) => (
+        <li key={l.id}>
+          <button
+            onClick={() => onApri(l.id)}
+            className="flex w-full items-center justify-between gap-3 p-3 text-left hover:bg-avorio/60"
+          >
+            <div className="min-w-0">
+              <p className="truncate font-medium">{l.ragione_sociale}</p>
+              <p className="truncate text-xs text-testo-chiaro/50">{l.note ?? "—"}</p>
+            </div>
+            <PillStato stato={l.stato} />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Vuoto({ testo }: { testo: string }) {
+  return (
+    <p className="rounded-2xl border border-dashed border-nero/15 bg-carta p-8 text-center text-sm text-testo-chiaro/55">
+      {testo}
+    </p>
   );
 }

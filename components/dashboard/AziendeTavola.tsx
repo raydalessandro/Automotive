@@ -7,6 +7,7 @@ import {
   importaAziende,
   aggiornaAzienda,
   esportaSelezione,
+  creaLeadDaAzienda,
   type EsitoImport,
   type ModoImport,
 } from "@/app/app/(dash)/aziende/actions";
@@ -258,6 +259,25 @@ export function AziendeTavola({ aziende }: { aziende: Azienda[] }) {
                     <tr>
                       <td colSpan={6} className="bg-avorio/60 p-3">
                         <SegnaliEditor azienda={a} onSalva={(s) => esegui(() => aggiornaAzienda(a.id, { segnali: s }))} pending={pending} />
+                        {/* Crea lead (§PR-3): la risposta outreach entra nella pipeline vendita. */}
+                        <div className="mt-3 flex items-center gap-3 border-t border-nero/10 pt-3">
+                          <button
+                            disabled={pending}
+                            onClick={() =>
+                              esegui(async () => {
+                                const r = await creaLeadDaAzienda(a.id);
+                                if (r.ok && r.leadId) router.push(`/app/lead?apri=${r.leadId}`);
+                                return r;
+                              })
+                            }
+                            className="btn-oro px-4 py-2 text-sm disabled:opacity-50"
+                          >
+                            Crea lead
+                          </button>
+                          <span className="text-xs text-testo-chiaro/50">
+                            Ha risposto: crea il lead e vai allo smistamento.
+                          </span>
+                        </div>
                       </td>
                     </tr>
                   )}

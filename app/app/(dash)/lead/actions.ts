@@ -50,6 +50,88 @@ export async function cambiaStato(id: string, stato: StatoLead): Promise<Risulta
   return { ok: true };
 }
 
+// Transizione con nota + patch extra (§PR-3): unico punto di scrittura per le azioni
+// operatore (smista, scarta, riassegna, riapri, chiudi). Aggiorna stato + audit, e
+// registra la riga di storia con l'autore e la nota libera.
+async function transisci(
+  id: string,
+  stato: StatoLead,
+  nota: string | null = null,
+  extraPatch: Record<string, unknown> = {},
+): Promise<RisultatoAzione> {
+  if (!STATI_LEAD.includes(stato)) return { error: "Stato non valido" };
+  if (!supabaseConfigurato()) return { error: "Supabase non configurato" };
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Sessione scaduta" };
+
+  const piano = pianoTransizione(id, stato, user.id, new Date().toISOString());
+  const { error } = await supabase.from("leads").update({ ...piano.patch, ...extraPatch }).eq("id", id);
+  if (error) return { error: error.message };
+  await supabase.from("lead_stati_storia").insert({ ...piano.storia, nota: nota?.trim() || null });
+
+  revalidatePath("/app/lead");
+  revalidatePath("/app");
+  return { ok: true };
+}
+
+/** Smista un lead a un venditore → stato `assegnato` + assegnato_a/il (§PR-3). */
+export async function smistaLead(id: string, venditoreId: string, nota?: string): Promise<RisultatoAzione> {
+  if (!venditoreId) return { error: "Nessun venditore selezionato" };
+  return transisci(id, "assegnato", nota ?? null, {
+    assegnato_a: venditoreId,
+    assegnato_il: new Date().toISOString(),
+  });
+}
+
+/** Riassegna a un altro venditore (resta `assegnato`, aggiorna assegnato_a/il). */
+export async function riassegnaLead(id: string, venditoreId: string, nota?: string): Promise<RisultatoAzione> {
+  return smistaLead(id, venditoreId, nota);
+}
+
+/** Scarta un lead → `perso` con nota (default "Scartato in smistamento"). */
+export async function scartaLead(id: string, nota?: string): Promise<RisultatoAzione> {
+  return transisci(id, "perso", nota ?? "Scartato in smistamento");
+}
+
+/** Riapre una trattativa chiusa/persa → torna `preso_in_carico`. */
+export async function riapriLead(id: string, nota?: string): Promise<RisultatoAzione> {
+  return transisci(id, "preso_in_carico", nota ?? "Riaperta dall'operatore");
+}
+
+/** Chiude un lead → `chiuso` con nota di esito. */
+export async function chiudiLead(id: string, nota?: string): Promise<RisultatoAzione> {
+  return transisci(id, "chiuso", nota ?? null);
+}
+
+// Brief azienda del lead (§PR-3 blocchi 1-2): dati dal magazzino via azienda_id.
+export type AziendaBrief = {
+  ragione_sociale: string;
+  citta: string | null;
+  provincia: string | null;
+  settore: string | null;
+  dimensione_stimata: string | null;
+  sito: string | null;
+  telefono: string | null;
+  segnali: string | null;
+  score: number | null;
+  fonte_ricerca: string | null;
+};
+
+export async function caricaAzienda(aziendaId: string): Promise<AziendaBrief | null> {
+  if (!supabaseConfigurato() || !aziendaId) return null;
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("aziende")
+    .select("ragione_sociale, citta, provincia, settore, dimensione_stimata, sito, telefono, segnali, score, fonte_ricerca")
+    .eq("id", aziendaId)
+    .maybeSingle();
+  if (error) return null;
+  return (data as AziendaBrief) ?? null;
+}
+
 export async function salvaNote(id: string, note: string): Promise<RisultatoAzione> {
   return aggiorna(id, { note: note.trim() || null });
 }
