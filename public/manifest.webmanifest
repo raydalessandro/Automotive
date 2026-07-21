@@ -1,0 +1,14 @@
+{
+  "name": "Impero Vendita",
+  "short_name": "Vendita",
+  "description": "I tuoi contatti da chiudere.",
+  "start_url": "/vendita",
+  "scope": "/vendita",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#12100D",
+  "theme_color": "#12100D",
+  "icons": [
+    { "src": "/icona-vendita.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

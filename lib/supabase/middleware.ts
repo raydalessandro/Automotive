@@ -31,7 +31,9 @@ export async function aggiornaSessione(request: NextRequest): Promise<NextRespon
 
   const path = request.nextUrl.pathname;
   const isLogin = path === "/app/login";
+  const isVendita = path.startsWith("/vendita");
 
+  // Login condiviso in /app/login (anche per i venditori): il non autenticato ci va.
   if (!user && !isLogin) {
     const redirect = request.nextUrl.clone();
     redirect.pathname = "/app/login";
@@ -39,11 +41,22 @@ export async function aggiornaSessione(request: NextRequest): Promise<NextRespon
     return NextResponse.redirect(redirect);
   }
 
-  if (user && isLogin) {
+  const vaiA = (pathname: string) => {
     const redirect = request.nextUrl.clone();
-    redirect.pathname = "/app";
+    redirect.pathname = pathname;
     redirect.search = "";
     return NextResponse.redirect(redirect);
+  };
+
+  if (user) {
+    // Ruolo: una riga in `venditori` ⇒ venditore (→ /vendita); altrimenti operatore (→ /app).
+    const { data: v } = await supabase.from("venditori").select("id").eq("id", user.id).maybeSingle();
+    const isVenditore = Boolean(v);
+
+    if (isLogin) return vaiA(isVenditore ? "/vendita" : "/app");
+    // Il venditore non entra in casa base; l'operatore non entra nella PWA venditori.
+    if (isVenditore && !isVendita) return vaiA("/vendita");
+    if (!isVenditore && isVendita) return vaiA("/app");
   }
 
   return response;

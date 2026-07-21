@@ -1,11 +1,11 @@
 import type { NextRequest } from "next/server";
 import { aggiornaSessione } from "@/lib/supabase/middleware";
 
-// Protegge solo /app/*. Il sito pubblico non passa dal middleware.
+// Protegge /app/* (operatore) e /vendita/* (venditori). Il sito pubblico non passa.
 export async function middleware(request: NextRequest) {
   return aggiornaSessione(request);
 }
 
 export const config = {
-  matcher: ["/app/:path*"],
+  matcher: ["/app/:path*", "/vendita/:path*"],
 };
