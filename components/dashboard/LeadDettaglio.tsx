@@ -202,7 +202,7 @@ export function LeadDettaglio({
             className="mt-2 w-full rounded-lg border border-nero/15 px-3 py-2 text-sm focus:border-oro focus:outline-none"
           />
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <SmistaMenu leadId={lead.id} venditori={venditori} label="Riassegna a ▾" />
+            <SmistaMenu leadId={lead.id} venditori={venditori} label="Riassegna a" />
             <button
               disabled={pending}
               onClick={() => esegui(() => riapriLead(lead.id, notaAzione || undefined), "Riaperto")}
