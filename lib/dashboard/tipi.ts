@@ -2,10 +2,16 @@
 
 import type { Configurazione } from "@/lib/servizi.config";
 
+// Stati lead (§PR-2). I 5 esistenti restano nell'ordine originale; i 3 nuovi
+// (assegnato, preso_in_carico, in_sospeso) sono inseriti seguendo la pipeline:
+// nuovo → contattato → assegnato → preso_in_carico → esiti (preventivo/in_sospeso/chiuso/perso).
 export const STATI_LEAD = [
   "nuovo",
   "contattato",
+  "assegnato",
+  "preso_in_carico",
   "preventivo_inviato",
+  "in_sospeso",
   "chiuso",
   "perso",
 ] as const;
@@ -14,7 +20,10 @@ export type StatoLead = (typeof STATI_LEAD)[number];
 export const LABEL_STATO_LEAD: Record<StatoLead, string> = {
   nuovo: "Nuovo",
   contattato: "Contattato",
+  assegnato: "Assegnato",
+  preso_in_carico: "Preso in carico",
   preventivo_inviato: "Preventivo inviato",
+  in_sospeso: "In sospeso",
   chiuso: "Chiuso",
   perso: "Perso",
 };
@@ -44,5 +53,9 @@ export type Lead = {
   aggiornato_il: string | null;
   aggiornato_da: string | null;
   valore_commissione: number | null;
+  // §PR-2: assegnazione al venditore e ponte con il magazzino aziende.
+  assegnato_a: string | null;
+  assegnato_il: string | null;
+  azienda_id: string | null;
   configurazione: Configurazione | null;
 };
