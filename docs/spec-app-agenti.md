@@ -1,65 +1,44 @@
-# Spec — Area venditori (smistamento risposte)
+# Spec — App venditori (/vendita, PWA)
 
-> Fase successiva del flusso: ricerca → gate → import → primo contatto → **risposta → smistamento → venditore a voce**.
-> Da implementare così com'è (Opus o dev): riusa pezzi già in repo, indicati punto per punto.
+> v2 — allineata al flusso dell'operatore. Stati e migrations in `spec-flusso-lead.md`,
+> UX di casa base in `spec-casa-base-lead.md`, sequenza PR in `piano-implementazione.md`.
 
-## Obiettivo
+## Principio
 
-Separare casa base (l'attuale `/app`: magazzino, campagne, analytics) dall'area venditori.
-I venditori vedono SOLO i lead che hanno risposto e che gli sono stati assegnati, con una
-scheda-brief che li forma in 60 secondi prima della chiamata. Onboarding di un nuovo
-venditore: si crea il profilo, installa la PWA, fa login — nessuna formazione su casa base.
+Il venditore non vede il sistema: vede solo i **suoi** contatti da sentire, con più
+informazioni possibili per chiudere la vendita. Due schermate, bottoni grandi, zero menu.
+PWA installabile ("Aggiungi a schermata Home"), nessuno store. Onboarding di un nuovo
+venditore: riga in `venditori`, login, fine — niente formazione su casa base.
 
-## Non-obiettivi (v1)
+## Schermata 1 — I miei lead
 
-Niente accesso venditori a magazzino, batch, campagne o analytics. Niente app native: PWA
-installabile ("Aggiungi a schermata Home"). Niente smistamento automatico: assegna l'operatore.
+Tre sezioni, nell'ordine di urgenza:
+**Da prendere in carico** (`assegnato`, con il tempo trascorso in evidenza) ·
+**In corso** (`preso_in_carico`, `contattato`) ·
+**In gestione** (`preventivo_inviato`, `in_sospeso`).
+Card minima: azienda · città · pill stato · gancio in una riga. Tap → scheda.
 
-## Modello dati — `supabase/migrations/009_venditori.sql`
+## Schermata 2 — Scheda (il brief che forma il venditore)
 
-- Tabella `venditori`: `id uuid` PK = `auth.users.id`, `nome`, `telefono`, `email`,
-  `telegram_chat_id text null`, `attivo bool default true`, `creato_il`.
-- Su `leads`: `assegnato_a uuid null references venditori(id)`, `assegnato_il timestamptz`.
-- RLS: un venditore legge e aggiorna solo `leads` con `assegnato_a = auth.uid()`.
-  Nessun accesso diretto a `aziende`: i campi della scheda si denormalizzano sul lead al
-  momento dell'assegnazione (vedi Flusso, punto 3). Ruolo implicito: esiste riga in
-  `venditori` ⇒ ruolo venditore, altrimenti casa base.
+I sei blocchi del brief (`spec-flusso-lead.md` §Brief): chi sono, perché li abbiamo
+contattati, cosa gli abbiamo detto, cosa hanno risposto, con che conto arrivare, timeline.
+Telefono e sito cliccabili; link calcolatore precompilato pronto da condividere.
 
-## Rotte
+Azioni:
+- da `assegnato`: un solo bottone grande **[ Prendo in carico ]**;
+- da `preso_in_carico`: quattro bottoni esito **[ Chiuso ✓ ] [ Preventivo inviato ]
+  [ In sospeso ] [ Perso ]**, ognuno con campo nota "cosa è venuto fuori";
+- su `perso`, in Fase 2, al posto della sola nota si apre il form a crocette (10 secondi).
 
-- `/vendita` — mobile-first, PWA (manifest + icona): lista dei propri lead per stato
-  (da chiamare → in corso → esito). `/vendita/[id]` — scheda-brief.
-- `middleware.ts`: estendere `matcher` a `"/vendita/:path*"`; dopo `aggiornaSessione`,
-  redirect incrociato per ruolo (venditore su `/app` → `/vendita`, e viceversa).
+## Tecnica
 
-## Scheda-brief (tutta da dati già raccolti, zero lavoro nuovo)
-
-1. Chi sono: ragione sociale, città, settore, dimensione, sito, telefono.
-2. Perché li abbiamo contattati: `segnali` + score (il gancio della ricerca).
-3. Cosa gli abbiamo detto: canale e messaggio T1 (dalla lista di tiro).
-4. Cosa hanno risposto: testo incollato dall'operatore allo smistamento.
-5. Con che conto arrivare: link calcolatore parametrico `?forma=…&veicolo=…` precompilato
-   (convenzione in `docs/primo-contatto.md`).
-6. Azioni: esito chiamata → transizione di stato con `lib/lead/transizione.ts`
-   (storia già tracciata dalla migration 008).
-
-## Flusso smistamento
-
-1. Arriva una risposta (email, WhatsApp o chiamata) → in casa base il lead va in `risposto`.
-2. In `/app/lead` un pannello "Da smistare" filtra `risposto AND assegnato_a IS NULL`.
-3. "Assegna a…" scrive `assegnato_a`, denormalizza la scheda sul lead e notifica il
-   venditore su Telegram — nuova `notificaAssegnazione()` in `lib/lead/notifiche.ts`
-   (il canale Telegram esiste già lì, riga ~111), con deep-link a `/vendita/[id]`.
-4. SLA: chiamata entro 30 minuti in orario ufficio (`docs/primo-contatto.md`).
-
-## Fasi
-
-- **F1**: migration 009 + RLS + `/vendita` lista e scheda in lettura + assegnazione manuale.
-- **F2**: notifiche Telegram per venditore, manifest PWA, esiti con transizione stati.
-- **F3**: assegnazione a monte del batch (la firma del T1 diventa quella del venditore, così
-  le chiamate inbound arrivano già alla persona giusta) + resa per venditore nelle metriche.
+- Rotta `/vendita` protetta: `middleware.ts` con matcher esteso e redirect per ruolo
+  (riga in `venditori` ⇒ `/vendita`; operatore ⇒ `/app`).
+- Dati via RLS (`assegnato_a = auth.uid()`): la PWA parla direttamente col DB.
+- Transizioni con `pianoTransizione` (patch + storia + nota): stessa macchina di casa base.
+- Notifica Telegram all'assegnazione con deep-link alla scheda (`lib/lead/notifiche.ts`).
 
 ## Guardrail
 
-Mai esporre ai venditori `fonte_ricerca`, i batch o aziende non assegnate. Test RLS sul
-modello di `lib/lead/transizione.test.ts`. Due venditori oggi, N domani: nessun limite nel modello.
+Mai esporre: `fonte_ricerca`, batch, aziende non assegnate, analytics. Test RLS sul
+modello di `transizione.test.ts`. Due venditori oggi, N domani senza cambiare nulla.
