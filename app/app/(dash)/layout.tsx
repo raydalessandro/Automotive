@@ -20,7 +20,7 @@ export default async function DashLayout({ children }: { children: React.ReactNo
   return (
     <div className="min-h-screen bg-avorio">
       <DashNav email={email} />
-      <div className="mx-auto max-w-[90rem] px-4 py-6">{children}</div>
+      <div className="mx-auto max-w-[92rem] px-4 py-6 sm:px-6 lg:px-10">{children}</div>
     </div>
   );
 }

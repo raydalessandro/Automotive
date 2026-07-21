@@ -27,7 +27,7 @@ const config: Config = {
         tabular: "tabular-nums",
       },
       maxWidth: {
-        content: "72rem",
+        content: "80rem",
       },
     },
   },
