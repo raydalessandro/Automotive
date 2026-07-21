@@ -119,6 +119,46 @@ async function inviaTelegram(testo: string): Promise<boolean> {
   }
 }
 
+// Invio Telegram a una chat specifica (§PR-5): il canale è lo stesso, cambia solo il
+// destinatario (il venditore assegnatario). Timeout duro via AbortController perché il
+// chiamante è fire-and-forget: non deve mai restare appeso in attesa di Telegram.
+async function inviaTelegramA(chatId: string, testo: string): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token || !chatId) return false;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 4000);
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text: testo, disable_web_page_preview: true }),
+      signal: ctrl.signal,
+    });
+    return res.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Notifica al venditore l'assegnazione di un lead (§PR-5), sul canale Telegram già
+ * esistente. Deep-link al brief in /vendita. Fallback silenzioso se il venditore non
+ * ha `telegram_chat_id`: lo smistamento non deve mai dipendere da Telegram.
+ */
+export async function notificaAssegnazione(
+  venditore: { telegram_chat_id: string | null },
+  lead: { id: string; azienda: string | null; citta: string | null },
+): Promise<void> {
+  const chatId = venditore.telegram_chat_id;
+  if (!chatId) return;
+  const azienda = lead.azienda ?? "Nuovo contatto";
+  const citta = lead.citta ?? "—";
+  const testo = `Nuovo lead: ${azienda} — ${citta}. Apri: ${siteUrl()}/vendita/${lead.id}`;
+  await inviaTelegramA(chatId, testo);
+}
+
 function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY;
   return key ? new Resend(key) : null;

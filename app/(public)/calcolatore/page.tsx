@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Calcolatore } from "@/components/Calcolatore";
 import { BannerFiscale } from "@/components/design/BannerFiscale";
+import { profiloDaParametri } from "@/lib/calcolatore/parametri";
 
 export const metadata: Metadata = {
   title: "Calcolatore costo reale noleggio",
@@ -8,7 +9,17 @@ export const metadata: Metadata = {
     "Scopri quanto ti costa davvero al mese un'auto in noleggio a lungo termine, in base al tuo profilo fiscale. IVA recuperata e imposte risparmiate incluse.",
 };
 
-export default function CalcolatorePage() {
+// Deep-link condiviso dal venditore (§PR-5): ?forma= e ?veicolo= precompilano il
+// profilo fiscale. La lettura avviene qui (server, via searchParams) e non dentro il
+// Calcolatore: quel componente è riusato su pagine statiche (schede, landing) dove
+// useSearchParams forzerebbe boundary Suspense ovunque e romperebbe l'SSG. Parametro
+// assente o invalido → profiloIniziale undefined → default del Calcolatore = oggi.
+export default function CalcolatorePage({
+  searchParams,
+}: {
+  searchParams?: { forma?: string; veicolo?: string };
+}) {
+  const profiloIniziale = profiloDaParametri(searchParams?.forma, searchParams?.veicolo);
   return (
     <div className="container-content py-12 sm:py-16">
       <header className="mx-auto mb-8 max-w-2xl text-center">
@@ -22,7 +33,7 @@ export default function CalcolatorePage() {
         <BannerFiscale />
       </div>
       <div className="mx-auto mt-8 max-w-2xl">
-        <Calcolatore canoneModificabile />
+        <Calcolatore canoneModificabile profiloIniziale={profiloIniziale} />
       </div>
     </div>
   );

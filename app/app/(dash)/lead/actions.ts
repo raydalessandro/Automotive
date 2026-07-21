@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient, supabaseConfigurato } from "@/lib/supabase/server";
 import { STATI_LEAD, type StatoLead } from "@/lib/dashboard/tipi";
 import { pianoTransizione } from "@/lib/lead/transizione";
+import { notificaAssegnazione } from "@/lib/lead/notifiche";
 
 export type RisultatoAzione = { ok?: boolean; error?: string };
 
@@ -77,13 +78,56 @@ async function transisci(
   return { ok: true };
 }
 
+// Notifica di assegnazione al venditore (§PR-5). Blindata: qualsiasi errore (rete,
+// Telegram giù, chat_id null, RLS) resta qui dentro e non tocca mai l'esito dello
+// smistamento. Recupera chat_id + azienda/città per comporre il deep-link a /vendita.
+async function notificaSmistamento(leadId: string, venditoreId: string): Promise<void> {
+  try {
+    const supabase = createClient();
+    const { data: v } = await supabase
+      .from("venditori")
+      .select("telegram_chat_id")
+      .eq("id", venditoreId)
+      .maybeSingle();
+    if (!v?.telegram_chat_id) return;
+
+    const { data: l } = await supabase
+      .from("leads")
+      .select("ragione_sociale, provincia, azienda_id")
+      .eq("id", leadId)
+      .maybeSingle();
+    if (!l) return;
+
+    // Città dal magazzino azienda se il lead ne ha una collegata, altrimenti provincia.
+    let citta: string | null = l.provincia ?? null;
+    if (l.azienda_id) {
+      const { data: a } = await supabase
+        .from("aziende")
+        .select("citta")
+        .eq("id", l.azienda_id)
+        .maybeSingle();
+      if (a?.citta) citta = a.citta;
+    }
+
+    await notificaAssegnazione(
+      { telegram_chat_id: v.telegram_chat_id },
+      { id: leadId, azienda: l.ragione_sociale ?? null, citta },
+    );
+  } catch {
+    // fire-and-forget: mai propagare (lo smistamento è già andato a buon fine).
+  }
+}
+
 /** Smista un lead a un venditore → stato `assegnato` + assegnato_a/il (§PR-3). */
 export async function smistaLead(id: string, venditoreId: string, nota?: string): Promise<RisultatoAzione> {
   if (!venditoreId) return { error: "Nessun venditore selezionato" };
-  return transisci(id, "assegnato", nota ?? null, {
+  const r = await transisci(id, "assegnato", nota ?? null, {
     assegnato_a: venditoreId,
     assegnato_il: new Date().toISOString(),
   });
+  // Aggancio Telegram (§PR-5): solo a smistamento riuscito, e mai bloccante/fallace.
+  if (r.ok) await notificaSmistamento(id, venditoreId);
+  return r;
 }
 
 /** Riassegna a un altro venditore (resta `assegnato`, aggiorna assegnato_a/il). */
