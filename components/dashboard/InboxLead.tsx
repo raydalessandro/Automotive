@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { type Lead, type StatoLead } from "@/lib/dashboard/tipi";
@@ -16,6 +16,7 @@ import { LeadDettaglio } from "./LeadDettaglio";
 import { PillStato } from "./PillStato";
 import { SmistaMenu, type VenditoreOpt } from "./SmistaMenu";
 import { scartaLead } from "@/app/app/(dash)/lead/actions";
+import { MOTIVI_PERSO, labelMotivo, type DettagliPerso } from "@/lib/lead/esiti";
 
 // Arricchimento card dal magazzino aziende (§PR-3): risposta outreach.
 export type AziendaCard = {
@@ -51,8 +52,33 @@ export function InboxLead({
   // ?stato= resta funzionante: apre la vista che contiene quello stato.
   const [tab, setTab] = useState<Vista>(statoIniziale ? vistaDi(statoIniziale) : "da_smistare");
   const [selezionato, setSelezionato] = useState<string | null>(apriIniziale ?? null);
+  // Dettagli del "perso" (§PR-6) per lead, letti via client (RLS operatore: vede tutto).
+  const [motiviPerso, setMotiviPerso] = useState<Record<string, DettagliPerso>>({});
 
   useEffect(() => setLeads(iniziali), [iniziali]);
+
+  // Motivi del perso: ultima riga di storia con dettagli per ogni lead. Degrada a vuoto
+  // se la colonna (§012) non è ancora applicata — la UI resta identica a prima.
+  useEffect(() => {
+    const supabase = createClient();
+    let vivo = true;
+    supabase
+      .from("lead_stati_storia")
+      .select("lead_id, dettagli, ts")
+      .not("dettagli", "is", null)
+      .order("ts", { ascending: false })
+      .then(({ data, error }) => {
+        if (!vivo || error || !data) return;
+        const m: Record<string, DettagliPerso> = {};
+        for (const r of data as { lead_id: string; dettagli: DettagliPerso }[]) {
+          if (r.dettagli && !m[r.lead_id]) m[r.lead_id] = r.dettagli; // primo = più recente
+        }
+        setMotiviPerso(m);
+      });
+    return () => {
+      vivo = false;
+    };
+  }, [leads]);
 
   // Realtime: nuovi lead e aggiornamenti compaiono senza refresh.
   useEffect(() => {
@@ -118,13 +144,20 @@ export function InboxLead({
           {tab === "in_gestione" && (
             <ListaGestione leads={viste.in_gestione} nomeVenditore={nomeVenditore} onApri={setSelezionato} />
           )}
-          {tab === "chiusi" && <ListaChiusi leads={viste.chiusi} onApri={setSelezionato} />}
+          {tab === "chiusi" && (
+            <ListaChiusi leads={viste.chiusi} motiviPerso={motiviPerso} onApri={setSelezionato} />
+          )}
         </div>
 
         <div className={selezionato ? "" : "hidden lg:block"}>
           {lead ? (
             <div className="rounded-2xl border border-nero/10 bg-carta lg:sticky lg:top-32 lg:max-h-[calc(100vh-9rem)]">
-              <LeadDettaglio lead={lead} venditori={venditori} onChiudi={() => setSelezionato(null)} />
+              <LeadDettaglio
+                lead={lead}
+                venditori={venditori}
+                dettagliPerso={motiviPerso[lead.id] ?? null}
+                onChiudi={() => setSelezionato(null)}
+              />
             </div>
           ) : (
             <div className="hidden h-full items-center justify-center rounded-2xl border border-dashed border-nero/15 bg-carta p-8 text-center text-sm text-testo-chiaro/45 lg:flex">
@@ -261,25 +294,107 @@ function ListaGestione({
 
 // ————————————————————————————————— Vista 3: Chiusi —————————————————————————————————
 
-function ListaChiusi({ leads, onApri }: { leads: Lead[]; onApri: (id: string) => void }) {
+function ListaChiusi({
+  leads,
+  motiviPerso,
+  onApri,
+}: {
+  leads: Lead[];
+  motiviPerso: Record<string, DettagliPerso>;
+  onApri: (id: string) => void;
+}) {
+  const [filtro, setFiltro] = useState<string>("tutti");
+
+  // Solo i motivi effettivamente presenti tra i chiusi diventano chip di filtro.
+  const motiviPresenti = useMemo(() => {
+    const set = new Set<string>();
+    for (const l of leads) motiviPerso[l.id]?.motivi.forEach((m) => set.add(m));
+    return MOTIVI_PERSO.filter((m) => set.has(m.id));
+  }, [leads, motiviPerso]);
+
+  const visibili = useMemo(
+    () =>
+      filtro === "tutti"
+        ? leads
+        : leads.filter((l) => motiviPerso[l.id]?.motivi.some((m) => m === filtro)),
+    [leads, motiviPerso, filtro],
+  );
+
   if (leads.length === 0) return <Vuoto testo="Nessun lead chiuso in questo periodo." />;
+
   return (
-    <ul className="divide-y divide-nero/10 overflow-hidden rounded-2xl border border-nero/10 bg-carta">
-      {leads.map((l) => (
-        <li key={l.id}>
-          <button
-            onClick={() => onApri(l.id)}
-            className="flex w-full items-center justify-between gap-3 p-3 text-left hover:bg-avorio/60"
-          >
-            <div className="min-w-0">
-              <p className="truncate font-medium">{l.ragione_sociale}</p>
-              <p className="truncate text-xs text-testo-chiaro/50">{l.note ?? "—"}</p>
-            </div>
-            <PillStato stato={l.stato} />
-          </button>
-        </li>
-      ))}
-    </ul>
+    <div>
+      {motiviPresenti.length > 0 && (
+        <div className="mb-3 flex flex-wrap gap-1.5">
+          <FiltroChip attivo={filtro === "tutti"} onClick={() => setFiltro("tutti")}>
+            Tutti
+          </FiltroChip>
+          {motiviPresenti.map((m) => (
+            <FiltroChip key={m.id} attivo={filtro === m.id} onClick={() => setFiltro(m.id)}>
+              {m.label}
+            </FiltroChip>
+          ))}
+        </div>
+      )}
+
+      {visibili.length === 0 ? (
+        <Vuoto testo="Nessun lead con questo motivo." />
+      ) : (
+        <ul className="divide-y divide-nero/10 overflow-hidden rounded-2xl border border-nero/10 bg-carta">
+          {visibili.map((l) => {
+            const d = motiviPerso[l.id];
+            return (
+              <li key={l.id}>
+                <button
+                  onClick={() => onApri(l.id)}
+                  className="flex w-full items-center justify-between gap-3 p-3 text-left hover:bg-avorio/60"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{l.ragione_sociale}</p>
+                    {d && d.motivi.length > 0 ? (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {d.motivi.map((m) => (
+                          <span
+                            key={m}
+                            className="rounded-full bg-nero/5 px-2 py-0.5 text-[11px] text-testo-chiaro/70"
+                          >
+                            {labelMotivo(m)}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="truncate text-xs text-testo-chiaro/50">{l.note ?? "—"}</p>
+                    )}
+                  </div>
+                  <PillStato stato={l.stato} />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function FiltroChip({
+  attivo,
+  onClick,
+  children,
+}: {
+  attivo: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`whitespace-nowrap rounded-full px-3 py-1 text-xs transition-colors ${
+        attivo ? "bg-nero text-testo-scuro" : "bg-nero/5 text-testo-chiaro/70 hover:bg-nero/10"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 

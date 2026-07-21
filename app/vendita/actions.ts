@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient, supabaseConfigurato } from "@/lib/supabase/server";
 import { pianoTransizione } from "@/lib/lead/transizione";
+import { validaDettagliPerso, type DettagliPerso } from "@/lib/lead/esiti";
 import type { StatoLead } from "@/lib/dashboard/tipi";
 
 export type Risultato = { ok?: boolean; error?: string };
@@ -10,7 +11,12 @@ export type Risultato = { ok?: boolean; error?: string };
 // Transizione del venditore: stessa macchina di casa base (pianoTransizione + storia
 // con nota). La RLS (§011) garantisce che il venditore tocchi SOLO i propri lead:
 // niente service role qui, si passa dal client autenticato.
-async function transizione(id: string, stato: StatoLead, nota: string | null): Promise<Risultato> {
+async function transizione(
+  id: string,
+  stato: StatoLead,
+  nota: string | null,
+  dettagli: DettagliPerso | null = null,
+): Promise<Risultato> {
   if (!supabaseConfigurato()) return { error: "Supabase non configurato" };
   const supabase = createClient();
   const {
@@ -21,7 +27,12 @@ async function transizione(id: string, stato: StatoLead, nota: string | null): P
   const piano = pianoTransizione(id, stato, user.id, new Date().toISOString());
   const { error } = await supabase.from("leads").update(piano.patch).eq("id", id);
   if (error) return { error: error.message };
-  await supabase.from("lead_stati_storia").insert({ ...piano.storia, nota: nota?.trim() || null });
+
+  // La colonna dettagli (§012) è referenziata SOLO quando c'è: gli esiti senza motivi
+  // (tutti tranne `perso`) restano identici a oggi anche prima della migration.
+  const riga: Record<string, unknown> = { ...piano.storia, nota: nota?.trim() || null };
+  if (dettagli) riga.dettagli = dettagli;
+  await supabase.from("lead_stati_storia").insert(riga);
 
   revalidatePath("/vendita");
   revalidatePath(`/vendita/${id}`);
@@ -35,9 +46,24 @@ export async function prendoInCarico(id: string): Promise<Risultato> {
 
 const ESITI: StatoLead[] = ["chiuso", "preventivo_inviato", "in_sospeso", "perso"];
 
-/** Registra un esito con la nota "cosa è venuto fuori". */
-export async function registraEsito(id: string, stato: StatoLead, nota?: string): Promise<Risultato> {
+/**
+ * Registra un esito con la nota "cosa è venuto fuori". Per `perso` (§PR-6) accetta i
+ * dettagli a crocette, validati con la lib pura: almeno 1 motivo obbligatorio, id noti,
+ * data solo con `non_e_il_momento`. Per gli altri esiti i dettagli sono ignorati e il
+ * flusso resta identico a oggi.
+ */
+export async function registraEsito(
+  id: string,
+  stato: StatoLead,
+  nota?: string,
+  dettagliRaw?: unknown,
+): Promise<Risultato> {
   if (!ESITI.includes(stato)) return { error: "Esito non valido" };
+  if (stato === "perso") {
+    const v = validaDettagliPerso(dettagliRaw);
+    if (!v.ok) return { error: v.error };
+    return transizione(id, stato, nota ?? null, v.dettagli);
+  }
   return transizione(id, stato, nota ?? null);
 }
 

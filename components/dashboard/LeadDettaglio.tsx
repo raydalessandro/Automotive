@@ -23,6 +23,7 @@ import {
 } from "@/app/app/(dash)/lead/actions";
 import { PillStato } from "./PillStato";
 import { SmistaMenu, type VenditoreOpt } from "./SmistaMenu";
+import { labelMotivo, type DettagliPerso } from "@/lib/lead/esiti";
 import { whatsappLink } from "@/lib/contatti";
 import { titoliRischi } from "@/lib/servizi.config";
 import { DOMANDE } from "@/lib/consulente.config";
@@ -52,13 +53,20 @@ function fmt(iso: string | null): string {
   return iso ? new Date(iso).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" }) : "—";
 }
 
+function fmtData(giorno: string): string {
+  const d = new Date(`${giorno}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? giorno : d.toLocaleDateString("it-IT", { dateStyle: "medium" });
+}
+
 export function LeadDettaglio({
   lead,
   venditori = [],
+  dettagliPerso = null,
   onChiudi,
 }: {
   lead: Lead;
   venditori?: VenditoreOpt[];
+  dettagliPerso?: DettagliPerso | null;
   onChiudi: () => void;
 }) {
   const router = useRouter();
@@ -226,6 +234,33 @@ export function LeadDettaglio({
             </button>
           </div>
         </div>
+
+        {/* Motivi del perso (§PR-6): le crocette del venditore, quando presenti. */}
+        {dettagliPerso && dettagliPerso.motivi.length > 0 && (
+          <div className="mt-5 rounded-xl border border-nero/10 bg-avorio/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-testo-chiaro/50">
+              Motivi del perso
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {dettagliPerso.motivi.map((m) => (
+                <span
+                  key={m}
+                  className="rounded-full bg-nero/5 px-2.5 py-0.5 text-xs text-testo-chiaro/75"
+                >
+                  {labelMotivo(m)}
+                </span>
+              ))}
+            </div>
+            {dettagliPerso.ricontattare_il && (
+              <p className="mt-2 text-sm text-testo-chiaro/70">
+                Ricontattare il <strong>{fmtData(dettagliPerso.ricontattare_il)}</strong>
+              </p>
+            )}
+            {dettagliPerso.nota_altro && (
+              <p className="mt-1 text-sm text-testo-chiaro/70">&laquo;{dettagliPerso.nota_altro}&raquo;</p>
+            )}
+          </div>
+        )}
 
         {/* Valore commissione — solo a contratto chiuso (§PR30). Opzionale ma sollecitato. */}
         {lead.stato === "chiuso" && (
