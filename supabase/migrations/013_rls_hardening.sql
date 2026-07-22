@@ -27,19 +27,29 @@ drop policy if exists venditore_se_stesso on venditori;
 create policy venditore_se_stesso on venditori for select to authenticated
   using (id = auth.uid());
 
--- ————— lead_stati_storia: nessuno firma righe per conto d'altri —————
--- USING invariato: il venditore continua a leggere TUTTA la storia dei suoi lead
--- (incluse le note dell'operatore). WITH CHECK ora richiede anche autore = auth.uid():
--- in scrittura può firmare solo a proprio nome. La operatore_full (§011) non si tocca.
+-- ————— lead_stati_storia: append-only per il venditore —————
+-- Il venditore legge tutta la storia dei suoi lead (incluse le note dell'operatore) e
+-- può SOLO aggiungere righe firmate a proprio nome. NIENTE update/delete: le correzioni
+-- restano all'operatore (operatore_full, §011, non toccata).
+-- Motivo del NON usare FOR ALL: una policy FOR ALL arma anche UPDATE e DELETE col solo
+-- USING (l'autore nel WITH CHECK non li tocca) — test dal vivo: 8/8 righe di storia
+-- aggiornabili E cancellabili dal venditore, incluse quelle dell'operatore, attese 0.
 drop policy if exists venditore_storia on lead_stati_storia;
-create policy venditore_storia on lead_stati_storia for all to authenticated
-  using (
-    exists (select 1 from leads l where l.id = lead_stati_storia.lead_id and l.assegnato_a = auth.uid())
-  )
-  with check (
-    autore = auth.uid()
-    and exists (select 1 from leads l where l.id = lead_stati_storia.lead_id and l.assegnato_a = auth.uid())
-  );
+
+drop policy if exists venditore_storia_select on lead_stati_storia;
+create policy venditore_storia_select on lead_stati_storia
+  for select to authenticated
+  using (exists (select 1 from leads l
+                 where l.id = lead_stati_storia.lead_id
+                   and l.assegnato_a = auth.uid()));
+
+drop policy if exists venditore_storia_insert on lead_stati_storia;
+create policy venditore_storia_insert on lead_stati_storia
+  for insert to authenticated
+  with check (autore = auth.uid()
+    and exists (select 1 from leads l
+                where l.id = lead_stati_storia.lead_id
+                  and l.assegnato_a = auth.uid()));
 
 -- ————— eventi / campagne / invii: da auth_full a operatore_full —————
 -- Solo l'operatore (chi NON è in venditori) legge/scrive. Il venditore non li vede.
