@@ -58,4 +58,10 @@ export type Lead = {
   assegnato_il: string | null;
   azienda_id: string | null;
   configurazione: Configurazione | null;
+  // §PR-8 multi-target: provenienza del lead + payload per-target validato dal DB.
+  // Solo tipi (la logica di validazione è nel DB / arriva in PR-9). I lead attuali
+  // sono 'nlt_b2b' con dati null.
+  target: string;
+  dati: Record<string, unknown> | null;
+  schema_v: number | null;
 };
