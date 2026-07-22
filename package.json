@@ -16,6 +16,7 @@
     "check:blog": "tsx scripts/valida-blog.ts",
     "aziende:importa": "tsx scripts/aziende-importa.ts",
     "aziende:esporta": "tsx scripts/aziende-esporta.ts",
+    "target:chiave": "tsx scripts/target-chiave.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

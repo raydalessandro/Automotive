@@ -30,6 +30,8 @@ export type TipoEvento = (typeof TIPI_EVENTO)[number];
 export const eventoSchema = z.object({
   sessione: z.string().min(8).max(64),
   tipo: z.enum(TIPI_EVENTO),
+  // Provenienza (§PR-9): le landing dei target lo impostano; default nlt_b2b lato route.
+  target: z.string().max(60).optional(),
   pagina: z.string().max(300).optional().or(z.literal("")),
   veicolo_id: z.string().max(120).optional().or(z.literal("")),
   profilo_fiscale: z.string().max(60).optional().or(z.literal("")),

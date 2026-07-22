@@ -164,10 +164,10 @@ function getResend(): Resend | null {
   return key ? new Resend(key) : null;
 }
 
-async function inviaEmailFallback(testo: string): Promise<void> {
+async function inviaEmailFallback(testo: string): Promise<boolean> {
   const resend = getResend();
   const to = process.env.LEAD_NOTIFY_EMAIL;
-  if (!resend || !to) return;
+  if (!resend || !to) return false;
   try {
     await resend.emails.send({
       from: `${SITE.nome} <noreply@imperoautomotive.it>`,
@@ -175,18 +175,70 @@ async function inviaEmailFallback(testo: string): Promise<void> {
       subject: "Nuovo lead dal sito",
       text: testo,
     });
+    return true;
   } catch {
-    // best effort
+    return false;
   }
 }
 
-/** Notifica interna: Telegram, con fallback email se Telegram fallisce (§6.2). */
-export async function notificaVenditore(d: DatiLead, ctx: Contesto): Promise<void> {
+/**
+ * Notifica interna: Telegram, con fallback email se Telegram fallisce (§6.2).
+ * Ritorna true se il lead è arrivato a qualcuno (serve al fix §6 della route: mai più
+ * "ok" con lead perso in silenzio quando insert E notifica falliscono entrambi).
+ */
+export async function notificaVenditore(d: DatiLead, ctx: Contesto): Promise<boolean> {
   const testo = messaggioTelegram(d, ctx);
-  const okTg = await inviaTelegram(testo);
-  if (!okTg) {
-    await inviaEmailFallback(testo);
+  if (await inviaTelegram(testo)) return true;
+  return inviaEmailFallback(testo);
+}
+
+// ————— Notifica per target esterni (§PR-9) —————
+export type TargetNotifica = {
+  target: string;
+  brand: string | null;
+  labels: Record<string, string> | null;
+  notifiche: { chat_id?: string; prefisso?: string } | null;
+};
+export type CoreNotifica = {
+  ragione_sociale: string;
+  telefono: string;
+  email?: string | null;
+  provincia?: string | null;
+};
+
+/**
+ * Notifica di un contatto da un target ≠ nlt_b2b (§PR-9): corpo generato dalle `labels`
+ * del registro (elenco "Label: valore" da core + `dati`), titolo prefissato `[brand]`,
+ * override opzionali da `registro.notifiche`. Ritorna true se è arrivata a qualcuno.
+ */
+export async function notificaTarget(
+  reg: TargetNotifica,
+  core: CoreNotifica,
+  dati: Record<string, unknown> | null,
+  leadId?: string | null,
+): Promise<boolean> {
+  const brand = reg.brand ?? reg.target;
+  const labels = reg.labels ?? {};
+  const label = (k: string) => labels[k] ?? k;
+  const prefisso = reg.notifiche?.prefisso ?? `[${brand}]`;
+  const righe: string[] = [
+    `📥 ${prefisso} nuovo contatto`,
+    `${label("ragione_sociale")}: ${core.ragione_sociale}`,
+    `📞 ${core.telefono}`,
+  ];
+  if (core.email) righe.push(`✉️ ${core.email}`);
+  if (core.provincia) righe.push(`${label("provincia")}: ${core.provincia}`);
+  if (dati) {
+    for (const [k, v] of Object.entries(dati)) {
+      if (v !== null && v !== undefined && v !== "") righe.push(`${label(k)}: ${v}`);
+    }
   }
+  if (leadId) righe.push(`🔗 ${siteUrl()}/app/lead?apri=${leadId}`);
+  const testo = righe.join("\n");
+  const chatId = reg.notifiche?.chat_id;
+  const okTg = chatId ? await inviaTelegramA(chatId, testo) : await inviaTelegram(testo);
+  if (okTg) return true;
+  return inviaEmailFallback(testo);
 }
 
 // Avatar 48px per la firma email (§2): foto via URL assoluto, altrimenti segnaposto

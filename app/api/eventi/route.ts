@@ -59,6 +59,7 @@ export async function POST(req: Request) {
     profilo_fiscale: e.profilo_fiscale || null,
     fonte: e.fonte ?? null,
     dati: e.dati ?? null,
+    target: e.target || "nlt_b2b",
   });
 
   return NextResponse.json({ ok: true }, { status: 200 });

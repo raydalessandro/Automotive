@@ -53,7 +53,16 @@ type TracciaOpts = {
   profilo_fiscale?: string;
   /** Proprietà strutturate del nuovo evento; env viene aggiunto in automatico. */
   dati?: DatiEvento;
+  /** Provenienza (§PR-9); di norma la imposta la landing una volta con impostaTargetTraccia. */
+  target?: string;
 };
+
+// Target di sessione (§PR-9): una landing di un route group lo imposta una volta, e ogni
+// evento successivo lo porta. Assente → la route /api/eventi mette 'nlt_b2b' di default.
+let targetCorrente: string | undefined;
+export function impostaTargetTraccia(target: string): void {
+  targetCorrente = target || undefined;
+}
 
 export function traccia(tipo: TipoEvento, opts: TracciaOpts = {}): void {
   if (typeof window === "undefined" || dnt()) return;
@@ -82,6 +91,8 @@ export function traccia(tipo: TipoEvento, opts: TracciaOpts = {}): void {
       fonte,
       // Tag ambiente su OGNI evento (§0.2).
       dati: { env: env(), ...(opts.dati ?? {}) },
+      // Provenienza: solo quando nota (opts o target di sessione). Assente → nlt_b2b lato route.
+      target: opts.target ?? targetCorrente,
     };
 
     const body = JSON.stringify(payload);
