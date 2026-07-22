@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { type Lead, type StatoLead } from "@/lib/dashboard/tipi";
 import {
@@ -15,6 +15,7 @@ import {
 import { LeadDettaglio } from "./LeadDettaglio";
 import { PillStato } from "./PillStato";
 import { SmistaMenu, type VenditoreOpt } from "./SmistaMenu";
+import { PillTarget } from "./PillTarget";
 import { scartaLead } from "@/app/app/(dash)/lead/actions";
 import { MOTIVI_PERSO, labelMotivo, type DettagliPerso } from "@/lib/lead/esiti";
 
@@ -28,6 +29,10 @@ export type AziendaCard = {
   citta: string | null;
 };
 
+// Registro target (§PR-10): brand + labels per pill/filtro/renderer.
+export type TargetInfo = { brand: string | null; labels: Record<string, string> | null };
+const TARGET_DEFAULT = "nlt_b2b";
+
 const TAB: { id: Vista; label: string }[] = [
   { id: "da_smistare", label: "Da smistare" },
   { id: "in_gestione", label: "In gestione" },
@@ -38,20 +43,28 @@ export function InboxLead({
   iniziali,
   venditori,
   aziende,
+  targets,
   statoIniziale,
+  targetIniziale,
   apriIniziale,
 }: {
   iniziali: Lead[];
   venditori: VenditoreOpt[];
   aziende: Record<string, AziendaCard>;
+  targets: Record<string, TargetInfo>;
   statoIniziale?: StatoLead;
+  targetIniziale?: string;
   apriIniziale?: string;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [leads, setLeads] = useState<Lead[]>(iniziali);
   // ?stato= resta funzionante: apre la vista che contiene quello stato.
   const [tab, setTab] = useState<Vista>(statoIniziale ? vistaDi(statoIniziale) : "da_smistare");
   const [selezionato, setSelezionato] = useState<string | null>(apriIniziale ?? null);
+  // Filtro provenienza (§PR-10): persiste in ?target=, si combina con ?stato=.
+  const [filtroTarget, setFiltroTarget] = useState<string | null>(targetIniziale ?? null);
   // Dettagli del "perso" (§PR-6) per lead, letti via client (RLS operatore: vede tutto).
   const [motiviPerso, setMotiviPerso] = useState<Record<string, DettagliPerso>>({});
 
@@ -101,7 +114,31 @@ export function InboxLead({
     };
   }, [router]);
 
-  const viste = useMemo(() => raggruppaViste(leads), [leads]);
+  const brandDi = (t: string | null | undefined) => targets[t ?? TARGET_DEFAULT]?.brand ?? (t ?? TARGET_DEFAULT);
+
+  // Provenienze presenti tra i lead: i chip del filtro compaiono solo se ce n'è più d'una.
+  const targetiPresenti = useMemo(() => {
+    const set = new Set<string>();
+    for (const l of leads) set.add(l.target ?? TARGET_DEFAULT);
+    return [...set];
+  }, [leads]);
+
+  // Filtro provenienza applicato prima delle viste (retro-compatibile: null = tutti).
+  const leadsVisibili = useMemo(
+    () => (filtroTarget ? leads.filter((l) => (l.target ?? TARGET_DEFAULT) === filtroTarget) : leads),
+    [leads, filtroTarget],
+  );
+
+  const cambiaFiltro = (t: string | null) => {
+    setFiltroTarget(t);
+    const p = new URLSearchParams(searchParams.toString());
+    if (t) p.set("target", t);
+    else p.delete("target");
+    const qs = p.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
+
+  const viste = useMemo(() => raggruppaViste(leadsVisibili), [leadsVisibili]);
   const nomeVenditore = useMemo(() => {
     const m = new Map<string, string>();
     for (const v of venditori) m.set(v.id, v.nome ?? "Senza nome");
@@ -130,6 +167,20 @@ export function InboxLead({
         ))}
       </div>
 
+      {/* Filtro provenienza (§PR-10): solo se c'è più di un target tra i lead. */}
+      {targetiPresenti.length > 1 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <FiltroChip attivo={!filtroTarget} onClick={() => cambiaFiltro(null)}>
+            Tutti
+          </FiltroChip>
+          {targetiPresenti.map((t) => (
+            <FiltroChip key={t} attivo={filtroTarget === t} onClick={() => cambiaFiltro(t)}>
+              {brandDi(t)}
+            </FiltroChip>
+          ))}
+        </div>
+      )}
+
       <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <div className={selezionato ? "hidden lg:block" : ""}>
           {tab === "da_smistare" && (
@@ -137,15 +188,21 @@ export function InboxLead({
               leads={viste.da_smistare}
               aziende={aziende}
               venditori={venditori}
+              brandDi={brandDi}
               onApri={setSelezionato}
               onScarta={(id) => scartaLead(id).then(() => router.refresh())}
             />
           )}
           {tab === "in_gestione" && (
-            <ListaGestione leads={viste.in_gestione} nomeVenditore={nomeVenditore} onApri={setSelezionato} />
+            <ListaGestione
+              leads={viste.in_gestione}
+              nomeVenditore={nomeVenditore}
+              brandDi={brandDi}
+              onApri={setSelezionato}
+            />
           )}
           {tab === "chiusi" && (
-            <ListaChiusi leads={viste.chiusi} motiviPerso={motiviPerso} onApri={setSelezionato} />
+            <ListaChiusi leads={viste.chiusi} motiviPerso={motiviPerso} brandDi={brandDi} onApri={setSelezionato} />
           )}
         </div>
 
@@ -156,6 +213,8 @@ export function InboxLead({
                 lead={lead}
                 venditori={venditori}
                 dettagliPerso={motiviPerso[lead.id] ?? null}
+                brand={brandDi(lead.target)}
+                labels={targets[lead.target ?? TARGET_DEFAULT]?.labels ?? null}
                 onChiudi={() => setSelezionato(null)}
               />
             </div>
@@ -176,12 +235,14 @@ function ListaDaSmistare({
   leads,
   aziende,
   venditori,
+  brandDi,
   onApri,
   onScarta,
 }: {
   leads: Lead[];
   aziende: Record<string, AziendaCard>;
   venditori: VenditoreOpt[];
+  brandDi: (t: string | null | undefined) => string;
   onApri: (id: string) => void;
   onScarta: (id: string) => void;
 }) {
@@ -203,9 +264,12 @@ function ListaDaSmistare({
                 <p className="font-medium">
                   {l.ragione_sociale} <span className="text-testo-chiaro/50">· {citta}</span>
                 </p>
-                <span className="shrink-0 rounded-full bg-nero/5 px-2 py-0.5 text-xs text-testo-chiaro/60">
-                  {sorgente === "risposta" ? "risposta ✉" : "form sito"}
-                </span>
+                <div className="flex shrink-0 items-center gap-1.5">
+                  {l.target && l.target !== "nlt_b2b" && <PillTarget brand={brandDi(l.target)} />}
+                  <span className="rounded-full bg-nero/5 px-2 py-0.5 text-xs text-testo-chiaro/60">
+                    {sorgente === "risposta" ? "risposta ✉" : "form sito"}
+                  </span>
+                </div>
               </div>
               <p className="mt-0.5 text-xs text-testo-chiaro/55">
                 {segmento} · {settore} · score {score ?? "—"}
@@ -238,10 +302,12 @@ function ListaDaSmistare({
 function ListaGestione({
   leads,
   nomeVenditore,
+  brandDi,
   onApri,
 }: {
   leads: Lead[];
   nomeVenditore: Map<string, string>;
+  brandDi: (t: string | null | undefined) => string;
   onApri: (id: string) => void;
 }) {
   if (leads.length === 0) return <Vuoto testo="Nessun lead in gestione." />;
@@ -278,6 +344,7 @@ function ListaGestione({
                       <p className="truncate text-xs text-testo-chiaro/50">{l.note ?? "—"}</p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
+                      {l.target && l.target !== "nlt_b2b" && <PillTarget brand={brandDi(l.target)} />}
                       <PillStato stato={l.stato} />
                       <span className="w-12 text-right text-xs tabular text-testo-chiaro/45">{g} gg</span>
                     </div>
@@ -297,10 +364,12 @@ function ListaGestione({
 function ListaChiusi({
   leads,
   motiviPerso,
+  brandDi,
   onApri,
 }: {
   leads: Lead[];
   motiviPerso: Record<string, DettagliPerso>;
+  brandDi: (t: string | null | undefined) => string;
   onApri: (id: string) => void;
 }) {
   const [filtro, setFiltro] = useState<string>("tutti");
@@ -366,7 +435,10 @@ function ListaChiusi({
                       <p className="truncate text-xs text-testo-chiaro/50">{l.note ?? "—"}</p>
                     )}
                   </div>
-                  <PillStato stato={l.stato} />
+                  <div className="flex shrink-0 items-center gap-2">
+                    {l.target && l.target !== "nlt_b2b" && <PillTarget brand={brandDi(l.target)} />}
+                    <PillStato stato={l.stato} />
+                  </div>
                 </button>
               </li>
             );

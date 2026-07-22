@@ -22,8 +22,10 @@ import {
   type AziendaBrief,
 } from "@/app/app/(dash)/lead/actions";
 import { PillStato } from "./PillStato";
+import { PillTarget } from "./PillTarget";
 import { SmistaMenu, type VenditoreOpt } from "./SmistaMenu";
 import { labelMotivo, type DettagliPerso } from "@/lib/lead/esiti";
+import { campiDaLabels } from "@/lib/dashboard/render-dati";
 import { whatsappLink } from "@/lib/contatti";
 import { titoliRischi } from "@/lib/servizi.config";
 import { DOMANDE } from "@/lib/consulente.config";
@@ -62,13 +64,20 @@ export function LeadDettaglio({
   lead,
   venditori = [],
   dettagliPerso = null,
+  brand,
+  labels,
   onChiudi,
 }: {
   lead: Lead;
   venditori?: VenditoreOpt[];
   dettagliPerso?: DettagliPerso | null;
+  brand?: string;
+  labels?: Record<string, string> | null;
   onChiudi: () => void;
 }) {
+  // Provenienza ≠ nlt_b2b: pill + renderer "Dati modulo" (§PR-10). nlt_b2b invariato.
+  const esterno = !!lead.target && lead.target !== "nlt_b2b";
+  const campiModulo = lead.dati ? campiDaLabels(labels, null, lead.dati) : [];
   const router = useRouter();
   const [pending, start] = useTransition();
   const [note, setNote] = useState(lead.note ?? "");
@@ -132,6 +141,11 @@ export function LeadDettaglio({
           <p className="text-sm text-testo-chiaro/55">
             {lead.referente} · score {lead.score ?? "—"}
           </p>
+          {esterno && brand && (
+            <div className="mt-1.5">
+              <PillTarget brand={brand} />
+            </div>
+          )}
         </div>
         <button onClick={onChiudi} className="shrink-0 text-testo-chiaro/50 hover:text-oro" aria-label="Chiudi">
           ✕
@@ -158,6 +172,21 @@ export function LeadDettaglio({
             </a>
           )}
         </div>
+
+        {/* Dati modulo (§PR-10): campi del target dalle labels. Assente per nlt_b2b (dati null). */}
+        {campiModulo.length > 0 && (
+          <div className="mt-5 rounded-xl border border-nero/10 bg-avorio/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-testo-chiaro/50">Dati modulo</p>
+            <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              {campiModulo.map((c) => (
+                <div key={c.label}>
+                  <dt className="text-xs text-testo-chiaro/45">{c.label}</dt>
+                  <dd className="mt-0.5 font-medium">{c.valore}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
 
         {/* Brief azienda (§PR-3, blocchi 1-2) — solo per i lead da risposta outreach. */}
         {lead.azienda_id && (

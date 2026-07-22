@@ -4,7 +4,9 @@ import { createClient, supabaseConfigurato } from "@/lib/supabase/server";
 import { caricaAziendaVendita, caricaStoriaVendita } from "../actions";
 import { AzioniScheda } from "@/components/vendita/AzioniScheda";
 import { PillStato } from "@/components/dashboard/PillStato";
+import { PillTarget } from "@/components/dashboard/PillTarget";
 import { LABEL_STATO_LEAD, type Lead } from "@/lib/dashboard/tipi";
+import { campiDaLabels } from "@/lib/dashboard/render-dati";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +27,20 @@ export default async function SchedaVendita({ params }: { params: { id: string }
     caricaStoriaVendita(lead.id),
   ]);
 
+  // Provenienza (§PR-10): brand + labels del target del lead. Select MIRATA (mai `*`: la
+  // colonna della chiave è revocata). Il venditore vede solo brand + Dati modulo del suo lead.
+  const esterno = !!lead.target && lead.target !== "nlt_b2b";
+  const { data: reg } = esterno
+    ? await supabase
+        .from("registro_target")
+        .select("target, brand, labels")
+        .eq("target", lead.target)
+        .maybeSingle()
+    : { data: null };
+  const brand = (reg?.brand as string | null) ?? lead.target ?? null;
+  const labels = (reg?.labels as Record<string, string> | null) ?? null;
+  const campiModulo = lead.dati ? campiDaLabels(labels, null, lead.dati) : [];
+
   const nome = azienda?.ragione_sociale ?? lead.ragione_sociale;
   const telefono = azienda?.telefono ?? lead.telefono;
   const rispostaIniziale = storia.find((t) => t.nota)?.nota ?? lead.note ?? null;
@@ -40,9 +56,30 @@ export default async function SchedaVendita({ params }: { params: { id: string }
 
       {/* Testata */}
       <div className="flex items-start justify-between gap-2">
-        <h1 className="font-display text-2xl font-semibold">{nome}</h1>
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl font-semibold">{nome}</h1>
+          {esterno && brand && (
+            <div className="mt-1.5">
+              <PillTarget brand={brand} />
+            </div>
+          )}
+        </div>
         <PillStato stato={lead.stato} />
       </div>
+
+      {/* Dati modulo (§PR-10): campi del target dalle labels. Assente per nlt_b2b. */}
+      {campiModulo.length > 0 && (
+        <Blocco titolo="Dati modulo">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
+            {campiModulo.map((c) => (
+              <div key={c.label}>
+                <dt className="text-xs text-testo-chiaro/45">{c.label}</dt>
+                <dd className="mt-0.5 font-medium">{c.valore}</dd>
+              </div>
+            ))}
+          </dl>
+        </Blocco>
+      )}
 
       {/* 1 · Chi sono */}
       <Blocco titolo="Chi sono">

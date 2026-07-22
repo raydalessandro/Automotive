@@ -31,6 +31,21 @@ async function caricaVenditori(): Promise<VenditoreOpt[]> {
   return (data ?? []) as VenditoreOpt[];
 }
 
+// Registro target (§PR-10): brand + labels per pill, filtro e renderer. Select MIRATA:
+// mai `*`, perché la colonna della chiave è revocata agli authenticated (§015) e la
+// romperebbe.
+export type TargetInfo = { brand: string | null; labels: Record<string, string> | null };
+async function caricaTargets(): Promise<Record<string, TargetInfo>> {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("registro_target").select("target, brand, labels");
+  if (error) return {};
+  const map: Record<string, TargetInfo> = {};
+  for (const r of (data ?? []) as ({ target: string } & TargetInfo)[]) {
+    map[r.target] = { brand: r.brand, labels: r.labels };
+  }
+  return map;
+}
+
 // Mappa aziende (arricchimento card: segmento/settore/score/segnali/città).
 async function caricaAziende(): Promise<Record<string, AziendaCard>> {
   const supabase = createClient();
@@ -47,7 +62,7 @@ async function caricaAziende(): Promise<Record<string, AziendaCard>> {
 export default async function LeadPage({
   searchParams,
 }: {
-  searchParams: { stato?: string; apri?: string };
+  searchParams: { stato?: string; apri?: string; target?: string };
 }) {
   const leads = await caricaLeads();
 
@@ -62,7 +77,11 @@ export default async function LeadPage({
     );
   }
 
-  const [venditori, aziende] = await Promise.all([caricaVenditori(), caricaAziende()]);
+  const [venditori, aziende, targets] = await Promise.all([
+    caricaVenditori(),
+    caricaAziende(),
+    caricaTargets(),
+  ]);
 
   const statoIniziale =
     searchParams.stato && STATI_LEAD.includes(searchParams.stato as StatoLead)
@@ -74,7 +93,9 @@ export default async function LeadPage({
       iniziali={leads}
       venditori={venditori}
       aziende={aziende}
+      targets={targets}
       statoIniziale={statoIniziale}
+      targetIniziale={searchParams.target}
       apriIniziale={searchParams.apri}
     />
   );
